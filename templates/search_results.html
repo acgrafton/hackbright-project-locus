@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Locus{% endblock %}
+
+{% block body %}
+<div>
+{{police['results'][0]['name']}}
+</div>
+
+<div>
+{{pharmacy['results']}}
+</div>
+
+<div>
+{{post_office['results']}}
+</div>
+
+{# <div>
+{{location}}
+</div> #}
+
+{% endblock %}

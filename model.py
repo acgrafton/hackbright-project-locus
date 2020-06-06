@@ -10,10 +10,13 @@ class User(db.Model):
 
     __tablename__= "users"
 
-    user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    user_id = db.Column(db.Integer,
+                        autoincrement=True,
+                        primary_key=True,
+                        )
+    email = db.Column(db.String, unique=True, nullable=False)
     first_name = db.Column(db.String, nullable=False)
     last_name = db.Column(db.String, nullable=False)
-    email = db.Column(db.String, unique=True, nullable=False)
     password = db.Column(db.String, nullable=False)
 
     #user_locations = a list of User_location objects
@@ -28,9 +31,10 @@ class User_location(db.Model):
 
     user_loc_id = db.Column(db.String, unique=True, primary_key=True)
     address = db.Column(db.String, nullable=False)
-    zipcode = db.Column(db.Integer, nullable=False)
-    time_zone = db.Column(db.String)
-    long_lat = db.Column(db.Float, nullable=False)
+    postal_code = db.Column(db.Integer, nullable=False)
+    # timezone = db.Column(db.String)
+    longitude = db.Column(db.Float, nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
     alt_name = db.Column(db.String, default=None)
 
     #place_types = a list of Place_type objects
@@ -105,7 +109,7 @@ class Travel_time_distance(db.Model):
 
 
 
-def connect_to_db(flask_app, db_uri='postgresql:///places', echo=True):
+def connect_to_db(flask_app, db_uri='postgresql:///locus', echo=False):
     flask_app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
     # flask_app.config['SQLALCHEMY_ECHO'] = echo
     flask_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -116,11 +120,12 @@ def connect_to_db(flask_app, db_uri='postgresql:///places', echo=True):
     print('Connected to the db!')
 
 
-if __name__ == '__main__':
-    from server import app
 
-    # Call connect_to_db(app, echo=False) if your program output gets
-    # too annoying; this will tell SQLAlchemy not to print out every
-    # query it executes.
+# if __name__ == '__main__':
+#     from server import app
 
-    connect_to_db(app, echo=False)
+#     # Call connect_to_db(app, echo=False) if your program output gets
+#     # too annoying; this will tell SQLAlchemy not to print out every
+#     # query it executes.
+
+#     connect_to_db(app)

@@ -1,8 +1,7 @@
 from flask import (Flask, render_template, request, flash, session, redirect)
 from model import connect_to_db
-import crud
+# import crud
 import os
-import requests
 import googlemaps
 from pprint import pformat
 from datetime import datetime
@@ -47,9 +46,7 @@ def show_results():
 
     #Show result page categorized by Public Services
     return render_template("search_results.html",
-                            police=police,
-                            pharmacy=pharmacy,
-                            post_office=post_office)
+                            results=geocode_results)
 
 
 

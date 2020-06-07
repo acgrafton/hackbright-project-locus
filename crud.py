@@ -21,7 +21,7 @@ def create_user(email, first_name, last_name, password):
 
     return new_user
 
-def add_home(address):
+def add_home(user_id, address):
     """Add 'home' user_location to database"""
 
     geocode_results = gmaps.geocode(address)
@@ -36,6 +36,7 @@ def add_home(address):
                          latitude=latitude,
                          longitude=longitude,
                          # timezone=timezone,
+                         user_id=user_id
                         )
     db.session.add(home)
     db.session.commit()

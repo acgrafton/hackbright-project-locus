@@ -22,7 +22,9 @@ class User(db.Model):
     #user_locations = a list of User_location objects
 
     def __repr__(self):
-        return f'<User user_id={self.user_id} email={self.email}>'
+        return "".join((f'<User user_id={self.user_id} ',
+                f'name={self.first_name}_{self.last_name} ',
+                f'email={self.email}>'))
 
 class User_location(db.Model):
     """User locations i.e. 'home', 'work'."""
@@ -31,17 +33,21 @@ class User_location(db.Model):
 
     user_loc_id = db.Column(db.String, unique=True, primary_key=True)
     address = db.Column(db.String, nullable=False)
-    postal_code = db.Column(db.Integer, nullable=False)
+    # postal_code = db.Column(db.Integer, nullable=False)
     # timezone = db.Column(db.String)
     longitude = db.Column(db.Float, nullable=False)
     latitude = db.Column(db.Float, nullable=False)
     alt_name = db.Column(db.String, default=None)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+
+    user = db.relationship('User', backref='user_locations')
 
     #place_types = a list of Place_type objects
 
     def __repr__(self):
-        return f'<User Location user_loc_id={self.user_loc_id}\
-                                zipcode={self.zipcode}'
+        return "".join((f'<User Location user_loc_id={self.user_loc_id} ',
+                        f'user_id={self.user_id} '
+                        f'address={self.address}>'))
 
 
 class Place_type(db.Model):

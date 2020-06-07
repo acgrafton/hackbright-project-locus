@@ -18,4 +18,17 @@ for n in range(10):
 
     user = crud.create_user(email, first_name, last_name, password)
 
-    print(user)
+users = model.User.query.all()
+
+co_zip_codes = []
+
+with open('static/co_zip_codes_2016.csv') as csv:
+    for line in csv:
+        zip_code=line.rstrip()
+        co_zip_codes.append(zip_code)
+
+for user in users:
+    zip_code = choice(co_zip_codes)
+    print(zip_code)
+    user.add_home(zip_code)
+    print(user, 'user_locations=', user.user_locations)

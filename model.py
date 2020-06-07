@@ -2,6 +2,12 @@
 
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+import googlemaps
+import os
+
+API_KEY = os.environ['GOOGLE_TOKEN']
+
+gmaps = googlemaps.Client(key=API_KEY)
 
 db = SQLAlchemy()
 
@@ -26,18 +32,39 @@ class User(db.Model):
                 f'name={self.first_name}_{self.last_name} ',
                 f'email={self.email}>'))
 
+    def add_home(self, address):
+        """Add 'home' user_location to database"""
+
+        geocode_results = gmaps.geocode(address)
+        location = geocode_results[0]['geometry']['location']
+        latitude = location['lat']
+        longitude = location['lng']
+        address = geocode_results[0]['formatted_address']
+
+        home = User_location(name='home',
+                             address=address,
+                             latitude=latitude,
+                             longitude=longitude,
+                             # location=location,
+                             user_id=self.user_id
+                            )
+        db.session.add(home)
+        db.session.commit()
+
+        return location
+
 class User_location(db.Model):
     """User locations i.e. 'home', 'work'."""
 
     __tablename__ = "user_locations"
 
-    user_loc_id = db.Column(db.String, unique=True, primary_key=True)
+    user_loc_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    name = db.Column(db.String, default=None)
     address = db.Column(db.String, nullable=False)
-    # postal_code = db.Column(db.Integer, nullable=False)
+    # location = db.Column(db.Point, nullable=False)
     # timezone = db.Column(db.String)
     longitude = db.Column(db.Float, nullable=False)
     latitude = db.Column(db.Float, nullable=False)
-    alt_name = db.Column(db.String, default=None)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
 
     user = db.relationship('User', backref='user_locations')
@@ -46,9 +73,9 @@ class User_location(db.Model):
 
     def __repr__(self):
         return "".join((f'<User Location user_loc_id={self.user_loc_id} ',
+                        f'user_location_name={self.name} '
                         f'user_id={self.user_id} '
                         f'address={self.address}>'))
-
 
 class Place_type(db.Model):
     """Place type such as grocery_store, restaurant, or DMV"""
@@ -59,7 +86,7 @@ class Place_type(db.Model):
     google_place_id = db.Column(db.String, 
                                 db.ForeignKey('places.google_place_id'),
                                 )
-    user_loc_id = db.Column(db.String, 
+    user_loc_id = db.Column(db.Integer, 
                             db.ForeignKey('user_locations.user_loc_id'),
                             )
 
@@ -100,7 +127,7 @@ class Travel_time_distance(db.Model):
                                         autoincrement=True, 
                                         nullable=False,
                                         )
-    user_loc_id = db.Column(db.String,
+    user_loc_id = db.Column(db.Integer,
                             db.ForeignKey('user_locations.user_loc_id'),
                             )
     google_place_id = db.Column(db.String, 

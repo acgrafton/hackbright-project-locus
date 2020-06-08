@@ -32,8 +32,8 @@ class User(db.Model):
                 f'name={self.first_name}_{self.last_name} ',
                 f'email={self.email}>'))
 
-    def add_home(self, address):
-        """Add 'home' user_location to database"""
+    def add_location(self, location_name, address):
+        """Add 'custom' user_location to database"""
 
         geocode_results = gmaps.geocode(address)
         location = geocode_results[0]['geometry']['location']
@@ -41,7 +41,7 @@ class User(db.Model):
         longitude = location['lng']
         address = geocode_results[0]['formatted_address']
 
-        home = User_location(name='home',
+        home = User_location(name=location_name,
                              address=address,
                              latitude=latitude,
                              longitude=longitude,
@@ -52,6 +52,17 @@ class User(db.Model):
         db.session.commit()
 
         return location
+
+    def add_home(self, address):
+        """Add 'home' user_location to database"""
+
+        add_location('home', address)
+
+    def add_work(self, address):
+        """Add 'home' user_location to database"""
+
+        add_location('work', address)
+
 
 class User_location(db.Model):
     """User locations i.e. 'home', 'work'."""

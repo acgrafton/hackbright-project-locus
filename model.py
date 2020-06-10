@@ -202,7 +202,7 @@ class PlaceCriterion(db.Model):
                    'radius': self.max_distance,
                    'limit': 1,
                    'categories':self.place_type_id,
-                   'term':self.place_type.category}
+                   'term':self.place_type.place_category_id}
 
         return requests.get(url, headers=headers, params=payload).json()
         
@@ -233,12 +233,26 @@ class PlaceType(db.Model):
 
     place_type_id = db.Column(db.String, primary_key=True, unique=True)
     title = db.Column(db.String)
-    category = db.Column(db.String)
+    place_category_id = db.Column(db.String, 
+                                  db.ForeignKey('place_categories.place_category_id'),
+                                  )
 
     #place_criteria = list of place_criteria
+    place_category = db.relationship('PlaceCategory', backref='place_types')
 
     def __repr__(self):
         return f'<PlaceType place_type_id={self.place_type_id}>'
+
+class PlaceCategory(db.Model):
+    """Broader categorization of places i.e. 'restaurants', 'food'"""
+
+    __tablename__ = "place_categories"
+
+    place_category_id = db.Column(db.String, primary_key=True)
+
+    #place_types = a list of place_types
+
+
 
 class Score(db.Model):
     """Score a location based user criteria"""

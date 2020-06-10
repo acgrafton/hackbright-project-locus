@@ -1,5 +1,5 @@
 from flask import (Flask, render_template, request, flash, session, redirect)
-from model import connect_to_db
+from model import connect_to_db, PlaceType
 import crud
 import os
 import googlemaps
@@ -22,31 +22,31 @@ def show_homepage():
 
     return render_template("homepage.html")
 
-@app.route('/search')
-def show_results():
-    """Show results of nearby places"""
+# @app.route('/search')
+# def show_results():
+#     """Show results of nearby places"""
 
-    #Retrieve user-input address
-    address = request.args.get('address')
+#     #Retrieve user-input address
+#     address = request.args.get('address')
 
 
-    geocode_results = gmaps.geocode(address)
-    location = geocode_results[0]['geometry']['location']
-    latitude = location['lat']
-    longitude = location['lng']
+#     geocode_results = gmaps.geocode(address)
+#     location = geocode_results[0]['geometry']['location']
+#     latitude = location['lat']
+#     longitude = location['lng']
 
-    police = gmaps.places_nearby(location=location, radius=5000, type='police')
-    pharmacy = gmaps.places_nearby(location=location, radius=5000, type='pharmacy')
-    post_office = gmaps.places_nearby(location=location, radius=5000, type='post_office')
-    gov = gmaps.places_nearby(location=location, radius=5000, type='local_government_office')
-    city_hall = gmaps.places_nearby(location=location, radius=5000, type='city_hall')
-    bank = gmaps.places_nearby(location=location, radius=5000, type='bank')
-    #returns a list of places
-    timezone = gmaps.timezone(location)['timeZoneName']
+#     police = gmaps.places_nearby(location=location, radius=5000, type='police')
+#     pharmacy = gmaps.places_nearby(location=location, radius=5000, type='pharmacy')
+#     post_office = gmaps.places_nearby(location=location, radius=5000, type='post_office')
+#     gov = gmaps.places_nearby(location=location, radius=5000, type='local_government_office')
+#     city_hall = gmaps.places_nearby(location=location, radius=5000, type='city_hall')
+#     bank = gmaps.places_nearby(location=location, radius=5000, type='bank')
+#     #returns a list of places
+#     timezone = gmaps.timezone(location)['timeZoneName']
 
-    #Show result page categorized by Public Services
-    return render_template("search_results.html",
-                            results=geocode_results)
+#     #Show result page categorized by Public Services
+#     return render_template("search_results.html",
+#                             results=geocode_results)
 
 @app.route('/login')
 def log_in_user():
@@ -81,9 +81,12 @@ def register_user():
         flash('This email has already been created.')
     else: 
         user = crud.create_user(email, first_name, last_name, password)
-        flash('Your account has been successfuly created. Please log in.')
+        flash('Your account has been successfuly created.')
         
-    return redirect('/')
+    return render_template("criteria.html",
+                            place_types=crud.get_all_place_types())
+
+# @app.route('profile')
 
 
 if __name__ == '__main__':

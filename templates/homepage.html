@@ -2,7 +2,35 @@
 {% block title %}Locus{% endblock %}
 
 {% block body %}
-  <div id="app"></div>
+  <h2>Create an Account</h2>
+    <form action="/new_user" method="POST">
+      <p>
+        Email <input type="text" name="email">
+      </p>
+
+      <p>
+        Password <input type="password" name="password">
+      </p>
+
+      <p>
+        <input type="submit">
+      </p>
+    </form>
+
+      <h2>Login</h2>
+  <form action="/login">
+    <p>
+      Email <input type="text" name="email">
+    </p>
+
+    <p>
+      Password <input type="password" name="password">
+    </p>
+
+    <p>
+      <input type="submit">
+    </p>
+  </form>
 
 {% endblock %}
 

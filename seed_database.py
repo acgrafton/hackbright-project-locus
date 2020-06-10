@@ -1,6 +1,7 @@
 import os
 import crud, model, server
 from random import randint, choice
+import json
 
 os.system('dropdb locus')
 os.system('createdb locus')
@@ -8,27 +9,21 @@ os.system('createdb locus')
 model.connect_to_db(server.app)
 model.db.create_all()
 
-lname = ['smith', 'brown', 'doe', 'jones', 'william', 'chan', 
-        'lee', 'hong', 'gonzales', 'lopez']
-for n in range(10):
-    email = f'user{n}@test.com'
-    first_name= 'jane'
-    last_name= f'{choice(lname)}'
-    password = 'test'
+with open('static/categories.json', 'r') as read_file:
+    data = json.load(read_file)
+    for category in data:
+        categories = category['parents']
+        this_category = None if categories == [] else categories[0]
+        place_type = model.PlaceType(place_type_id=category['alias'], 
+                                     title=category['title'],
+                                     category=this_category)
+        model.db.session.add(place_type)
+        model.db.session.commit()
 
-    user = crud.create_user(email, first_name, last_name, password)
 
-users = model.User.query.all()
+# b = model.PlaceType.query.filter(model.PlaceType.place_type_id=='Bubble Tea')
 
-co_zip_codes = []
+model.example_data()
 
-with open('static/co_zip_codes_2016.csv') as csv:
-    for line in csv:
-        zip_code=line.rstrip()
-        co_zip_codes.append(zip_code)
-
-for user in users:
-    zip_code = choice(co_zip_codes)
-    print(zip_code)
-    user.add_home(zip_code)
-    print(user, 'user_locations=', user.user_locations)
+harry = model.User.query.filter_by(user_id=1).first()
+fm = harry.locations[0]

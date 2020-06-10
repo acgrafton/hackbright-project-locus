@@ -1,6 +1,7 @@
 """CRUD Operations"""
 
-from model import db, User, User_location, connect_to_db
+from model import (User, Location, LocationPlaceCriterion, PlaceCriterion, 
+                   db, connect_to_db)
 import os
 import googlemaps
 
@@ -71,12 +72,6 @@ def modify_user_location(user, new_address, user_location_name='home'):
     user_location.address = geocode_results[0]['formatted_address']
 
     return user_location
-
-
-def verify_user(email):
-    """Return boolean whether user with provided email exists in database"""
-
-    return User.query.filter(User.email == email).count() == 1:
         
 
 def verify_password_by_email(email, password):
@@ -84,7 +79,7 @@ def verify_password_by_email(email, password):
 
     user = get_user_by_email(email)
 
-    return user.password = password
+    return user.password == password
 
 def delete_user(email):
     """Delete a user provided the user's email"""
@@ -98,6 +93,29 @@ def delete_user_location(user_location):
 
     db.session.delete(user_location)
     db.session.commit()
+
+def get_location_by_id(location_id):
+
+    return Location.query.filter_by(location_id=location_id).first()
+
+def add_location_place_criterion(location_id, criterion_id, meets_criterion):
+    """Create new entry into location place criterion"""
+
+    lpc = LocationPlaceCriterion(location_id=location_id, 
+                                criterion_id=criterion_id, 
+                                meets_criterion=meets_criterion,
+                                )
+    db.session.add(lpc)
+    db.session.commit()
+
+    return lmc
+
+# def get_place_type_id_by_name(place_type_name):
+#     """Return place type id given name (i.e. 'grocery store')"""
+
+#     place_type = PlaceType.query.filter(PlaceType.name=place_type_name).first()
+
+#     return place_type.place_type_id
 
 
 if __name__ == '__main__':

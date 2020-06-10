@@ -1,6 +1,6 @@
 from flask import (Flask, render_template, request, flash, session, redirect)
 from model import connect_to_db
-# import crud
+import crud
 import os
 import googlemaps
 from pprint import pformat
@@ -48,6 +48,42 @@ def show_results():
     return render_template("search_results.html",
                             results=geocode_results)
 
+@app.route('/login')
+def log_in_user():
+    """Provided correct email and password, log-in user"""
+
+    #Check email in database
+    if crud.get_user_by_email(email) == None:
+        flash('Incorrect email.')
+
+    #Check password match
+    elif crud.verify_password(email, password) == False:
+        flash('Incorrect password.') 
+
+    #Save user to session
+    else: 
+        user = crud.get_user_by_email(email)
+        session['user'] = user
+        flash('Logged in!')
+
+    return redirect('/')
+
+@app.route('/new_user', methods=['POST'])
+def register_user():
+    """Register new user"""
+    
+    email = requests.form.get('email')
+    first_name = requests.form.get('first-name')
+    last_name = requests.form.get('last-name')
+    password = requests.form.get('password')
+
+    if crud.get_user_by_email(email):
+        flash('This email has already been created.')
+    else: 
+        user = crud.create_user(email, first_name, last_name, password)
+        flash('Your account has been successfuly created. Please log in.')
+        
+    return redirect('/')
 
 
 if __name__ == '__main__':

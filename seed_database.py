@@ -23,14 +23,12 @@ with open('static/categories.json', 'r') as read_file:
             place_type = model.PlaceType(place_type_id=category['alias'], 
                                      title=category['title'],
                                      place_category_id=yparent[0])
+        elif yparent:
+            place_type = model.PlaceType(place_type_id=category['alias'], 
+                                     title=category['title'],
+                                     place_category_id=yparent[0])
         else:
             place_type = model.PlaceType(place_type_id=category['alias'], 
                                      title=category['title'])
         session.add(place_type)
         session.commit()
-
-
-model.example_data()
-
-harry = model.User.query.filter_by(user_id=1).first()
-fm = harry.locations[0]

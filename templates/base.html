@@ -13,6 +13,11 @@
 
   <!-- Include the page's content with this block. -->
   {% block body %}
+    {% for msg in get_flashed_messages() %}
+      <p class="flash-msg">
+        {{ msg }}
+      </p>
+    {% endfor %}
   {% endblock %}
 
    <!-- Include any page-specific Javascript using this block. -->

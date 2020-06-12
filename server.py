@@ -52,27 +52,31 @@ def log_in_user():
     """Provided correct email and password, log-in user"""
 
     email = request.args.get('email')
-    print(email)
     password = request.args.get('password')
-    print(password)
 
     #Check email in database
     if crud.get_user_by_email(email) == None:
-        print('incorrect email')
         flash('Incorrect email.')
 
     #Check password match
     elif crud.verify_password_by_email(email, password) == False:
         flash('Incorrect password.') 
-        print('incorrect password')
 
     #Save user to session
     else: 
         session['user'] = email
-        flash('Logged in!')
-        print(session)
+        flash(f'You are logged in')
 
-    return redirect('/api/profile')
+    return redirect('/profile')
+
+@app.route('/api/logout', methods=['POST'])
+def lof_out_user():
+    """Clear user out of session data"""
+    session.pop('user', None)
+    flash('You have logged out')
+
+    return redirect('/')
+
 
 @app.route('/new_user', methods=['POST'])
 def register_user():
@@ -91,12 +95,24 @@ def register_user():
         
     return render_template("profile.html")
 
-@app.route('/api/profile')
+@app.route('/profile')
 def show_profile():
 
-    # print(session)
+    if not session.get('user') is None:
+        user = crud.get_user_by_email(session['user'])
+        criteria = user.place_criteria #list of PlaceCriteria objects
+        locations = user.locations #list of Location objects
 
-    return render_template('profile.html')
+        #Iterate through list and convert each object into a dictionary
+        criteria_dict = [criterion.attr_dict() for criterion in criteria]
+        location_dict = [location.attr_dict() for location in locations]
+
+
+    return render_template('profile.html', 
+                            user=user.attr_dict(),
+                            criteria=criteria_dict,
+                            locations=location_dict,
+                            )
 
 @app.route('/api/place_categories')
 def get_place_categories_json():
@@ -120,14 +136,25 @@ def get_place_types_json(selected_category):
 
     return jsonify({selected_category: place_type})
 
-@app.route('/api/save_place_type', methods=['POST'])
-def save_place_type():
-    """Save form submission data to database"""
 
-    place_type_id = request.form.get('place-type')
-    session['user'].add_place_criterion(place_type_id, 5)
+@app.route('/api/set_criteria', methods=['POST'])
+def save_user_criteria():
+    """Save users criteria into database"""
 
-    return redirect('api/profile')
+    user = crud.get_user_by_email(session['user'])
+    selected_place_type = request.form.get('place-type')
+    selected_importance = request.form.get('importance')
+
+    place_type_id = crud.get_place_type_id_by_title(selected_place_type)
+
+    user.add_place_criterion(place_type_id, selected_importance)
+
+    flash('Criteria saved!')
+
+    return redirect('/profile')
+
+
+
 
 if __name__ == '__main__':
     connect_to_db(app)

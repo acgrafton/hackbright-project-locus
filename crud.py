@@ -146,6 +146,22 @@ def get_place_categories():
 
     return pcatq.filter(PlaceCategory.place_category_id.in_(CATEGORIES)).all()
 
+def get_place_type_id_by_title(place_type_title):
+    """Return place type id given the title"""
+
+    ptq = PlaceType.query
+
+    return ptq.filter(PlaceType.title == place_type_title).first().place_type_id
+
+def to_dict(place_criteria):
+    """Given a PlaceCriteria object, return a dictionary with its attributes"""
+
+    return({'id': place_criteria.place_criteria_id, 
+           'place_type': place_criteria.place_type_id,
+           'importance': place_criteria.importance,
+           'max_distance': place_criteria.max_distance,
+           })
+
 
 if __name__ == '__main__':
     from server import app

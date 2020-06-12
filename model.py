@@ -37,6 +37,13 @@ class User(db.Model):
                 f'name={self.first_name}_{self.last_name} ',
                 f'email={self.email}>'))
 
+    def attr_dict(self):
+        """Return core attributes excluding password in dictionary form"""
+        
+        return {'email': self.email, 
+                'first_name': self.first_name, 
+                'last_name': self.last_name}
+
 
     def add_location(self, address):
         """Add 'custom' user_location to database"""
@@ -110,7 +117,16 @@ class Location(db.Model):
                         f'user_id={self.user_id} '
                         f'address={self.address}>'))
 
+    def attr_dict(self):
+        """Return core attributes in dictionary form"""
+    
+        return {'label': self.label, 
+                'address': self.address, 
+                'longitude': self.longitude,
+                'latitude': self.latitude,
+                }    
 
+        
     def add_lp_criterion(self, place_criterion_id, meets_criterion, results):
         """Add Location Place Criterion"""
 
@@ -189,6 +205,16 @@ class PlaceCriterion(db.Model):
                         f'user_id={self.user_id} '
                         f'place_type_id={self.place_type_id} '
                         f'name={self.name}>'))
+
+    def attr_dict(self):
+        """Return dictionary of object's key attributes"""
+    
+        return {'id': self.place_criterion_id, 
+                'place_type': self.place_type.title, 
+                'importance': self.importance,
+                'max_distance': self.max_distance,
+                'user_id': self.user_id,
+                'name': self.name}
 
     def get_yelp_response(self, latitude, longitude):
         """Make Yelp API call and get response based on PlaceCriterion 

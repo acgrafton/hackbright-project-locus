@@ -19,7 +19,11 @@
   <!-- Include the page's content with this block. -->
   {% block body %}
 
+
   {% endblock %}
+  {% if session['user'] %}
+    <a href='/api/logout' id='logout'>Log Out</a>
+  {% endif %}
 
    <!-- Include any page-specific Javascript using this block. -->
   {% block js %}

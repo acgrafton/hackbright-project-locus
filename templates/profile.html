@@ -1,24 +1,45 @@
 {% extends 'base.html' %}
 {% block title %}Your Profile{% endblock %}
 
-
-
 {% block body %}
-{#   Logged in: {{user}} #}
-  <section id="">
+{#   <section id="">
     <img src="">
-  </section>
+  </section> #}
 
   <section id="profile-container">
-    
+    <h3>User Information</h3>
+    <div class='card' id='user-card'>
+    First Name: {{user['first_name']}} |
+    Last Name: {{user['last_name']}} |
+    Email: {{user['email']}}
+    </div>
+  </section>
+  <hr>
+  <section id="saved-criteria-container">
+    <h3>Criteria</h3>
+    {% for criterion in criteria %}
+      <div class='card' id='criterion-card'>
+        Place Type: {{criterion['place_type']}} |
+        Importance: {{criterion['importance']}} |
+        Max Distance: {{criterion['max_distance']}} meters
+      </div>
+    {% endfor %}
+  </section>
+  <hr>
+  <section id="saved-locations-container">
+    <h3>Saved Locations</h3>
+    {% for location in locations %}
+      <div class='card' id='location-card'>
+        Address: {{location.address}}
+    </div>
+    {% endfor %}
   </section>
 
-  <section id="criteria-container">
-    <a id="add-more" style="display: none;">
-      Click here to add more
-    </a>
-  </section>
 
-  <script src="/static/js/locus.js"></script>
+
+  <section id="criteria-container"></section>
+
+  <script src="/static/js/user.js"></script>
+  <script src="/static/js/criteria.js"></script>
 
 {% endblock body %}

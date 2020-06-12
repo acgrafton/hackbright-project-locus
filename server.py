@@ -2,9 +2,8 @@ from flask import (Flask, render_template, request, flash, session, redirect, js
 from model import connect_to_db
 import crud
 import os
-import googlemaps
+# import googlemaps
 from pprint import pformat
-from datetime import datetime
 
 from jinja2 import StrictUndefined 
 
@@ -14,13 +13,13 @@ app.jinja_env.undefined = StrictUndefined
 
 API_KEY = os.environ['GOOGLE_TOKEN']
 
-gmaps = googlemaps.Client(key=API_KEY)
+# gmaps = googlemaps.Client(key=API_KEY)
 
 @app.route('/')
 def show_homepage():
     """Show homepage"""
 
-    return render_template("profile.html")
+    return render_template("homepage.html")
 
 # @app.route('/search')
 # def show_results():
@@ -52,24 +51,28 @@ def show_homepage():
 def log_in_user():
     """Provided correct email and password, log-in user"""
 
-    email = request.form.get('email')
-    password = request.form.get('password')
+    email = request.args.get('email')
+    print(email)
+    password = request.args.get('password')
+    print(password)
 
     #Check email in database
     if crud.get_user_by_email(email) == None:
+        print('incorrect email')
         flash('Incorrect email.')
 
     #Check password match
-    elif crud.verify_password(email, password) == False:
+    elif crud.verify_password_by_email(email, password) == False:
         flash('Incorrect password.') 
+        print('incorrect password')
 
     #Save user to session
     else: 
-        user = crud.get_user_by_email(email)
-        session['user'] = user
+        session['user'] = email
         flash('Logged in!')
+        print(session)
 
-    return redirect('/')
+    return redirect('/api/profile')
 
 @app.route('/new_user', methods=['POST'])
 def register_user():
@@ -88,6 +91,13 @@ def register_user():
         
     return render_template("profile.html")
 
+@app.route('/api/profile')
+def show_profile():
+
+    # print(session)
+
+    return render_template('profile.html')
+
 @app.route('/api/place_categories')
 def get_place_categories_json():
     """Return a JSON response with all place categories"""
@@ -102,23 +112,22 @@ def get_place_categories_json():
     return jsonify(list_categories)
 
 
-@app.route('/api/place_types')
-def get_place_types_json():
-    """Return a JSON response with all place types"""
+@app.route('/api/place_types/<selected_category>')
+def get_place_types_json(selected_category):
+    """Return a JSON response with all place types provided a selected category"""
 
-    restaurants = crud.get_place_type_ids_by_category('restaurants')
-    food = crud.get_place_type_ids_by_category('food')
-    health = crud.get_place_type_ids_by_category('health')
-    parks = crud.get_place_type_ids_by_category('parks')
-    fitness = crud.get_place_type_ids_by_category('fitness')
-    education = crud.get_place_type_ids_by_category('education')
-    shopping = crud.get_place_type_ids_by_category('shopping')
-    arts = crud.get_place_type_ids_by_category('arts')
+    place_type = crud.get_place_type_ids_by_category(selected_category)
 
-    return jsonify({'restaurants': restaurants, 'food':food,
-                    'health': health, 'parks': parks,
-                    'fitness': fitness, 'education':education,
-                    'shopping': shopping, 'arts': arts})    
+    return jsonify({selected_category: place_type})
+
+@app.route('/api/save_place_type', methods=['POST'])
+def save_place_type():
+    """Save form submission data to database"""
+
+    place_type_id = request.form.get('place-type')
+    session['user'].add_place_criterion(place_type_id, 5)
+
+    return redirect('api/profile')
 
 if __name__ == '__main__':
     connect_to_db(app)

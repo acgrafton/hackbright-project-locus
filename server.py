@@ -91,6 +91,7 @@ def register_user():
         flash('This email has already been created.')
     else: 
         user = crud.create_user(email, first_name, last_name, password)
+        session['new_user': True]
         flash('Your account has been successfuly created. Now let\'s set your location criteria.')
         
     return render_template("profile.html")
@@ -101,17 +102,13 @@ def show_profile():
     if not session.get('user') is None:
         user = crud.get_user_by_email(session['user'])
         criteria = user.place_criteria #list of PlaceCriteria objects
-        locations = user.locations #list of Location objects
-
-        #Iterate through list and convert each object into a dictionary
-        criteria_dict = [criterion.attr_dict() for criterion in criteria]
-        location_dict = [location.attr_dict() for location in locations]
+        scores = user.scores #list of Location object
 
 
     return render_template('profile.html', 
-                            user=user.attr_dict(),
-                            criteria=criteria_dict,
-                            locations=location_dict,
+                            user=user,
+                            criteria=criteria,
+                            scores=scores ,
                             )
 
 @app.route('/api/place_categories')

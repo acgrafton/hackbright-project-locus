@@ -37,16 +37,11 @@ class User(db.Model):
                 f'name={self.first_name}_{self.last_name} ',
                 f'email={self.email}>'))
 
-    def attr_dict(self):
-        """Return core attributes excluding password in dictionary form"""
-        
-        return {'email': self.email, 
-                'first_name': self.first_name, 
-                'last_name': self.last_name}
 
-
-    def add_location(self, address):
-        """Add 'custom' user_location to database"""
+    @staticmethod
+    def geocode(address):
+        """Given an address, return a dictionary with point, latitute, longitude, 
+        and address"""
 
         geocode_results = gmaps.geocode(address)
         point = geocode_results[0]['geometry']['location']
@@ -54,8 +49,20 @@ class User(db.Model):
         longitude = point['lng']
         address = geocode_results[0]['formatted_address']
 
-        location = Location(address=address,latitude=latitude,longitude=longitude,
-                        user_id=self.user_id)
+        return {'point': point, 
+                'latitude': latitude, 
+                'longitude': longitude,
+                'address': address,
+                }
+
+    @staticmethod    
+    def create_location(geocode_dict):
+        """Given geocode dict (including point, lat, long, address)"""
+
+        location = Location(address=geocode_dict['address'],
+                            latitude=geocode_dict['latitude'],
+                            longitude=geocode_dict['longitude'],
+                            )
 
         db.session.add(location)
         db.session.commit()
@@ -76,11 +83,6 @@ class User(db.Model):
         return criterion
 
 
-    def add_home(self, address):
-        """Add 'home' user_location to database"""
-
-        add_location('home', address)
-
     def update_max_points(self):
         """Return maximum points to be used to calculate location 
         score for user"""
@@ -95,6 +97,29 @@ class User(db.Model):
         return points
 
 
+    def score_location(self, address):
+        """Given an address, score location based on user criteria"""
+
+        #Dictionary of geocode results including point, lat, long, address
+        geocode = self.geocode(address)
+
+        #Shortcut to query Location
+        lq = Location.query
+
+        #Query Location table for address
+        location = lq.filter(Location.latitude == geocode['latitude'], 
+                     Location.longitude == geocode['longitude']).first()
+
+        #Create Location object if it does not yet exist
+        if location == None:
+            location = self.create_location(geocode)
+       
+        #Score the location for user
+        score = location.create_score(self)
+
+        return score
+
+
 class Location(db.Model):
     """User locations i.e. 'home', 'work'."""
 
@@ -105,28 +130,16 @@ class Location(db.Model):
     address = db.Column(db.String, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
     latitude = db.Column(db.Float, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
-
-    user = db.relationship('User', backref='locations')
 
     #place_types = a list of Place_type objects
     #location_place_criteria = list of location_place_criteria objects
+    #scores = list of score objects
 
     def __repr__(self):
         return "".join((f'<User Location location_id={self.location_id} ',
-                        f'user_id={self.user_id} '
                         f'address={self.address}>'))
 
-    def attr_dict(self):
-        """Return core attributes in dictionary form"""
-    
-        return {'label': self.label, 
-                'address': self.address, 
-                'longitude': self.longitude,
-                'latitude': self.latitude,
-                }    
 
-        
     def add_lp_criterion(self, place_criterion_id, meets_criterion, results):
         """Add Location Place Criterion"""
 
@@ -158,24 +171,25 @@ class Location(db.Model):
             return False
 
 
-    def calculate_score(self):
+    def calculate_score(self, user):
         """Calculate score out of 100"""
 
         points = 0
         
-        for criterion in self.user.place_criteria:
+        for criterion in user.place_criteria:
             if self.meets_criterion(criterion):
                 points += criterion.importance
 
-        return (points / self.user.max_points) * 100
+        return (points / user.max_points) * 100
 
 
-    def add_score(self):
-        """Add score for location"""
+    def create_score(self, user):
+        """Takes in User object and calculates score on Location""" 
 
-        score = Score(score=self.calculate_score(),
+        score = Score(score=self.calculate_score(user),
                       location_id=self.location_id,
-                      user_id=self.user.user_id)
+                      user_id=user.user_id,
+                      )
 
         db.session.add(score)
         db.session.commit()
@@ -252,6 +266,7 @@ class LocationPlaceCriterion(db.Model):
                         f'place_criteria_id={self.place_criterion_id} '
                         f'location_id={self.location_id}>'))
 
+
 class PlaceType(db.Model):
     """Place type such as grocery_store, restaurant, or DMV"""
 
@@ -268,6 +283,7 @@ class PlaceType(db.Model):
 
     def __repr__(self):
         return f'<PlaceType place_type_id={self.place_type_id}>'
+
 
 class PlaceCategory(db.Model):
     """Broader categorization of places i.e. 'restaurants', 'food'"""
@@ -290,7 +306,7 @@ class Score(db.Model):
     location_id = db.Column(db.Integer, db.ForeignKey('locations.location_id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
 
-    location = db.relationship('Location', backref='score')
+    location = db.relationship('Location', backref='scores')
     user = db.relationship('User', backref='scores')
 
     def __repr__(self):
@@ -327,18 +343,12 @@ def example_data():
     harry.add_place_criterion('bubbletea', 3, max_distance=8047)
     harry.add_place_criterion('grocery', 5, name='Hmart')
     harry.add_place_criterion('parks', 4)
-
-    #Add locations
-    fm = harry.add_location('Fort Morgan, CO')
-    chicago = harry.add_location('60611')
-    la = harry.add_location('San Gabriel, CA')
-
     harry.update_max_points()
 
-    #Evaluate location
-    fm.add_score()
-    chicago.add_score()
-    la.add_score()
+    #Add locations
+    fm = harry.score_location('Fort Morgan, CO')
+    chicago = harry.score_location('60611')
+    la = harry.score_location('San Gabriel, CA')
 
 
 def connect_to_db(flask_app, db_uri='postgresql:///locus', echo=False):

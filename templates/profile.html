@@ -9,33 +9,42 @@
   <section id="profile-container">
     <h3>User Information</h3>
     <div class='card' id='user-card'>
-    First Name: {{user['first_name']}} |
-    Last Name: {{user['last_name']}} |
-    Email: {{user['email']}}
+    First Name: {{user.first_name}}
+    Last Name: {{user.last_name}} |
+    Email: {{user.email}}
     </div>
+    <button id='edit-criteria'>Edit User</button>
   </section>
   <hr>
   <section id="saved-criteria-container">
     <h3>Criteria</h3>
     {% for criterion in criteria %}
       <div class='card' id='criterion-card'>
-        Place Type: {{criterion['place_type']}} |
-        Importance: {{criterion['importance']}} |
-        Max Distance: {{criterion['max_distance']}} meters
+        Place Type: {{criterion.place_type.title}} |
+        Importance: {{criterion.importance}} |
+        Max Distance: {{criterion.max_distance}} meters
       </div>
     {% endfor %}
+    <fieldset id=edit-criteria>
+      <button id='add-criterion'>Add</button>
+      <button id='edit-criterion'>Edit</button>
+      <button id='remove-criterion'>Remove</button>
+    </fieldset>
   </section>
   <hr>
   <section id="saved-locations-container">
     <h3>Saved Locations</h3>
-    {% for location in locations %}
+    {% for score in scores %}
       <div class='card' id='location-card'>
-        Address: {{location.address}}
+        Address: {{score.location.address}} |
+        Score: {{score.score}}
     </div>
     {% endfor %}
+    <fieldset id=edit-locations>
+      <button id='add-location'>Add Location</button>
+      <button id='remove-location'>Remove Location</button>
+    </fieldset>
   </section>
-
-
 
   <section id="criteria-container"></section>
 

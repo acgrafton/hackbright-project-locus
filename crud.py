@@ -4,6 +4,7 @@ from model import (User, Location, LocationPlaceCriterion, PlaceCriterion,
                    PlaceType, PlaceCategory, db, connect_to_db)
 import os
 import googlemaps
+import re
 
 API_KEY = os.environ['GOOGLE_TOKEN']
 
@@ -12,10 +13,11 @@ gmaps = googlemaps.Client(key=API_KEY)
 CATEGORIES = ['active', 'arts', 'education', 'fitness', 'food', 'health', 'restaurants', 'shopping']
 
 
-def create_user(email, first_name, last_name, password):
+def create_user(email, username, first_name, last_name, password):
     """Create and return new user."""
 
     new_user = User(email=email, 
+                    username=username,
                     first_name=first_name, 
                     last_name=last_name, 
                     password=password,
@@ -26,31 +28,14 @@ def create_user(email, first_name, last_name, password):
     return new_user
 
 
-def get_user_by_id(user_id):
-    """Return user given user_id"""
+def get_user(username_or_email):
+    """Return user given username or email"""
 
-    return User.query.get(user_id)
+    if re.fullmatch(r"/(\w+)\@(\w+)\.(\w+)/", username_or_email):
+        return User.query.filter(User.email == username_or_email).first()
 
-
-def get_user_by_email(email):
-    """Return user given an email"""
-
-    return User.query.filter(User.email == email).first()
-
-
-def get_user_locations_by_user(user):
-    """Return a list of user_locations given user"""
-
-    return user.user_locations
-
-
-def get_user_location_by_name(user, user_location_name='home'):
-    """Return a user_location object given user and user location name"""
-
-    lq = Location.query
-
-    return lq.filter(Location.user_id == user.user_id,
-                          Location.name == Location_name).one()
+    else:
+        return User.query.filter(User.username == username_or_email).first()
 
 
 def modify_email(user, new_email):
@@ -67,34 +52,20 @@ def modify_password(user, new_password):
     user.password = new_email
 
     return user_id
-
-
-def modify_user_location(user, new_address, user_location_name='home'):
-    """Modify address given existing user and user_location"""
-
-    user_location = get_user_location_by_name(user, user_location_name)
-
-    geocode_results = gmaps.geocode(address)
-    location = geocode_results[0]['geometry']['location']
-    user_location.latitude = location['lat']
-    user_location.longitude = location['lng']
-    user_location.address = geocode_results[0]['formatted_address']
-
-    return user_location
         
 
-def verify_password_by_email(email, password):
+def verify_password(username, password):
     """Return boolean whether password given user provided email and password"""
 
-    user = get_user_by_email(email)
+    user = get_user(username)
 
     return user.password == password
 
 
-def delete_user(email):
+def delete_user(username):
     """Delete a user provided the user's email"""
 
-    user = get_user_by_email(email)
+    user = get_user(username)
     db.session.delete(user)
     db.session.commit()
 
@@ -106,10 +77,10 @@ def delete_user_location(user_location):
     db.session.commit()
 
 
-def get_location_by_id(location_id):
+def get_location_by_id(address):
     """Get location by id"""
 
-    return Location.query.filter_by(location_id=location_id).first()
+    return Location.query.filter_by(address=address).first()
 
 
 def add_location_place_criterion(location_id, criterion_id, meets_criterion):
@@ -152,15 +123,6 @@ def get_place_type_id_by_title(place_type_title):
     ptq = PlaceType.query
 
     return ptq.filter(PlaceType.title == place_type_title).first().place_type_id
-
-def to_dict(place_criteria):
-    """Given a PlaceCriteria object, return a dictionary with its attributes"""
-
-    return({'id': place_criteria.place_criteria_id, 
-           'place_type': place_criteria.place_type_id,
-           'importance': place_criteria.importance,
-           'max_distance': place_criteria.max_distance,
-           })
 
 
 if __name__ == '__main__':

@@ -9,7 +9,6 @@
     <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
   </head>
 <body>
-  <h1>Locus</h1>
     {% for msg in get_flashed_messages() %}
       <p class="flash-msg">
         {{ msg }}
@@ -21,9 +20,11 @@
 
 
   {% endblock %}
-  {% if session['user'] %}
-    <a href='/api/logout' id='logout'>Log Out</a>
-  {% endif %}
+{#   {% if session['user'] %}
+    <button id='logout-btn' onclick='/api/logout'>Log Out</button>
+  {% else %}
+    <button id='login-btn' onclick='/api/login'>Log In</button>  
+  {% endif %} #}
 
    <!-- Include any page-specific Javascript using this block. -->
   {% block js %}

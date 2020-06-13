@@ -23,6 +23,7 @@ class User(db.Model):
                         autoincrement=True,
                         primary_key=True,
                         )
+    username = db.Column(db.String, unique=True, nullable=False)
     email = db.Column(db.String, unique=True, nullable=False)
     first_name = db.Column(db.String, nullable=False)
     last_name = db.Column(db.String, nullable=False)
@@ -324,11 +325,13 @@ def example_data():
     User.query.delete()
 
     #Add sample users
-    harry = User(email='harry@hogwarts.com', 
+    harry = User(email='harry@hogwarts.com',
+                 username='hpotter', 
                  first_name='Harry', 
                  last_name='Potter', 
                  password='hedwig')
-    remus = User(email='remus@howarts.com', 
+    remus = User(email='remus@howarts.com',
+                 username='rlupin', 
                  first_name='Remus', 
                  last_name='Lupin', 
                  password='moon')

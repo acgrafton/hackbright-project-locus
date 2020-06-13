@@ -6,47 +6,54 @@
     <img src="">
   </section> #}
 
-  <section id="profile-container">
+  <section id="profile">
     <h3>User Information</h3>
     <div class='card' id='user-card'>
-    First Name: {{user.first_name}}
-    Last Name: {{user.last_name}} |
-    Email: {{user.email}}
+      <ul class='user-det'>
+        <li> username: <span id="username">{{user.username}}</span></li>
+        <li>first name: <span id="fname">{{user.first_name}}</span></li>
+        <li>last name: <span id="lname">{{user.last_name}}</span> </li>
+        <li>email: <span id="email">{{user.email}}</span></li>
+      </ul>
     </div>
-    <button id='edit-criteria'>Edit User</button>
+    <fieldset id='edit-user'>
+      <button class='crud'  id='edit-user-btn'>Edit User</button>
+      <button class='crud' id='remove-user-btn'>Remove User</button>
+    </fieldset>
   </section>
   <hr>
-  <section id="saved-criteria-container">
+  <section id="saved-criteria">
     <h3>Criteria</h3>
     {% for criterion in criteria %}
       <div class='card' id='criterion-card'>
-        Place Type: {{criterion.place_type.title}} |
-        Importance: {{criterion.importance}} |
-        Max Distance: {{criterion.max_distance}} meters
+        <ul class='crit-det' id='placetype'>Place Type: {{criterion.place_type.title}}</ul>
+        <ul class='crit-det' id='placetype'>Importance: {{criterion.importance}}</ul>
+        <ul class='crit-det' id='placetype'>Max Distance: {{criterion.max_distance}} meters </ul>
+        <br>
       </div>
     {% endfor %}
     <fieldset id=edit-criteria>
-      <button id='add-criterion'>Add</button>
-      <button id='edit-criterion'>Edit</button>
-      <button id='remove-criterion'>Remove</button>
+      <button class='crud' id='add-criterion'>Add</button>
+      <button class='crud' id='edit-criterion'>Edit</button>
+      <button class='crud' id='remove-criterion'>Remove</button>
     </fieldset>
   </section>
   <hr>
-  <section id="saved-locations-container">
+  <section id="saved-locations">
     <h3>Saved Locations</h3>
     {% for score in scores %}
       <div class='card' id='location-card'>
-        Address: {{score.location.address}} |
-        Score: {{score.score}}
+        <ul>Address: {{score.location.address}}</ul>
+        <ul>Score: {{score.score}}</ul>
     </div>
     {% endfor %}
     <fieldset id=edit-locations>
-      <button id='add-location'>Add Location</button>
-      <button id='remove-location'>Remove Location</button>
+      <button class='crud' id='add-location'>Add Location</button>
+      <button class='crud'cr id='remove-location'>Remove Location</button>
     </fieldset>
   </section>
 
-  <section id="criteria-container"></section>
+  <section id="criteria-container" hidde></section>
 
   <script src="/static/js/user.js"></script>
   <script src="/static/js/criteria.js"></script>

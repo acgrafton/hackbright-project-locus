@@ -2,22 +2,26 @@
 {% block title %}Locus{% endblock %}
 
 {% block body %}
-  <h2>Create an Account</h2>
+  <h2>sign up</h2>
     <form action="/new_user" method="POST">
       <p>
-        Email <input type="text" name="email">
-      </p>
-      <p>
-        First Name <input type="text" name="first-name">
+        email <input type="text" name="email">
       </p>
 
       <p>
-        Last Name <input type="text" name="last-name">
+        username <input type="text" name="username">
+      </p>
+      <p>
+        first name <input type="text" name="first-name">
+      </p>
+
+      <p>
+        last name <input type="text" name="last-name">
       </p>
 
 
       <p>
-        Password <input type="password" name="password">
+        password <input type="password" name="password">
       </p>
 
       <p>
@@ -25,14 +29,14 @@
       </p>
     </form>
 
-      <h2>Login</h2>
-  <form action="/login">
+      <h2>login</h2>
+  <form action="/api/login">
     <p>
-      Email <input type="text" name="email">
+      username <input type="text" name="username">
     </p>
 
     <p>
-      Password <input type="password" name="password">
+      password <input type="password" name="password">
     </p>
 
     <p>

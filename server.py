@@ -47,30 +47,31 @@ def show_homepage():
 #     return render_template("search_results.html",
 #                             results=geocode_results)
 
-@app.route('/login')
+@app.route('/api/login')
 def log_in_user():
     """Provided correct email and password, log-in user"""
 
-    email = request.args.get('email')
+    username = request.args.get('username')
     password = request.args.get('password')
 
     #Check email in database
-    if crud.get_user_by_email(email) == None:
-        flash('Incorrect email.')
+    if crud.get_user(username) == None:
+        flash('Incorrect username.')
 
     #Check password match
-    elif crud.verify_password_by_email(email, password) == False:
+    elif crud.verify_password(username, password) == False:
         flash('Incorrect password.') 
 
     #Save user to session
     else: 
-        session['user'] = email
+        session['user'] = username
+        session['logged_in'] = 'yes'
         flash(f'You are logged in')
 
-    return redirect('/profile')
+    return redirect(f'/profile/{username}')
 
 @app.route('/api/logout', methods=['POST'])
-def lof_out_user():
+def log_out_user():
     """Clear user out of session data"""
     session.pop('user', None)
     flash('You have logged out')
@@ -94,22 +95,25 @@ def register_user():
         session['new_user': True]
         flash('Your account has been successfuly created. Now let\'s set your location criteria.')
         
-    return render_template("profile.html")
+    return redirect('profile/<username>')
 
-@app.route('/profile')
-def show_profile():
+@app.route('/profile/<username>')
+def show_profile(username):
 
-    if not session.get('user') is None:
-        user = crud.get_user_by_email(session['user'])
+    print(session.get('user'))
+    print(username)
+    print(session['logged_in'])
+
+    if session.get('user') == username and session['logged_in'] == 'yes':
+        user = crud.get_user(username)
         criteria = user.place_criteria #list of PlaceCriteria objects
         scores = user.scores #list of Location object
 
-
-    return render_template('profile.html', 
-                            user=user,
-                            criteria=criteria,
-                            scores=scores ,
-                            )
+        return render_template('profile.html', 
+                                user=user,
+                                criteria=criteria,
+                                scores=scores ,
+                                )
 
 @app.route('/api/place_categories')
 def get_place_categories_json():

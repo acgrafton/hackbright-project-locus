@@ -9,16 +9,17 @@ const cancelUserChgs = () => {
 
     document.querySelector('ul.user-det').style.display = '';
     document.querySelector('fieldset#edit-user').style.display = '';
-}
+};
 
 const cancelPwdChgs = () => {
-    document.querySelector('form#password-form').style.display = 'none';
+    const form = document.querySelector('form#password-form');
+    document.querySelector('div#user-card.card').removeChild(form);
     showUserForm();
-}
+};
 
 const hideUserDetails = () => {
     document.querySelector('div#user-card.card').style.display = 'none';
-}
+};
 
 const showUserDetails = () => {
     document.querySelector('div#user-card.card').style.display = '';
@@ -26,11 +27,11 @@ const showUserDetails = () => {
 
 const hideUserForm = () => {
     document.querySelector('form#user-form').style.display = 'none';
-}
+};
 
 const showUserForm = () => {
     document.querySelector('form#user-form').style.display = '';
-}
+};
 
 
 //Create Edit User Form
@@ -96,8 +97,6 @@ const createEditUserForm = () => {
     saveBtn = createSaveBtn();
     saveBtn.setAttribute('form', 'user-form');
 
-
-
     fs.appendChild(saveBtn);
     cancelBtn = createCancelBtn(cancelUserChgs);
     fs.appendChild(cancelBtn);
@@ -115,7 +114,7 @@ const createEditPasswordForm = () => {
 
     //Create form
     form = document.createElement('form')
-    form.setAttribute('action', 'api/edit_password');
+    form.setAttribute('action', '/api/edit_password');
     form.setAttribute('method', 'POST');
     form.setAttribute('id', 'password-form');
 
@@ -132,11 +131,11 @@ const createEditPasswordForm = () => {
     cancelBtn = createCancelBtn(cancelPwdChgs);
 
     //Add input and button elements to form
-    form.addChild(input)
-    form.addChild(saveBtn)
-    form.addChild(cancelBtn)
+    form.appendChild(input);
+    form.appendChild(saveBtn);
+    form.appendChild(cancelBtn);
 
-    return form
+    return form;
 }
 
 

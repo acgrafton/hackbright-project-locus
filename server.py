@@ -79,6 +79,7 @@ def log_in_user():
 
     return redirect(f'/profile/{username}')
 
+
 @app.route('/api/logout', methods=['POST'])
 def log_out_user():
     """Clear user out of session data"""
@@ -106,8 +107,10 @@ def register_user():
         
     return redirect('profile/<username>')
 
+
 @app.route('/profile/<username>')
 def show_profile(username):
+    """Render user profile page if logged in. Otherwise, redirect to homepage"""
 
     if session.get('user') == username and session['logged_in'] == 'yes':
         user = crud.get_user(username)
@@ -119,6 +122,9 @@ def show_profile(username):
                                 criteria=criteria,
                                 scores=scores,
                                 )
+    else:
+        return redirect('/')
+
 
 @app.route('/api/place_categories')
 def get_place_categories_json():
@@ -159,6 +165,7 @@ def save_user_criteria():
 
     return redirect('/profile')
 
+
 @app.route('/api/edit_user', methods=['POST'])
 def save_user_changes():
     """Save user changes"""
@@ -187,39 +194,25 @@ def save_user_changes():
     else:
         flash('No change')
 
-    criteria = user.place_criteria #list of PlaceCriteria objects
-    scores = user.scores #list of Location object
-
     return redirect(f'/profile/{username}')
+
 
 @app.route('/api/edit_password', methods=['POST'])
 def save_password_changes():
     """Save password changes"""
 
-    password = request.form.get('password')
+    password = request.form.get('edit-password')
 
     username = session['user']
     user = crud.get_user(username)
 
     if user.password != password:
-        user.password = password
+        user.update_password(password)
         flash('Password changed')
     else:
         flash('No change')
 
-    criteria = user.place_criteria #list of PlaceCriteria objects
-    scores = user.scores #list of Location object
-
-    return render_template('profile.html',
-                            user=user,
-                            criteria=criteria,
-                            scores=scores,
-                            )
-
-
-
-
-
+    return redirect(f'/profile/{username}')
 
 
 if __name__ == '__main__':

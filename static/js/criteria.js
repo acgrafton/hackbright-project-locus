@@ -147,7 +147,6 @@ const generateImportanceMenu = () => {
 }
 
 
-
 //Sets 'disabled' attribute of all place-category buttons to 'false'
 const resetCategories = () => {
     categoryButtons = document.getElementById('cat-fieldset')
@@ -156,14 +155,45 @@ const resetCategories = () => {
 
 
 (function run_locus() {
-    const addCritBtn = document.querySelector('button#add-crit.crud');
 
+    //Attach event listener to "Add" criteria button
+    //Callback function to show category menu to add criteria
+    const addCritBtn = document.querySelector('button#add-crit.crud');
+    
     addCritBtn.addEventListener('click', ()=> {
         hideCritBtns();
         generateCategories();
-
-
     });
 
 
+    //Attach event listener to "Edit" criteria button
+    //Callback function to create form to allow user to make changes
+    const editCritBtn = document.querySelector('button#edit-crit.crud');
+    
+    editCritBtn.addEventListener('click', () => {
+        hideCritBtns();
+        createEditCritForm(); //need to write
+    });
+
+    //Attach event listener to "Remove" criteria button
+    //Callback function to create form to allow user to select criteria to remove
+    const removeCritBtn = document.querySelector('button#remove-crit.crud');
+    removeCritBtn.addEventListener('click', () => {
+        hideCritBtns();
+        createRemoveCritForm(); // need to write => checkbox to select criteria to remove
+
+    });
 })();
+
+
+
+
+
+
+
+
+
+
+
+
+

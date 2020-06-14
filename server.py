@@ -30,33 +30,7 @@ def show_homepage():
         return redirect(f'/profile/{username}')
 
 
-# @app.route('/search')
-# def show_results():
-#     """Show results of nearby places"""
-
-#     #Retrieve user-input address
-#     address = request.args.get('address')
-
-
-#     geocode_results = gmaps.geocode(address)
-#     location = geocode_results[0]['geometry']['location']
-#     latitude = location['lat']
-#     longitude = location['lng']
-
-#     police = gmaps.places_nearby(location=location, radius=5000, type='police')
-#     pharmacy = gmaps.places_nearby(location=location, radius=5000, type='pharmacy')
-#     post_office = gmaps.places_nearby(location=location, radius=5000, type='post_office')
-#     gov = gmaps.places_nearby(location=location, radius=5000, type='local_government_office')
-#     city_hall = gmaps.places_nearby(location=location, radius=5000, type='city_hall')
-#     bank = gmaps.places_nearby(location=location, radius=5000, type='bank')
-#     #returns a list of places
-#     timezone = gmaps.timezone(location)['timeZoneName']
-
-#     #Show result page categorized by Public Services
-#     return render_template("search_results.html",
-#                             results=geocode_results)
-
-@app.route('/api/login')
+@app.route('/api/login', methods=['POST'])
 def log_in_user():
     """Provided correct email and password, log-in user"""
 
@@ -153,7 +127,8 @@ def get_place_types_json(selected_category):
 def save_user_criteria():
     """Save users criteria into database"""
 
-    user = crud.get_user_by_email(session['user'])
+    username = session['user']
+    user = crud.get_user(username)
     selected_place_type = request.form.get('place-type')
     selected_importance = request.form.get('importance')
 
@@ -163,7 +138,7 @@ def save_user_criteria():
 
     flash('Criteria saved!')
 
-    return redirect('/profile')
+    return redirect(f'/profile/{username}')
 
 
 @app.route('/api/edit_user', methods=['POST'])

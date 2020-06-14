@@ -24,19 +24,21 @@
   <hr>
   <section id="criteria">
     <h3>Criteria</h3>
+    <div class='card' id='criterion-card'>
+      <ul class='crit-det'>
     {% for criterion in criteria %}
-      <div class='card' id='criterion-card'>
-        <ul class='crit-det' id='placetype'>Place Type: {{criterion.place_type.title}}</ul>
-        <ul class='crit-det' id='placetype'>Importance: {{criterion.importance}}</ul>
-        <ul class='crit-det' id='placetype'>Max Distance: {{criterion.max_distance}} meters </ul>
-        <br>
-      </div>
+          <li>Place Type: {{criterion.place_type.title}}</li>
+          <li>Importance: {{criterion.importance}}</li>
+          <li>Max Distance: {{criterion.max_distance}} meters </li>
+          <br>  
     {% endfor %}
-    <fieldset id=edit-criteria>
-      <button class='crud' id='add-criterion'>Add</button>
-      <button class='crud' id='edit-criterion'>Edit</button>
-      <button class='crud' id='remove-criterion'>Remove</button>
-    </fieldset>
+      </ul>
+        <fieldset id=crit-btns>
+          <button class='crud' id='add-crit'>Add</button>
+          <button class='crud' id='edit-crit'>Edit</button>
+          <button class='crud' id='remove-crit'>Remove</button>
+        </fieldset>
+      </div>
   </section>
   <hr>
   <section id="locations">

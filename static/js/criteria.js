@@ -1,5 +1,30 @@
 // crud script for editing user's location criteria
 
+const hideCriteriaDetails = () => {
+    document.querySelector('ul.crit-det').style.display = 'none';
+};
+
+const showCriteriaDetails = () => {
+    document.querySelector('ul.crit-det').style.display = '';
+};
+
+const hideCategories = () => {
+    document.querySelector('fieldset#cat-fieldset').style.display = 'none';
+};
+
+const showCategories = () => {
+    document.querySelector('fieldset#cat-fieldset').style.display = '';
+};
+
+const hideCritBtns = () => {
+    document.querySelector('fieldset#crit-btns').style.display = 'none';
+}
+
+const showCritBtns = () => {
+    document.querySelector('fieldset#crit-btns').style.display = '';
+}
+
+
 //Generate buttons of place categories for user to select
 const generateCategories = () => {
     fetch('/api/place_categories')
@@ -13,12 +38,11 @@ const generateCategories = () => {
                 btn.innerHTML = category;
                 btn.addEventListener('click', (evt) => {
                     fs.setAttribute('disabled', true);
-                    // btn.setAttribute('disabled', true);
                     const clickedBtn = evt.target.innerText;
                     createCriteriaForm(clickedBtn);
                 });
                 fs.appendChild(btn);
-            document.querySelector('#criteria').append(fs);
+            document.querySelector('#criterion-card').append(fs);
             };
         });
 };
@@ -26,7 +50,7 @@ const generateCategories = () => {
 //Create a form for user to set place criteria and importance
 const createCriteriaForm = (selectedCategory) => {
 
-    cc = document.querySelector('#criteria-container')
+    cc = document.querySelector('#criterion-card')
     
     //Create form element
     const f = document.createElement('form');
@@ -132,7 +156,14 @@ const resetCategories = () => {
 
 
 (function run_locus() {
+    const addCritBtn = document.querySelector('button#add-crit.crud');
 
-    generateCategories();
+    addCritBtn.addEventListener('click', ()=> {
+        hideCritBtns();
+        generateCategories();
+
+
+    });
+
 
 })();

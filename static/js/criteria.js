@@ -1,3 +1,4 @@
+// crud script for editing user's location criteria
 
 //Generate buttons of place categories for user to select
 const generateCategories = () => {
@@ -12,12 +13,12 @@ const generateCategories = () => {
                 btn.innerHTML = category;
                 btn.addEventListener('click', (evt) => {
                     fs.setAttribute('disabled', true);
-                    btn.setAttribute('disabled', true);
+                    // btn.setAttribute('disabled', true);
                     const clickedBtn = evt.target.innerText;
                     createCriteriaForm(clickedBtn);
                 });
                 fs.appendChild(btn);
-            document.querySelector('#criteria-container').append(fs);
+            document.querySelector('#criteria').append(fs);
             };
         });
 };
@@ -83,44 +84,6 @@ const createCriteriaForm = (selectedCategory) => {
 };
 
 
-// Given selected category, generates form with dropdown menu for place type
-// let generatePlaceTypes = (selectedCategory) => {
-
-//     //Get place types json from server and convert back to array.
-//     fetch(`/api/place_types/${selectedCategory}`)
-//     .then(response => response.json())
-//     .then(data => {
-
-//         console.log(data);
-
-//         //Array of place types in alpha order
-//         placeTypes = data[selectedCategory];
-//         console.log(placeTypes)
-
-//         //Create dropdown menu and append to form
-//         let d = document.createElement('datalist');
-//         d.setAttribute('id', 'place-types');
-
-//         //Loop through placeTypes array and make each of those an option
-//         for (placeType of placeTypes) {
-//             option = document.createElement('option');
-//             option.setAttribute('value', placeType);
-//             option.innerHTML = (placeType.charAt(0).toUpperCase() + placeType.slice(1));
-//             d.appendChild(option);
-//         };
-//     });
-// };
-
-const createSaveBtn = () => {
-    let s = document.createElement('button');
-    s.setAttribute('name', 'save');
-    s.setAttribute('value', 'Save')
-    s.setAttribute('id', 'save');
-    s.setAttribute('onclick', 'saveCriteria()');
-    s.innerHTML = 'Save';
-    return s;
-}
-
 const saveCriteria = (btn) => {
     btn.setAttribute('disabled', true)
     getElementById('form', 'criteria-form').submit()
@@ -159,14 +122,7 @@ const generateImportanceMenu = () => {
     return d;
 }
 
-//Return an 'Add More' button that resets categories when clicked 
-const addMoreButton = () => {
-    btn = document.createElement('button');
-    btn.setAttribute('id', 'add-more');
-    btn.setAttribute('onclick', 'resetCategories()');
-    btn.innerHTML = 'Add More';
-    return btn
-}
+
 
 //Sets 'disabled' attribute of all place-category buttons to 'false'
 const resetCategories = () => {

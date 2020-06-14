@@ -120,6 +120,38 @@ class User(db.Model):
 
         return score
 
+    def update_first_name(self, email):
+        """Update password"""
+
+        self.first_name = first_name
+        db.session.commit()
+
+        return first_name
+
+    def update_last_name(self, email):
+        """Update password"""
+
+        self.last_name = last_name
+        db.session.commit()
+
+        return last_name
+
+    def update_email(self, email):
+        """Update password"""
+
+        self.email = email
+        db.session.commit()
+
+        return email
+
+    def update_password(self, password):
+        """Update password"""
+
+        self.password = password
+        db.session.commit()
+
+
+
 
 class Location(db.Model):
     """User locations i.e. 'home', 'work'."""

@@ -15,14 +15,14 @@
         <li>last name: <span id="lname">{{user.last_name}}</span> </li>
         <li>email: <span id="email">{{user.email}}</span></li>
       </ul>
+      <fieldset id='edit-user'>
+        <button class='crud'  id='edit-user-btn'>Edit User</button>
+        <button class='crud' id='remove-user-btn'>Remove User</button>
+      </fieldset>
     </div>
-    <fieldset id='edit-user'>
-      <button class='crud'  id='edit-user-btn'>Edit User</button>
-      <button class='crud' id='remove-user-btn'>Remove User</button>
-    </fieldset>
   </section>
   <hr>
-  <section id="saved-criteria">
+  <section id="criteria">
     <h3>Criteria</h3>
     {% for criterion in criteria %}
       <div class='card' id='criterion-card'>
@@ -39,7 +39,7 @@
     </fieldset>
   </section>
   <hr>
-  <section id="saved-locations">
+  <section id="locations">
     <h3>Saved Locations</h3>
     {% for score in scores %}
       <div class='card' id='location-card'>
@@ -53,8 +53,8 @@
     </fieldset>
   </section>
 
-  <section id="criteria-container" hidde></section>
-
+  
+  <script src="/static/js/buttons.js"></script>
   <script src="/static/js/user.js"></script>
   <script src="/static/js/criteria.js"></script>
 

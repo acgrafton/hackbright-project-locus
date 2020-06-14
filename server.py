@@ -17,9 +17,18 @@ API_KEY = os.environ['GOOGLE_TOKEN']
 
 @app.route('/')
 def show_homepage():
-    """Show homepage"""
+    """Show homepage if not logged in, otherwise redirect to profile page"""
 
-    return render_template("homepage.html")
+    if session.get('user') is None:
+
+        return render_template("homepage.html")
+
+    else:
+
+        username = session['user']
+
+        return redirect(f'/profile/{username}')
+
 
 # @app.route('/search')
 # def show_results():
@@ -100,10 +109,6 @@ def register_user():
 @app.route('/profile/<username>')
 def show_profile(username):
 
-    print(session.get('user'))
-    print(username)
-    print(session['logged_in'])
-
     if session.get('user') == username and session['logged_in'] == 'yes':
         user = crud.get_user(username)
         criteria = user.place_criteria #list of PlaceCriteria objects
@@ -112,7 +117,7 @@ def show_profile(username):
         return render_template('profile.html', 
                                 user=user,
                                 criteria=criteria,
-                                scores=scores ,
+                                scores=scores,
                                 )
 
 @app.route('/api/place_categories')
@@ -153,6 +158,66 @@ def save_user_criteria():
     flash('Criteria saved!')
 
     return redirect('/profile')
+
+@app.route('/api/edit_user', methods=['POST'])
+def save_user_changes():
+    """Save user changes"""
+
+    first_name = request.form.get('edit-first-name')
+    last_name = request.form.get('edit-last-name')
+    email = request.form.get('edit-email')
+
+    username = session['user']
+    user = crud.get_user(username)
+    
+    info_changed = False
+
+    if user.first_name != first_name:
+        user.update_first_name(first_name)
+        info_changed = True
+    if user.last_name != last_name:
+        user.update_last_name(last_name)
+        info_changed = True
+    if user.email != email:
+        user.update_email(email)
+        info_changed = True
+
+    if info_changed == True:
+        flash('Changes saved')
+    else:
+        flash('No change')
+
+    criteria = user.place_criteria #list of PlaceCriteria objects
+    scores = user.scores #list of Location object
+
+    return redirect(f'/profile/{username}')
+
+@app.route('/api/edit_password', methods=['POST'])
+def save_password_changes():
+    """Save password changes"""
+
+    password = request.form.get('password')
+
+    username = session['user']
+    user = crud.get_user(username)
+
+    if user.password != password:
+        user.password = password
+        flash('Password changed')
+    else:
+        flash('No change')
+
+    criteria = user.place_criteria #list of PlaceCriteria objects
+    scores = user.scores #list of Location object
+
+    return render_template('profile.html',
+                            user=user,
+                            criteria=criteria,
+                            scores=scores,
+                            )
+
+
+
 
 
 

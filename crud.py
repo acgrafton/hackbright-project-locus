@@ -38,6 +38,13 @@ def get_user(username_or_email):
         return User.query.filter(User.username == username_or_email).first()
 
 
+def delete_user(username):
+    """Delete a user"""
+
+    user = get_user(username)
+    db.session.delete(user)
+    db.session.commit()
+
 def modify_email(user, new_email):
     """Given user object and new_email, modify user's email attribute"""
 

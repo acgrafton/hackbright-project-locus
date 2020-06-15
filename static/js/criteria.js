@@ -1,5 +1,22 @@
 // crud script for editing user's location criteria
 
+const cancelCritChgs = () => {
+    let card = document.querySelector('div#criterion-card.card');
+    let form = document.querySelector('form#edit-crit-form');
+    card.removeChild(form);
+    showCriteriaDetails()
+};
+
+const cancelAddCrit = () => {
+    let card = document.querySelector('div#criterion-card.card');
+    let form = document.querySelector('form#criteria-form');
+    card.removeChild(form);
+    showCriteriaDetails();
+    hideCategories();
+    document.querySelector('button#add-crit.crud').style.display = '';
+};
+
+
 const hideCriteriaDetails = () => {
     document.querySelector('ul.crit-det').style.display = 'none';
 };
@@ -15,14 +32,6 @@ const hideCategories = () => {
 const showCategories = () => {
     document.querySelector('fieldset#cat-fieldset').style.display = '';
 };
-
-const hideCritBtns = () => {
-    document.querySelector('fieldset#crit-btns').style.display = 'none';
-}
-
-const showCritBtns = () => {
-    document.querySelector('fieldset#crit-btns').style.display = '';
-}
 
 
 //Generate buttons of place categories for user to select
@@ -87,31 +96,21 @@ const createCriteriaForm = (selectedCategory) => {
             option.innerHTML = (placeType.charAt(0).toUpperCase() + placeType.slice(1));
             d.appendChild(option);
         };
-
         f.appendChild(d);
 
-        //Create input element for importance menu
-        impInput = document.createElement('input');
-        impInput.setAttribute('id', 'importance');
-        impInput.setAttribute('name', 'importance');
-        impInput.setAttribute('list', 'importance-rating');
-        impInput.setAttribute('placeholder', 'Select Importance');
-        f.appendChild(impInput);
-
+        //Add importance menu
         f.appendChild(generateImportanceMenu());
+
+        //Add save and cancel buttons
         f.appendChild(createSaveBtn());
+        f.appendChild(createCancelBtn(cancelAddCrit));
 
         cc.appendChild(f);
+
         return f;
  
     });
 };
-
-
-const saveCriteria = (btn) => {
-    btn.setAttribute('disabled', true)
-    getElementById('form', 'criteria-form').submit()
-}
 
 
 const addCategoryListeners = () => {
@@ -131,8 +130,14 @@ const addCategoryListeners = () => {
 const generateImportanceMenu = () => {
     //Create dropdown menu
 
-    let d = document.createElement('datalist');
-    d.setAttribute('id', 'importance-rating');
+    const input = document.createElement('input');
+    input.setAttribute('id', 'importance');
+    input.setAttribute('name', 'importance');
+    input.setAttribute('list', 'importance-rating');
+    input.setAttribute('placeholder', 'Select Importance');
+
+    const dl = document.createElement('datalist');
+    dl.setAttribute('id', 'importance-rating');
 
     //Loop through placeTypes array and make each of those an option
     let num = 1
@@ -140,10 +145,12 @@ const generateImportanceMenu = () => {
         option = document.createElement('option');
         option.setAttribute('value', num.toString());
         option.innerHTML = num.toString();
-        d.appendChild(option);
+        dl.appendChild(option);
         num += 1;
     };
-    return d;
+    input.appendChild(dl);
+
+    return input;
 }
 
 
@@ -154,35 +161,142 @@ const resetCategories = () => {
 };
 
 
-(function run_locus() {
+//Given user-clicked button html element, return a form to edit the selected criterion
+const createEditCritForm = (clickedBtn) => {
+    console.log(clickedBtn);
+
+    //Get current criteria info
+    placeID = clickedBtn.id.slice(5);
+    placeTitle = document.getElementById(`${placeID}-title`).innerHTML;
+    placeImportance = document.getElementById(`${placeID}-importance`).innerHTML;
+    placeDistance = document.getElementById(`${placeID}-distance`).innerHTML;
+
+    //Insert data into an object for easy access
+    placeInfo = {'importance': placeImportance,
+                 'max distance': placeDistance,
+                }
+    
+    //Create form element
+    const form = document.createElement('form');
+    form.setAttribute("action", "/api/edit_criteria");
+    form.setAttribute("method", "POST");
+    form.setAttribute("id", "edit-crit-form");
+
+    //Create Place Type Name field (non-editable)
+    span = document.createElement('span');
+    span.innerHTML = `Place Name: ${placeTitle}`;
+    form.appendChild(span);
+    br1 = document.createElement('br');
+    form.appendChild(br1);
+
+    //Add hidden input elements containing place type info prior to changes
+    for (const placeField in placeInfo) {
+        input = document.createElement('input');
+        input.setAttribute('name', `old-${placeField.split(' ').join("-")}`);
+        input.setAttribute('type', 'hidden');
+        input.setAttribute('value', `${placeInfo[placeField]}`);
+        form.appendChild(input);
+    };
+
+    //Add input elements and append to fieldset
+    for (const placeField in placeInfo) {
+        label = document.createElement('label');
+        label.setAttribute('for', `edit-${placeField.split(' ').join("-")}`);
+        label.innerHTML = placeField;
+        form.appendChild(label);
+
+        if (placeField === 'importance') {
+
+            form.appendChild(generateImportanceMenu());
+        } else {
+            input = document.createElement('input');
+            input.setAttribute('class', 'edit-place-type');
+            input.setAttribute('id', `edit-${placeField.split(' ').join("-")}`);
+            input.setAttribute('name', `edit-${placeField.split(' ').join("-")}`);
+            input.setAttribute('type', 'text');
+            input.setAttribute('value', `${placeInfo[placeField]}`);
+            form.appendChild(input);
+        };
+        br2 = document.createElement('br');
+        form.appendChild(br2);
+    };
+
+    //Create 'save' and 'cancel' buttons
+    saveBtn = createSaveBtn();
+    saveBtn.setAttribute('form', 'edit-crit-form');
+    form.appendChild(saveBtn);
+
+    cancelBtn = createCancelBtn(cancelCritChgs);
+    form.appendChild(cancelBtn);
+
+    return form;
+};
+
+const removeCriteria = (clickedBtn) => {
+    
+    console.log(clickedBtn);
+    const placeID = clickedBtn.id.slice(7);
+    console.log(placeID);
+
+    const data = {'placeID': placeID};
+
+    let fetchData = {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    };
+
+    console.log(fetchData)
+
+    fetch('/api/remove_criteria', fetchData)
+        .then(response => response.json())
+        .then(data => {
+            document.location.reload();
+        });
+}
+
+
+
+(function runCriteria() {
 
     //Attach event listener to "Add" criteria button
     //Callback function to show category menu to add criteria
     const addCritBtn = document.querySelector('button#add-crit.crud');
     
-    addCritBtn.addEventListener('click', ()=> {
-        hideCritBtns();
+    addCritBtn.addEventListener('click', (evt)=> {
+        evt.preventDefault();
+        document.querySelector('button#add-crit.crud').style.display = 'none';
         generateCategories();
     });
 
 
-    //Attach event listener to "Edit" criteria button
+    //Attach event listener to "Edit" criteria buttons
     //Callback function to create form to allow user to make changes
-    const editCritBtn = document.querySelector('button#edit-crit.crud');
+    const editCritBtns = document.querySelectorAll('button.crud.crit.edit');
+
+    for (const editCritBtn of editCritBtns) {
+        editCritBtn.addEventListener('click', (evt) => {
+            evt.preventDefault();
+            editForm = createEditCritForm(evt.target);
+            document.querySelector('div#criterion-card.card').appendChild(editForm);
+            hideCriteriaDetails();
+        });
+    };
     
-    editCritBtn.addEventListener('click', () => {
-        hideCritBtns();
-        createEditCritForm(); //need to write
-    });
 
-    //Attach event listener to "Remove" criteria button
+    //Attach event listener to "Remove" criteria buttons
     //Callback function to create form to allow user to select criteria to remove
-    const removeCritBtn = document.querySelector('button#remove-crit.crud');
-    removeCritBtn.addEventListener('click', () => {
-        hideCritBtns();
-        createRemoveCritForm(); // need to write => checkbox to select criteria to remove
+    const removeCritBtns = document.querySelectorAll('button.crud.crit.remove');
 
-    });
+    for (const removeCritBtn of removeCritBtns) {
+        removeCritBtn.addEventListener('click', (evt) => {
+            evt.preventDefault();
+            removeCriteria(evt.target); 
+        });
+    };
+    
 })();
 
 

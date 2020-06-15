@@ -83,6 +83,16 @@ class User(db.Model):
 
         return criterion
 
+    def del_place_crit(self, place_type_id):
+
+        pcq = PlaceCriterion.query
+        
+        criterion = pcq.filter(PlaceCriterion.place_type_id==place_type_id,
+                              PlaceCriterion.user_id==self.user_id).first()
+
+        db.session.delete(criterion)
+        db.session.commit()
+
 
     def update_max_points(self):
         """Return maximum points to be used to calculate location 

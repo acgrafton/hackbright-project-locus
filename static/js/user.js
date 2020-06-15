@@ -17,12 +17,12 @@ const cancelPwdChgs = () => {
     showUserForm();
 };
 
-const hideUserDetails = () => {
-    document.querySelector('div#user-card.card').style.display = 'none';
+const hideUserDet = () => {
+    document.querySelector('ul.user-det').style.display = 'none';
 };
 
-const showUserDetails = () => {
-    document.querySelector('div#user-card.card').style.display = '';
+const showUserDet = () => {
+    document.querySelector('ul.user-det').style.display = '';
 };
 
 const hideUserForm = () => {
@@ -34,7 +34,7 @@ const showUserForm = () => {
 };
 
 
-//Create Edit User Form
+//Return an form to edit user information
 const createEditUserForm = () => {
     //Grab existing data
     username = document.getElementById('username').innerHTML;
@@ -93,13 +93,14 @@ const createEditUserForm = () => {
         fs.appendChild(br2);
     };
 
-    //Create and add cancel and save buttons
+    //Create 'save', 'cancel', and 'change password' buttons
     saveBtn = createSaveBtn();
     saveBtn.setAttribute('form', 'user-form');
-
     fs.appendChild(saveBtn);
+
     cancelBtn = createCancelBtn(cancelUserChgs);
     fs.appendChild(cancelBtn);
+
     pwdBtn = createPasswordBtn();
     fs.appendChild(pwdBtn);
 
@@ -109,7 +110,7 @@ const createEditUserForm = () => {
     return form;
 }
 
-//Create edit password form
+//Return an 'Change Password' form
 const createEditPasswordForm = () => {
 
     //Create form
@@ -138,14 +139,43 @@ const createEditPasswordForm = () => {
     return form;
 }
 
+//Delete user from database and load homepage
+const removeUser = () => {
 
-(function runUserScript() {
-    let editUserBtn = document.querySelector('button#edit-user-btn.crud');
+    fetchData = {
+        method:'POST'
+    };
+
+    fetch('/api/remove_user', fetchData)
+    .then(response => response.json())
+    .then(data => {
+        if (data['success'] === true) {
+            alert('User removed successfully');
+            document.location.assign('/')
+        } else {
+            alert(`${data['error']}`);
+            document.location.reload();
+
+        };
+    });
+};
+
+
+
+(function runUsers() {
+    const editUserBtn = document.querySelector('button#edit-user-btn.crud');
 
     editUserBtn.addEventListener('click', () => {
         newForm = createEditUserForm();
         document.querySelector('div#user-card.card').append(newForm)
     });
+
+    const removeUserBtn = document.querySelector('button#remove-user-btn.crud');
+
+    removeUserBtn.addEventListener('click', () => {
+        removeUser();
+    });
+
 
 })();
 

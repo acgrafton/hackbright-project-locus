@@ -34,8 +34,10 @@ def show_homepage():
 def log_in_user():
     """Provided correct email and password, log-in user"""
 
-    username = request.args.get('username')
-    password = request.args.get('password')
+
+    username = request.form.get('username')
+    password = request.form.get('password')
+    print(username,password)
 
     #Check email in database
     if crud.get_user(username) == None:
@@ -68,15 +70,17 @@ def register_user():
     """Register new user"""
     
     email = request.form.get('email')
+    username = request.form.get('username')
     first_name = request.form.get('first-name')
     last_name = request.form.get('last-name')
     password = request.form.get('password')
 
-    if crud.get_user_by_email(email):
+    print(email, username, first_name, last_name, password)
+
+    if crud.get_user(email):
         flash('This email has already been created.')
     else: 
-        user = crud.create_user(email, first_name, last_name, password)
-        session['new_user': True]
+        user = crud.create_user(email, username, first_name, last_name, password)
         flash('Your account has been successfuly created. Now let\'s set your location criteria.')
         
     return redirect('profile/<username>')
@@ -188,6 +192,45 @@ def save_password_changes():
         flash('No change')
 
     return redirect(f'/profile/{username}')
+
+
+@app.route('/api/remove_criteria', methods=['POST'])
+def remove_criteria():
+    """Remove a criteria from a user"""
+
+    #Retrieve data in parsed JSON form
+    data = request.json
+
+    #Retrieve user
+    username = session['user']
+    user = crud.get_user(username)
+
+    place_type_id = data['placeID']
+
+    try:
+        user.del_place_crit(place_type_id)
+
+        return jsonify({'success': True})
+
+    except Exception as err:
+        return jsonify({'success': False,
+                        'error': str(err)})
+
+@app.route('/api/remove_user', methods=['POST'])
+def remove_user():
+    """Remove a user"""
+
+
+    try:
+        crud.delete_user(session['user'])
+        session.pop('user', None)
+
+        return jsonify({'success': True})
+
+    except Exception as err:
+        return jsonify({'success': False,
+                        'error': str(err)})
+
 
 
 if __name__ == '__main__':

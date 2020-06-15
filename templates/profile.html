@@ -26,32 +26,44 @@
     <h3>Criteria</h3>
     <div class='card' id='criterion-card'>
       <ul class='crit-det'>
-    {% for criterion in criteria %}
-          <li>Place Type: {{criterion.place_type.title}}</li>
-          <li>Importance: {{criterion.importance}}</li>
-          <li>Max Distance: {{criterion.max_distance}} meters </li>
+        {% for criterion in criteria %}
+          <li>Place Type: 
+              <span id='{{criterion.place_type.place_type_id}}-title'> 
+                {{criterion.place_type.title}}
+              </span>
+            </li>
+          <li>Importance: 
+            <span id='{{criterion.place_type.place_type_id}}-importance'>
+              {{criterion.importance}}
+            </span>
+          </li>
+          <li>Max Distance: 
+            <span id='{{criterion.place_type.place_type_id}}-distance'>
+              {{criterion.max_distance}} </span> meters
+          </li>
+          <button class='crud crit edit' id='edit-{{criterion.place_type.place_type_id}}'>Edit</button>
+          <button class='crud crit remove' id='remove-{{criterion.place_type.place_type_id}}'>Remove</button>
+          <br>
           <br>  
-    {% endfor %}
-      </ul>
-        <fieldset id=crit-btns>
+        {% endfor %}
           <button class='crud' id='add-crit'>Add</button>
-          <button class='crud' id='edit-crit'>Edit</button>
-          <button class='crud' id='remove-crit'>Remove</button>
-        </fieldset>
-      </div>
+      </ul>
+    </div>
   </section>
   <hr>
   <section id="locations">
     <h3>Saved Locations</h3>
+    <div class='card' id='loc-card'>
+      <ul class='loc-det'>
     {% for score in scores %}
-      <div class='card' id='location-card'>
-        <ul>Address: {{score.location.address}}</ul>
-        <ul>Score: {{score.score}}</ul>
-    </div>
+        <li>Address: {{score.location.address}}</li>
+        <li>Score: {{score.score}}</li>
+        <br>
     {% endfor %}
-    <fieldset id=edit-locations>
-      <button class='crud' id='add-location'>Add Location</button>
-      <button class='crud'cr id='remove-location'>Remove Location</button>
+    </div>
+    <fieldset id=edit-loc>
+      <button class='crud' id='add-loc'>Add Location</button>
+      <button class='crud'cr id='remove-loc'>Remove Location</button>
     </fieldset>
   </section>
 
@@ -59,5 +71,6 @@
   <script src="/static/js/buttons.js"></script>
   <script src="/static/js/user.js"></script>
   <script src="/static/js/criteria.js"></script>
+  <script src="/static/js/locations.js"></script>
 
 {% endblock body %}

@@ -109,7 +109,7 @@ class User(db.Model):
 
 
     def score_location(self, address):
-        """Given an address, score location based on user criteria"""
+        """Scores a location and returns a dictionary of results"""
 
         #Dictionary of geocode results including point, lat, long, address
         geocode = self.geocode(address)
@@ -126,9 +126,9 @@ class User(db.Model):
             location = self.create_location(geocode)
        
         #Score the location for user
-        score = location.create_score(self)
+        score_results = location.evaluate(self)
 
-        return score
+        return score_results
 
     def update_first_name(self, email):
         """Update password"""
@@ -183,53 +183,53 @@ class Location(db.Model):
                         f'address={self.address}>'))
 
 
-    def add_lp_criterion(self, place_criterion_id, meets_criterion, results):
+    def add_lp_criterion(self, place_criterion_id, num_results, meets_criterion=False):
         """Add Location Place Criterion"""
 
         lp_criterion = LocationPlaceCriterion(location_id=self.location_id,
                                               place_criterion_id=place_criterion_id,
-                                              meets_criterion=meets_criterion,
-                                              results=results)
+                                              num_results=num_results,
+                                              meets_criterion=meets_criterion)
         db.session.add(lp_criterion)
         db.session.commit()
 
         return lp_criterion
 
 
-    def meets_criterion(self, place_criterion):
-        """Evaluates whether a location has results for a given criterion.
-        Returns a dictionary with a boolean of whether if meets criteria and number of results"""
+    def evaluate(self, user):
+        """Given a user, return a dictionary with final score 
+          and criteria evaluated"""
 
-        data = place_criterion.get_yelp_response(self.latitude, self.longitude)
-
-        num_results = data['total']
-
-        #Evaluate results and return dictionary
-        if num_results > 0:
-            self.add_lp_criterion(place_criterion.place_criterion_id, True, num_results)
-            return True
-        
-        else:
-            self.add_lp_criterion(place_criterion.place_criterion_id, False, num_results)
-            return False
-
-
-    def calculate_score(self, user):
-        """Calculate score out of 100"""
-
+        evaluation = {'criteria':[]}
         points = 0
         
+        #Loop through criteria and add points based on if results are found.
+        #Add each criteria and its results to evaluation dictionary.
         for criterion in user.place_criteria:
-            if self.meets_criterion(criterion):
+
+            data = criterion.get_yelp_response(self.latitude, self.longitude)
+            
+            if data['total'] > 0:
                 points += criterion.importance
 
-        return (points / user.max_points) * 100
+                self.add_lp_criterion(criterion.place_criterion_id, 
+                                      data['total'],
+                                      True)
 
+            else:
+                self.add_lp_criterion(criterion.place_criterion_id, 
+                                      data['total'])
 
-    def create_score(self, user):
-        """Takes in User object and calculates score on Location""" 
+            evaluation['criteria'].append({'place_type': criterion.place_type_id,
+                                           'importance': criterion.importance,
+                                           'distance': criterion.max_distance,
+                                           'results': data['businesses'],
+                                          })
 
-        score = Score(score=self.calculate_score(user),
+        points = (points / user.max_points) * 100
+        evaluation['score'] = points
+
+        score = Score(score=points,
                       location_id=self.location_id,
                       user_id=user.user_id,
                       )
@@ -237,7 +237,7 @@ class Location(db.Model):
         db.session.add(score)
         db.session.commit()
 
-        return score
+        return evaluation
 
 
 class PlaceCriterion(db.Model):
@@ -283,7 +283,7 @@ class PlaceCriterion(db.Model):
         payload = {'latitude': latitude,
                    'longitude': longitude,
                    'radius': self.max_distance,
-                   'limit': 1,
+                   'limit': 10,
                    'categories':self.place_type_id,
                    'term':self.place_type.place_category_id}
 
@@ -296,7 +296,7 @@ class LocationPlaceCriterion(db.Model):
 
     lpc_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     meets_criterion = db.Column(db.Boolean, nullable=False)
-    results = db.Column(db.Integer, nullable=False)
+    num_results = db.Column(db.Integer, nullable=False)
     location_id = db.Column(db.Integer, db.ForeignKey('locations.location_id'))
     place_criterion_id = db.Column(db.Integer, db.ForeignKey('place_criteria.place_criterion_id'))
 
@@ -366,34 +366,66 @@ def example_data():
     Location.query.delete()
     User.query.delete()
 
-    #Add sample users
-    harry = User(email='harry@hogwarts.com',
-                 username='hpotter', 
-                 first_name='Harry', 
-                 last_name='Potter', 
-                 password='hedwig')
-    remus = User(email='remus@howarts.com',
-                 username='rlupin', 
-                 first_name='Remus', 
-                 last_name='Lupin', 
-                 password='moon')
-    # hermione = User('hermione@hogwarts.com', 'Hermione', 'Granger', 'time')
-    # luna = User('luna@hogwarts.com', 'Luna', 'Lovegood', 'quibbler')
+    #Add sample users Top Chef season 17 theme
+    melissa = User(email='melissak@tc.com',
+                 username='mking', 
+                 first_name='Melissa', 
+                 last_name='King', 
+                 password='scallops')
+    kevin = User(email='kgillespie@tc.com',
+                 username='kgillespie@tc.com', 
+                 first_name='Kevin', 
+                 last_name='Gillespie', 
+                 password='pork')
+    stephanie = User(email='stephaniec@tc.com',
+                 username='stephaniec', 
+                 first_name='Stephanie', 
+                 last_name='lamb', 
+                 password='pasta')
+    bryan = User(email='bryanv@tc.com',
+                 username='bryanv', 
+                 first_name='Bryan', 
+                 last_name='Voltaggio', 
+                 password='carrots')
 
-    db.session.add(harry)
-    db.session.add(remus)
+    gregory = User(email='gregoryg@tc.com',
+                 username='gregoryg', 
+                 first_name='Gregory', 
+                 last_name='Gourdet', 
+                 password='chicken')
+
+    db.session.add(melissa)
+    db.session.add(kevin)
+    db.session.add(stephanie)
+    db.session.add(bryan)
+    db.session.add(gregory)
     db.session.commit()
 
     #Add place criteria
-    harry.add_place_criterion('bubbletea', 3, max_distance=8047)
-    harry.add_place_criterion('grocery', 5, name='Hmart')
-    harry.add_place_criterion('parks', 4)
-    harry.update_max_points()
+    melissa.add_place_criterion('congee', 3, max_distance=8047)
+    melissa.add_place_criterion('grocery', 5, max_distance=8047)
+    melissa.add_place_criterion('sushi', 2, max_distance=8047)
+    melissa.add_place_criterion('ramen', 4)
+    melissa.update_max_points()
+
+    gregory.add_place_criterion('vegetarian', 5, max_distance=8047)
+    gregory.add_place_criterion('vegan', 5, max_distance=8047)
+    gregory.add_place_criterion('grocery', 5, max_distance=3218)
+    gregory.add_place_criterion('parks', 2)
+    gregory.add_place_criterion('recreation', 2)
+    gregory.add_place_criterion('publicmarkets', 4)
+    gregory.update_max_points()
+
+
 
     #Add locations
-    fm = harry.score_location('Fort Morgan, CO')
-    chicago = harry.score_location('60611')
-    la = harry.score_location('San Gabriel, CA')
+    bevhills = melissa.score_location('90210')
+    phoenix = melissa.score_location('Phoenix, AZ')
+    portland = gregory.score_location('Portland, OR')
+    beaverton = gregory.score_location('Beaverton, OR')
+    vancouver = gregory.score_location('98685')
+    vancouver = gregory.score_location('Corvalis, OR')
+
 
 
 def connect_to_db(flask_app, db_uri='postgresql:///locus', echo=False):

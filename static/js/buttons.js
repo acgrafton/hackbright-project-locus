@@ -42,6 +42,15 @@ const createPasswordBtn = () => {
 }
 
 
+//Return an 'Add' button
+const createAddButton = (addFunction) => {
+    btn = document.createElement('button');
+    btn.setAttribute('onclick', 'addFunction');
+    btn.innerHTML = 'Add';
+    return btn
+}
+
+
 (function runButtons() {
 
 })();

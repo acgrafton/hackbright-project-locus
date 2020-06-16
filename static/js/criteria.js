@@ -234,9 +234,7 @@ const createEditCritForm = (clickedBtn) => {
 
 const removeCriteria = (clickedBtn) => {
     
-    console.log(clickedBtn);
     const placeID = clickedBtn.id.slice(7);
-    console.log(placeID);
 
     const data = {'placeID': placeID};
 
@@ -247,8 +245,6 @@ const removeCriteria = (clickedBtn) => {
             'Content-Type': 'application/json'
         },
     };
-
-    console.log(fetchData)
 
     fetch('/api/remove_criteria', fetchData)
         .then(response => response.json())

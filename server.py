@@ -2,7 +2,7 @@ from flask import (Flask, render_template, request, flash, session, redirect, js
 from model import connect_to_db
 import crud
 import os
-# import googlemaps
+import googlemaps
 from pprint import pformat
 
 from jinja2 import StrictUndefined 
@@ -13,7 +13,7 @@ app.jinja_env.undefined = StrictUndefined
 
 API_KEY = os.environ['GOOGLE_TOKEN']
 
-# gmaps = googlemaps.Client(key=API_KEY)
+gmaps = googlemaps.Client(key=API_KEY)
 
 @app.route('/')
 def show_homepage():
@@ -28,6 +28,27 @@ def show_homepage():
         username = session['user']
 
         return redirect(f'/profile/{username}')
+
+
+@app.route('/new_user', methods=['POST'])
+def register_user():
+    """Register new user"""
+    
+    email = request.form.get('email')
+    username = request.form.get('username')
+    first_name = request.form.get('first-name')
+    last_name = request.form.get('last-name')
+    password = request.form.get('password')
+
+    print(email, username, first_name, last_name, password)
+
+    if crud.get_user(email):
+        flash('This email has already been created.')
+    else: 
+        user = crud.create_user(email, username, first_name, last_name, password)
+        flash('Your account has been successfuly created. Now let\'s set your location criteria.')
+        
+    return redirect('profile/<username>')
 
 
 @app.route('/api/login', methods=['POST'])
@@ -65,25 +86,68 @@ def log_out_user():
     return redirect('/')
 
 
-@app.route('/new_user', methods=['POST'])
-def register_user():
-    """Register new user"""
+@app.route('/api/edit_user', methods=['POST'])
+def save_user_changes():
+    """Save user changes"""
+
+    first_name = request.form.get('edit-first-name')
+    last_name = request.form.get('edit-last-name')
+    email = request.form.get('edit-email')
+
+    username = session['user']
+    user = crud.get_user(username)
     
-    email = request.form.get('email')
-    username = request.form.get('username')
-    first_name = request.form.get('first-name')
-    last_name = request.form.get('last-name')
-    password = request.form.get('password')
+    info_changed = False
 
-    print(email, username, first_name, last_name, password)
+    if user.first_name != first_name:
+        user.update_first_name(first_name)
+        info_changed = True
+    if user.last_name != last_name:
+        user.update_last_name(last_name)
+        info_changed = True
+    if user.email != email:
+        user.update_email(email)
+        info_changed = True
 
-    if crud.get_user(email):
-        flash('This email has already been created.')
-    else: 
-        user = crud.create_user(email, username, first_name, last_name, password)
-        flash('Your account has been successfuly created. Now let\'s set your location criteria.')
-        
-    return redirect('profile/<username>')
+    if info_changed == True:
+        flash('Changes saved')
+    else:
+        flash('No change')
+
+    return redirect(f'/profile/{username}')
+
+
+@app.route('/api/remove_user', methods=['POST'])
+def remove_user():
+    """Remove a user"""
+
+    try:
+        crud.delete_user(session['user'])
+        session.pop('user', None)
+
+        return jsonify({'success': True})
+
+    except Exception as err:
+        return jsonify({'success': False,
+                        'error': str(err)})
+
+
+@app.route('/api/edit_password', methods=['POST'])
+def save_password_changes():
+    """Save password changes"""
+
+    password = request.form.get('edit-password')
+
+    username = session['user']
+    user = crud.get_user(username)
+
+    if user.password != password:
+        user.update_password(password)
+        flash('Password changed')
+    else:
+        flash('No change')
+
+    return redirect(f'/profile/{username}')
 
 
 @app.route('/profile/<username>')
@@ -145,55 +209,6 @@ def save_user_criteria():
     return redirect(f'/profile/{username}')
 
 
-@app.route('/api/edit_user', methods=['POST'])
-def save_user_changes():
-    """Save user changes"""
-
-    first_name = request.form.get('edit-first-name')
-    last_name = request.form.get('edit-last-name')
-    email = request.form.get('edit-email')
-
-    username = session['user']
-    user = crud.get_user(username)
-    
-    info_changed = False
-
-    if user.first_name != first_name:
-        user.update_first_name(first_name)
-        info_changed = True
-    if user.last_name != last_name:
-        user.update_last_name(last_name)
-        info_changed = True
-    if user.email != email:
-        user.update_email(email)
-        info_changed = True
-
-    if info_changed == True:
-        flash('Changes saved')
-    else:
-        flash('No change')
-
-    return redirect(f'/profile/{username}')
-
-
-@app.route('/api/edit_password', methods=['POST'])
-def save_password_changes():
-    """Save password changes"""
-
-    password = request.form.get('edit-password')
-
-    username = session['user']
-    user = crud.get_user(username)
-
-    if user.password != password:
-        user.update_password(password)
-        flash('Password changed')
-    else:
-        flash('No change')
-
-    return redirect(f'/profile/{username}')
-
-
 @app.route('/api/remove_criteria', methods=['POST'])
 def remove_criteria():
     """Remove a criteria from a user"""
@@ -216,20 +231,31 @@ def remove_criteria():
         return jsonify({'success': False,
                         'error': str(err)})
 
-@app.route('/api/remove_user', methods=['POST'])
-def remove_user():
-    """Remove a user"""
 
 
-    try:
-        crud.delete_user(session['user'])
-        session.pop('user', None)
 
-        return jsonify({'success': True})
+@app.route('/api/criteria', methods=['POST'])
+def get_user_criteria_json():
+    """Return criteria in JSON"""
 
-    except Exception as err:
-        return jsonify({'success': False,
-                        'error': str(err)})
+    #User selected location
+    address = request.json['address']
+    
+    #Retrieve user
+    user = crud.get_user(session['user'])
+    
+    #Get dictionary of score and criteria
+    return jsonify(user.score_location(address))
+
+
+@app.route('/search_location')
+def display_location_search():
+    """Display location search page"""
+
+    return render_template('location.html',
+                            key=API_KEY)
+
+
 
 
 

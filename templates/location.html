@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+
+{%block head %}
+<link rel="stylesheet" href="/static/css/location.css"/>
+{% endblock %}
+
+
+{% block title %}Find and Add a Location{% endblock %}
+
+{% block body %}
+  <header>
+    <nav></nav>
+    </header> 
+    <main>
+      <div class="hotel-search">
+        <div id="findhotels">
+          Find post office in:
+        </div>
+
+        <div id="locationField">
+        <input id="autocomplete" placeholder="Enter a location" type="text" />
+      </div>
+    </div>
+
+      <section class="map">
+        <div id="map"></div>
+      </section>
+       <div id="listing">
+        <table id="resultsTable">
+        <tbody id="results"></tbody>
+      </table>
+    </div>
+
+    <div style="display: none">
+      <div id="info-content">
+        <table>
+          <tr id="iw-url-row" class="iw_table_row">
+            <td id="iw-icon" class="iw_table_icon"></td>
+            <td id="iw-url"></td>
+          </tr>
+          <tr id="iw-address-row" class="iw_table_row">
+            <td class="iw_attribute_name">Address:</td>
+            <td id="iw-address"></td>
+          </tr>
+          <tr id="iw-phone-row" class="iw_table_row">
+            <td class="iw_attribute_name">Telephone:</td>
+            <td id="iw-phone"></td>
+          </tr>
+          <tr id="iw-rating-row" class="iw_table_row">
+            <td class="iw_attribute_name">Rating:</td>
+            <td id="iw-rating"></td>
+          </tr>
+          <tr id="iw-website-row" class="iw_table_row">
+            <td class="iw_attribute_name">Website:</td>
+            <td id="iw-website"></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+
+      <section id="score"></section>
+    </main>
+
+
+
+
+
+
+
+
+{% endblock body %}
+
+{% block js %}
+<script src="/static/js/location_search.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{key}}&libraries=places&callback=initMap"></script>
+
+{% endblock %}

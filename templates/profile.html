@@ -55,12 +55,13 @@
     {% for score in scores %}
         <li>Address: {{score.location.address}}</li>
         <li>Score: {{score.score}}</li>
+        <button class='crud loc remove'cr id='remove-{{score.score_id}}'>Remove Location</button>
         <br>
     {% endfor %}
     </div>
     <fieldset id=edit-loc>
-      <button class='crud' id='add-loc'>Add Location</button>
-      <button class='crud'cr id='remove-loc'>Remove Location</button>
+      <button class='crud loc remove' id='add-loc'>Add Location</button>
+      
     </fieldset>
   </section>
 

@@ -82,15 +82,25 @@ class User(db.Model):
         db.session.commit()
 
         return criterion
+        
 
     def del_place_crit(self, place_type_id):
 
         pcq = PlaceCriterion.query
-        
+
         criterion = pcq.filter(PlaceCriterion.place_type_id==place_type_id,
                               PlaceCriterion.user_id==self.user_id).first()
 
         db.session.delete(criterion)
+        db.session.commit()
+
+
+    def del_score(self, score_id):
+        """Delete a score object from a user"""
+        
+        score = Score.query.get(score_id)
+
+        db.session.delete(score)
         db.session.commit()
 
 

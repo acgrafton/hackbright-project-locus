@@ -220,10 +220,9 @@ def remove_criteria():
     username = session['user']
     user = crud.get_user(username)
 
-    place_type_id = data['placeID']
-
     try:
-        user.del_place_crit(place_type_id)
+        #Delete criteria from database using placeId to get criteria
+        user.del_place_crit(data['placeId'])
 
         return jsonify({'success': True})
 
@@ -256,6 +255,27 @@ def display_location_search():
                             key=API_KEY)
 
 
+@app.route('/api/remove_location', methods=['POST'])
+def remove_location():
+    """Remove a user's score for a location"""
+
+    #Retrieve data in parsed JSON form
+    data = request.json
+
+    #Retrieve user
+    username = session['user']
+    user = crud.get_user(username)
+
+    score_id = data['scoreId']
+
+    try:
+        user.del_score(score_id)
+
+        return jsonify({'success': True})
+
+    except Exception as err:
+        return jsonify({'success': False,
+                        'error': str(err)})
 
 
 

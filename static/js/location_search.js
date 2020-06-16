@@ -50,19 +50,21 @@ function initMap() {
             fetch('/api/criteria', fetchData)
                 .then(response => response.json())
                 .then(data => {
-                    score = data.score //location's total score based on weighted avg
-                    criteria = data.criteria //list of criteria objects
+                    console.log(data)
+                    score = data['score'] //location's total score based on weighted avg
+                    console.log(data['score'])
+                    criteria = data['criteria'] //list of criteria objects
 
                     for (const criterion of criteria) {
 
-                        for (const place of criterion.results) {
+                        for (const place of criterion['results']) {
                             const infoContent = (`
                                 <div class="window-content">
                                   <ul class="place-info">
-                                    <li><b>Name: </b>${place.alias}</li>
-                                    <li><b>Met Criteria: </b>${criterion.place_type}</li>
-                                    <li><b>Yelp Rating: </b>${place.rating}</li>
-                                    <li><b>Distance: </b>${place.distance}</li>
+                                    <li><b>Name: </b>${place['alias']}</li>
+                                    <li><b>Met Criteria: </b>${criterion['place_type']}</li>
+                                    <li><b>Yelp Rating: </b>${place['rating']}</li>
+                                    <li><b>Distance: </b>${place['distance']}</li>
                                   </ul>
                                 </div>
                                 `);

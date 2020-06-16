@@ -232,12 +232,16 @@ const createEditCritForm = (clickedBtn) => {
     return form;
 };
 
+//Delete criteria from database and reload page.
 const removeCriteria = (clickedBtn) => {
     
-    const placeID = clickedBtn.id.slice(7);
+    //Get place id from the button clicked
+    const placeId = clickedBtn.id.slice(7);
 
-    const data = {'placeID': placeID};
+    //Put it into an object
+    const data = {'placeId': placeId};
 
+    //Setup fetch data
     let fetchData = {
         method: 'POST',
         body: JSON.stringify(data),
@@ -246,10 +250,15 @@ const removeCriteria = (clickedBtn) => {
         },
     };
 
+    //Make ajax call - if successful, reload page, if not, flash error msg
     fetch('/api/remove_criteria', fetchData)
         .then(response => response.json())
         .then(data => {
-            document.location.reload();
+            if (data['success'] === true) {
+                document.location.reload();
+            } else {
+                alert(`Error: ${data['error']}`)
+            }
         });
 }
 

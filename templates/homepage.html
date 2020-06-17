@@ -1,48 +1,27 @@
 {% extends 'base.html' %}
-{% block title %}Locus{% endblock %}
+{% block title %}Locus: Is this location right for you?{% endblock %}
 
 {% block body %}
   <h2>sign up</h2>
     <form action="/new_user" method="POST">
-      <p>
-        email <input type="text" name="email">
-      </p>
-
-      <p>
-        username <input type="text" name="username">
-      </p>
-      <p>
-        first name <input type="text" name="first-name">
-      </p>
-
-      <p>
-        last name <input type="text" name="last-name">
-      </p>
-
-
-      <p>
-        password <input type="password" name="password">
-      </p>
-
-      <p>
-        <input type="submit">
-      </p>
+      <fieldset class = "new-user-fs">
+        email <input type="text" name="email"><br>
+        username <input type="text" name="username"><br>
+        first name <input type="text" name="first-name"><br>
+        last name <input type="text" name="last-name"><br>
+        password <input type="password" name="password"><br>
+      </fieldset>
+      <input type="submit">
     </form>
 
-      <h2>login</h2>
-  <form action="/api/login" method="POST">
-    <p>
-      username <input type="text" name="username">
-    </p>
-
-    <p>
-      password <input type="password" name="password">
-    </p>
-
-    <p>
+    <h2>login</h2>
+    <form action="/api/login" method="POST">
+      <fieldset class="login-fs">
+        username <input type="text" name="username"><br>
+        password <input type="password" name="password"><br>
+      </fieldset>
       <input type="submit">
-    </p>
-  </form>
+    </form>
 
 {% endblock %}
 

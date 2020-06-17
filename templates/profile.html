@@ -2,6 +2,9 @@
 {% block title %}Your Profile{% endblock %}
 
 {% block body %}
+<header>
+    <button class='logout' value='Log Out' id='logout'>Log Out</button>
+</header>
 
   <section id="profile">
     <h3>User Information</h3>
@@ -49,7 +52,7 @@
   </section>
   <hr>
   <section id="locations">
-    <h3>Saved Locations</h3>
+    <h3>Scored Locations</h3>
     <div class='card' id='loc-card'>
       <ul class='loc-det'>
     {% for score in scores %}
@@ -58,14 +61,10 @@
         <button class='crud loc remove'cr id='remove-{{score.score_id}}'>Remove Location</button>
         <br>
     {% endfor %}
+    <button class='crud loc remove' id='add-loc'>Add Location</button>
     </div>
-    <fieldset id=edit-loc>
-      <button class='crud loc remove' id='add-loc'>Add Location</button>
-      
-    </fieldset>
   </section>
 
-  
   <script src="/static/js/buttons.js"></script>
   <script src="/static/js/user.js"></script>
   <script src="/static/js/criteria.js"></script>

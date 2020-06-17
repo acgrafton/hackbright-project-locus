@@ -7,8 +7,6 @@ var MARKER_PATH = 'https://developers.google.com/maps/documentation/javascript/i
 var hostnameRegexp = new RegExp('^https?://.+?/');
 
 
-
-
 function initMap() {
     
     const map = new google.maps.Map(
@@ -41,19 +39,24 @@ function initMap() {
             
             let fetchData = {
                 method: 'POST',
-                body: JSON.stringify({'address': place.formatted_address}),
+                body: JSON.stringify({'address': place.formatted_address,
+                                        'point': place.geometry.location}),
                 headers: {
                     'Content-Type': 'application/json'
                 },
             };
 
+            console.log(fetchData);
+
             fetch('/api/criteria', fetchData)
                 .then(response => response.json())
                 .then(data => {
                     console.log(data)
-                    score = data['score'] //location's total score based on weighted avg
-                    console.log(data['score'])
-                    criteria = data['criteria'] //list of criteria objects
+
+                    const criteria = data.criteria
+                    const score = data.score //location's total score based on weighted avg
+                    
+                     //list of criteria objects
 
                     for (const criterion of criteria) {
 
@@ -61,10 +64,10 @@ function initMap() {
                             const infoContent = (`
                                 <div class="window-content">
                                   <ul class="place-info">
-                                    <li><b>Name: </b>${place['alias']}</li>
-                                    <li><b>Met Criteria: </b>${criterion['place_type']}</li>
-                                    <li><b>Yelp Rating: </b>${place['rating']}</li>
-                                    <li><b>Distance: </b>${place['distance']}</li>
+                                    <li><b>Name: </b>${place.name}</li>
+                                    <li><b>Met Criteria: </b>${criterion.place_type}</li>
+                                    <li><b>Yelp Rating: </b>${place.rating}</li>
+                                    <li><b>Distance: </b>${place.distance}</li>
                                   </ul>
                                 </div>
                                 `);
@@ -74,7 +77,7 @@ function initMap() {
                                     lat: place.coordinates.latitude,
                                     lng: place.coordinates.longitude
                                 },
-                                title: `Place Name: ${place.alias}`,
+                                title: `Place Name: ${place.name}`,
                                 map: map
                             });
 

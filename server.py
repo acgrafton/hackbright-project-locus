@@ -3,7 +3,6 @@ from model import connect_to_db
 import crud
 import os
 import googlemaps
-from pprint import pformat
 
 from jinja2 import StrictUndefined 
 
@@ -24,7 +23,6 @@ def show_homepage():
         return render_template("homepage.html")
 
     else:
-
         username = session['user']
 
         return redirect(f'/profile/{username}')
@@ -34,19 +32,24 @@ def show_homepage():
 def register_user():
     """Register new user"""
     
+    #Retrieve formdata
     email = request.form.get('email')
     username = request.form.get('username')
     first_name = request.form.get('first-name')
     last_name = request.form.get('last-name')
     password = request.form.get('password')
 
-    print(email, username, first_name, last_name, password)
-
+    #Alert if email already exists
     if crud.get_user(email):
-        flash('This email has already been created.')
+        flash('This email already exists. Please login')
+    
+    #Otherwise, create new user account, add to session, and redirect to profile
     else: 
         user = crud.create_user(email, username, first_name, last_name, password)
-        flash('Your account has been successfuly created. Now let\'s set your location criteria.')
+        session['user'] = username
+        session['logged_in'] = 'yes'
+        flash('Your account has been successfuly created.', 
+              'Get started by setting your location criteria.')
         
     return redirect('profile/<username>')
 
@@ -55,10 +58,9 @@ def register_user():
 def log_in_user():
     """Provided correct email and password, log-in user"""
 
-
+    #Retrieve formdata
     username = request.form.get('username')
     password = request.form.get('password')
-    print(username,password)
 
     #Check email in database
     if crud.get_user(username) == None:
@@ -80,6 +82,7 @@ def log_in_user():
 @app.route('/api/logout', methods=['POST'])
 def log_out_user():
     """Clear user out of session data"""
+
     session.pop('user', None)
     flash('You have logged out')
 
@@ -231,20 +234,18 @@ def remove_criteria():
                         'error': str(err)})
 
 
-
-
 @app.route('/api/criteria', methods=['POST'])
 def get_user_criteria_json():
     """Return criteria in JSON"""
 
-    #User selected location
-    address = request.json['address']
+    #Geocode info from searched location
+    geocode = request.json
     
     #Retrieve user
     user = crud.get_user(session['user'])
     
     #Get dictionary of score and criteria
-    return jsonify(user.score_location(address))
+    return jsonify(user.score_location(geocode))
 
 
 @app.route('/search_location')

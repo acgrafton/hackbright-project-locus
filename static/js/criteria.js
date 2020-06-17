@@ -1,5 +1,7 @@
-// crud script for editing user's location criteria
+// script for the criteria section of the profile page
 
+
+//Helper functions to show and hide elements on page---------------------------
 const cancelCritChgs = () => {
     let card = document.querySelector('div#criterion-card.card');
     let form = document.querySelector('form#edit-crit-form');
@@ -16,7 +18,6 @@ const cancelAddCrit = () => {
     document.querySelector('button#add-crit.crud').style.display = '';
 };
 
-
 const hideCriteriaDetails = () => {
     document.querySelector('ul.crit-det').style.display = 'none';
 };
@@ -32,48 +33,62 @@ const hideCategories = () => {
 const showCategories = () => {
     document.querySelector('fieldset#cat-fieldset').style.display = '';
 };
+//------------------------------------------------------------------------------
 
 
 //Generate buttons of place categories for user to select
-const generateCategories = () => {
+const createCategoryBtns = () => {
+    
+    //Get categories from database
     fetch('/api/place_categories')
         .then(response => response.json())
         .then((data) => {
-            fs = document.createElement('fieldset');
-            fs.setAttribute('id', 'cat-fieldset')
+
+            //Create fieldset to contain the category buttons
+            fdset = document.createElement('fieldset');
+            fdset.setAttribute('id', 'cat-fieldset')
+
+            //Loop through categories and create buttons with event listeners
+            //for each
             for (const category of data){
                 const btn = document.createElement('button');
+                btn.setAttribute('class', 'category')
                 btn.setAttribute('id', `${category}`);
                 btn.innerHTML = category;
+
+                //Add Event Listener for each category - when clicked create
+                //criteria form with a dropdown with subcategories
                 btn.addEventListener('click', (evt) => {
-                    fs.setAttribute('disabled', true);
+                    fdset.setAttribute('disabled', true);
                     const clickedBtn = evt.target.innerText;
-                    createCriteriaForm(clickedBtn);
+                    createCritFrm(clickedBtn);
                 });
-                fs.appendChild(btn);
-            document.querySelector('#criterion-card').append(fs);
+                fdset.appendChild(btn);
+
+            document.querySelector('#criterion-card').append(fdset);
             };
         });
 };
 
-//Create a form for user to set place criteria and importance
-const createCriteriaForm = (selectedCategory) => {
 
-    cc = document.querySelector('#criterion-card')
+//Create a form for user to set place criteria and importance
+const createCritFrm = (selectedCategory) => {
+
+    card = document.querySelector('#criterion-card')
     
     //Create form element
-    const f = document.createElement('form');
-    f.setAttribute("action", "/api/set_criteria");
-    f.setAttribute("method", "POST");
-    f.setAttribute("id", "criteria-form");
+    const form = document.createElement('formorm');
+    form.setAttribute("action", "/api/set_criteria");
+    form.setAttribute("method", "POST");
+    form.setAttribute("id", "criteria-form");
 
-    ptInput = document.createElement('input');
-    ptInput.setAttribute('type','text');
-    ptInput.setAttribute('id', 'place-type');
-    ptInput.setAttribute('name', 'place-type');
-    ptInput.setAttribute('list', 'place-types');
-    ptInput.setAttribute('placeholder', 'Select Place Type');
-    f.appendChild(ptInput);
+    input = document.createElement('input');
+    input.setAttribute('type','text');
+    input.setAttribute('id', 'place-type');
+    input.setAttribute('name', 'place-type');
+    input.setAttribute('list', 'place-types');
+    input.setAttribute('placeholder', 'Select Place Type');
+    form.appendChild(input);
 
     //Get place types json from server and convert back to array.
     fetch(`/api/place_types/${selectedCategory}`)
@@ -85,8 +100,8 @@ const createCriteriaForm = (selectedCategory) => {
         console.log(placeTypes)
 
         //Create dropdown menu and append to form
-        let d = document.createElement('datalist');
-        d.setAttribute('id', 'place-types');
+        let datalist = document.createElement('datalist');
+        datalist.setAttribute('id', 'place-types');
 
 
         //Loop through placeTypes array and make each of those an option
@@ -94,42 +109,29 @@ const createCriteriaForm = (selectedCategory) => {
             option = document.createElement('option');
             option.setAttribute('value', placeType);
             option.innerHTML = (placeType.charAt(0).toUpperCase() + placeType.slice(1));
-            d.appendChild(option);
+            datalist.appendChild(option);
         };
-        f.appendChild(d);
+
+        form.appendChild(datalist);
 
         //Add importance menu
-        f.appendChild(generateImportanceMenu());
+        form.appendChild(generateImportanceMenu());
 
         //Add save and cancel buttons
-        f.appendChild(createSaveBtn());
-        f.appendChild(createCancelBtn(cancelAddCrit));
+        form.appendChild(createSaveBtn());
+        form.appendChild(createCancelBtn(cancelAddCrit));
 
-        cc.appendChild(f);
+        card.appendChild(form);
 
-        return f;
- 
+        return form;
     });
 };
 
 
-const addCategoryListeners = () => {
-    Array.from(document.querySelectorAll('button'))
-        .forEach((btn) => {
-            btn.addEventListener('click', (evt) => {
-                fs = document.getElementById('cat-fieldset');
-                fs.setAttribute('disabled', true);
-                const clickedBtn = evt.target.innerText;
-                generatePlaceTypes(clickedBtn);
-            });
-        });
-}
-
-
 //Create dropdown menu to select importance criteria
 const generateImportanceMenu = () => {
-    //Create dropdown menu
 
+    //Create input element
     const input = document.createElement('input');
     input.setAttribute('id', 'importance');
     input.setAttribute('name', 'importance');
@@ -148,6 +150,7 @@ const generateImportanceMenu = () => {
         dl.appendChild(option);
         num += 1;
     };
+
     input.appendChild(dl);
 
     return input;
@@ -162,8 +165,7 @@ const resetCategories = () => {
 
 
 //Given user-clicked button html element, return a form to edit the selected criterion
-const createEditCritForm = (clickedBtn) => {
-    console.log(clickedBtn);
+const createEditCritFrm = (clickedBtn) => {
 
     //Get current criteria info
     placeID = clickedBtn.id.slice(5);
@@ -206,8 +208,8 @@ const createEditCritForm = (clickedBtn) => {
         form.appendChild(label);
 
         if (placeField === 'importance') {
-
             form.appendChild(generateImportanceMenu());
+
         } else {
             input = document.createElement('input');
             input.setAttribute('class', 'edit-place-type');
@@ -263,45 +265,43 @@ const removeCriteria = (clickedBtn) => {
 }
 
 
-
 (function runCriteria() {
 
-    //Attach event listener to "Add" criteria button
-    //Callback function to show category menu to add criteria
+    //Get Add Criteria button
     const addCritBtn = document.querySelector('button#add-crit.crud');
     
+    //Attach event listener with callback function to create category buttons
     addCritBtn.addEventListener('click', (evt)=> {
         evt.preventDefault();
         document.querySelector('button#add-crit.crud').style.display = 'none';
-        generateCategories();
+        createCategoryBtns();
     });
 
-
-    //Attach event listener to "Edit" criteria buttons
-    //Callback function to create form to allow user to make changes
+    //Get edit criteria buttons
     const editCritBtns = document.querySelectorAll('button.crud.crit.edit');
 
+    //Add event listener to each button. 
+    //Callback function to show dropdown menu to select criteria
     for (const editCritBtn of editCritBtns) {
         editCritBtn.addEventListener('click', (evt) => {
             evt.preventDefault();
-            editForm = createEditCritForm(evt.target);
+            editForm = createEditCritFrm(evt.target);
             document.querySelector('div#criterion-card.card').appendChild(editForm);
             hideCriteriaDetails();
         });
     };
     
-
-    //Attach event listener to "Remove" criteria buttons
-    //Callback function to create form to allow user to select criteria to remove
+    //Get remove criteria buttons
     const removeCritBtns = document.querySelectorAll('button.crud.crit.remove');
 
+    //Attach event listener to each button
+    //Callback function to create form to allow user to select criteria to remove
     for (const removeCritBtn of removeCritBtns) {
         removeCritBtn.addEventListener('click', (evt) => {
             evt.preventDefault();
             removeCriteria(evt.target); 
         });
     };
-    
 })();
 
 

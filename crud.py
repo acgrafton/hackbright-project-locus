@@ -1,6 +1,6 @@
 """CRUD Operations"""
 
-from model import (User, Location, LocationPlaceCriterion, PlaceCriterion, 
+from model import (User, Location, LocPlCriterion, PlaceCriterion, 
                    PlaceType, PlaceCategory, db, connect_to_db)
 import os
 import googlemaps
@@ -88,19 +88,6 @@ def get_location_by_id(address):
     """Get location by id"""
 
     return Location.query.filter_by(address=address).first()
-
-
-def add_location_place_criterion(location_id, criterion_id, meets_criterion):
-    """Create new entry into location place criterion"""
-
-    lpc = LocationPlaceCriterion(location_id=location_id, 
-                                criterion_id=criterion_id, 
-                                meets_criterion=meets_criterion,
-                                )
-    db.session.add(lpc)
-    db.session.commit()
-
-    return lpc
 
 
 def get_place_type_ids_by_category(category):

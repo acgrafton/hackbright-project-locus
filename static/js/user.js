@@ -1,5 +1,7 @@
 //crud script for editing user profile information
 
+
+//
 //Remove form and revert back to showing user profile details
 const cancelUserChgs = () => {
     
@@ -161,6 +163,27 @@ const removeUser = () => {
 };
 
 
+const logOut = () => {
+
+    fetchData = {
+        method:'POST'
+    };
+
+    fetch('/api/logout', fetchData)
+    .then(response => response.json())
+    .then(data => {
+        if (data['success'] === true) {
+            alert('You are logged out')
+            document.location.assign('/')
+        } else {
+            alert(`${data['error']}`);
+            document.location.reload();
+        }
+    })
+}
+
+
+
 
 (function runUsers() {
     const editUserBtn = document.querySelector('button#edit-user-btn.crud');
@@ -175,6 +198,12 @@ const removeUser = () => {
     removeUserBtn.addEventListener('click', () => {
         removeUser();
     });
+
+    const logOutBtn = document.querySelector('button#logout');
+
+    logOutBtn.addEventListener('click', () => {
+        logOut();
+    })
 
 
 })();

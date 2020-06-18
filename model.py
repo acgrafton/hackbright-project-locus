@@ -246,46 +246,78 @@ class Location(db.Model):
                                 LocPlCriterion.plcriterion_id == crit.plcriterion_id
                                 ).first()
 
-            print(locplcrit)
 
-            #Get yelp business search endpoint data
-            data = crit.get_yelp_response(self.latitude, self.longitude)
-            print(data)
-            num_results = data['total']
-            
-            #Create new Loc Place Criterion object if record does not exist
-            #Update meets_criteria and num_results if it does
-            #Increment points by importance level if there's at least one result
-            if (num_results > 0) and (locplcrit == None):
+            if crit.place_type_id in ['banks', 'grocery', 'hospitals']:
+                        
+                #Key=miles, Value= points
+                name_rubric = {1: 5, 3: 4, 5: 3, 10: 2}
+                gen_rubric = { 1: 4, 3: 3, 5:2, 10:1}
 
-                points += crit.importance
-                
-                self.add_lpcrit(crit.plcriterion_id, num_results, True)
+                #Loop through the 3 distance parameters (1 mile, 3 miles, 5 miles)
+                for dist in gen_rubric.keys():
+                    
+                    #API call to pull data from google
+                    data = crit.google_places(self.latitude, 
+                                                    self.longitude,
+                                                    distance=dist)
+                    results = data['results']
+                    num_results = len(results)
+                    
+                    #Calculate points based whether criterion has specific name
+                    if crit.name != None:
+                        points = (name_rubric[dist] 
+                                 if num_results > 0 else gen_rubric[dist])
 
-            elif (num_results > 0) and (locplcrit != None):
-                
-                points += crit.importance
-                
-                locplcrit.meets_criterion == True
-                locplcrit.num_results = num_results
+                    if not locplcrit and not num_results:
+                        self.add_lpcrit(crit.plcriterion_id, num_results, True)
 
-            elif (num_results == 0) and (locplcrit == None):
-                
-                self.add_lpcrit(crit.plcriterion_id, data['total']) 
-               
-            else:
+                    elif not locplcrit and num_results:
+                        self.add_lpcrit(crit.plcriterion_id, num_results) 
 
-                locplcrit.meets_criterion == False
-                locplcrit.num_results = num_results
-
-            print('points', points)
-            print('maxpts', user.max_points)
-                
-            evaluation['criteria'].append({'place_type': crit.place_type_id,
+                evaluation['criteria'].append({'place_type': crit.place_type_id,
                                            'importance': crit.importance,
                                            'distance': crit.max_distance,
-                                           'results': data['businesses'],
+                                           'google': results,
+                                           'yelp': None
                                           })
+
+            else:
+
+                #Get yelp business search endpoint data
+                data = crit.yelp(self.latitude, self.longitude)
+                num_results = data['total']
+                
+                #Create new Loc Place Criterion object if record does not exist
+                #Update meets_criteria and num_results if it does
+                #Increment points by importance level if there's at least one result
+                if (num_results > 0) and (locplcrit == None):
+
+                    points += crit.importance
+                    
+                    self.add_lpcrit(crit.plcriterion_id, num_results, True)
+
+                elif (num_results > 0) and (locplcrit != None):
+                    
+                    points += crit.importance
+                    
+                    locplcrit.meets_criterion == True
+                    locplcrit.num_results = num_results
+
+                elif (num_results == 0) and (locplcrit == None):
+                    
+                    self.add_lpcrit(crit.plcriterion_id, num_results) 
+                   
+                else:
+
+                    locplcrit.meets_criterion == False
+                    locplcrit.num_results = num_results
+                
+                evaluation['criteria'].append({'place_type': crit.place_type_id,
+                                               'importance': crit.importance,
+                                               'distance': crit.max_distance,
+                                               'google': None,
+                                               'yelp': data['businesses'],
+                                              })
 
         #Calculate points out of max and multiply by 100
         points = (points / user.max_points) * 100
@@ -303,8 +335,8 @@ class PlaceCriterion(db.Model):
 
     plcriterion_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     place_type_id = db.Column(db.String, db.ForeignKey('place_types.place_type_id'))
-    importance = db.Column(db.Integer, autoincrement=True)
-    max_distance = db.Column(db.Integer, default=16093) #default set to 10 miles
+    importance = db.Column(db.Integer, default=5)
+    max_distance = db.Column(db.Integer, default=8049) #default set to 5 miles
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     name = db.Column(db.String, default=None)
 
@@ -329,7 +361,7 @@ class PlaceCriterion(db.Model):
                 'max_distance': self.max_distance,
                 'name': self.name}
 
-    def get_yelp_response(self, latitude, longitude):
+    def yelp(self, latitude, longitude):
         """Make Yelp API call and get response based on PlaceCriterion 
         attributes"""
 
@@ -347,12 +379,12 @@ class PlaceCriterion(db.Model):
 
         return requests.get(url, headers=headers, params=payload).json()
 
-    def google_places(self, latitude, longitude):
+    def google_places(self, latitude, longitude, distance=8049):
 
         location = {'lat': latitude, 'lng': longitude}
 
         return gmaps.places_nearby(location=location,
-                                    radius=self.max_distance,
+                                    radius=distance,
                                     type=self.place_type_id,
                                     name=self.name,
                                     )

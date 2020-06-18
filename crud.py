@@ -10,8 +10,11 @@ API_KEY = os.environ['GOOGLE_TOKEN']
 
 gmaps = googlemaps.Client(key=API_KEY)
 
-CATEGORIES = ['active', 'arts', 'education', 'fitness', 'food', 'health', 'restaurants', 'shopping']
-
+CATEGORIES = ['active', 'airports', 'arts', 'restaurants', 'grocery', 
+                 'homeandgarden', 'education', 'utilities', 'auto', 
+                 'localservices', 'financialservices', 'laundryservices',
+                 'petservices', 'beautysvc', 'parks', 'gym', 'publicservicesgovt',
+                 'religiousorgs', 'shopping', 'martialarts']
 
 def create_user(email, username, first_name, last_name, password):
     """Create and return new user."""

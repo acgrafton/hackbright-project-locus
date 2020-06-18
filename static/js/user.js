@@ -98,6 +98,7 @@ const createEditUserForm = () => {
     //Create 'save', 'cancel', and 'change password' buttons
     saveBtn = createSaveBtn();
     saveBtn.setAttribute('form', 'user-form');
+    saveBtn.setAttribute('id', 'save-user-chg');
     fs.appendChild(saveBtn);
 
     cancelBtn = createCancelBtn(cancelUserChgs);
@@ -139,6 +140,12 @@ const createEditPasswordForm = () => {
     form.appendChild(cancelBtn);
 
     return form;
+}
+
+//Make user information changes submitted by user
+const editUser = () => {
+    btn = document.querySelector('#save-user-chg');
+    btn.addEventListener('click')
 }
 
 //Delete user from database and load homepage
@@ -188,22 +195,16 @@ const logOut = () => {
 (function runUsers() {
     const editUserBtn = document.querySelector('button#edit-user-btn.crud');
 
-    editUserBtn.addEventListener('click', () => {
+    editUserBtn.onclick = () => {
         newForm = createEditUserForm();
         document.querySelector('div#user-card.card').append(newForm)
-    });
+    };
 
     const removeUserBtn = document.querySelector('button#remove-user-btn.crud');
-
-    removeUserBtn.addEventListener('click', () => {
-        removeUser();
-    });
+    removeUserBtn.onclick = removeUser;
 
     const logOutBtn = document.querySelector('button#logout');
-
-    logOutBtn.addEventListener('click', () => {
-        logOut();
-    })
+    logOutBtn.onclick = logOut;
 
 
 })();

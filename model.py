@@ -29,15 +29,21 @@ class User(db.Model):
     first_name = db.Column(db.String, nullable=False)
     last_name = db.Column(db.String, nullable=False)
     password = db.Column(db.String, nullable=False)
-    max_points = db.Column(db.Integer, default=None)
+    max_points = db.Column(db.Integer, default=0)
 
-    #locations = a list of Location objects
     #place_criteria = a list of PlaceCriteria objects
+    #scores = a list of score objects
 
     def __repr__(self):
         return "".join((f'<User user_id={self.user_id} ',
                 f'name={self.first_name}_{self.last_name} ',
                 f'email={self.email}>'))
+
+    def serialize(self):
+        """Return a dictionary of core user attributes"""
+
+        return {'username': username, 'email': email,
+                'first_name': first_name, 'last_name': last_name}
 
 
     @staticmethod    
@@ -64,6 +70,7 @@ class User(db.Model):
 
         db.session.add(criterion)
         db.session.commit()
+        self.update_max_points()
 
         return criterion
 
@@ -96,6 +103,7 @@ class User(db.Model):
             points += criterion.importance
 
         self.max_points = points
+        db.session.commit()
 
         return points
 
@@ -165,6 +173,17 @@ class User(db.Model):
 
         self.password = password
         db.session.commit()
+
+    def get_scores(self):
+        """Return a list of score dictionaries"""
+
+        return [score.serialize() for score in self.scores]
+
+    def get_place_criteria(self):
+        """Return a list of criteria dictionaries"""
+
+        return [place_criterion.serialize() 
+                for place_criterion in self.place_criteria]
  
 
 class Location(db.Model):
@@ -185,6 +204,12 @@ class Location(db.Model):
     def __repr__(self):
         return "".join((f'<User Location location_id={self.location_id} ',
                         f'address={self.address}>'))
+
+    def serialize(self):
+        """Return a dictionary of core attributes"""
+
+        return {'id': self.location_id, 'label': self.label, 
+                'address': self.address,'lng': longitude, 'lat': latitude}
 
 
     def add_lpcrit(self, plcriterion_id, num_results, meets_criterion=False):
@@ -225,33 +250,37 @@ class Location(db.Model):
 
             #Get yelp business search endpoint data
             data = crit.get_yelp_response(self.latitude, self.longitude)
+            print(data)
             num_results = data['total']
             
             #Create new Loc Place Criterion object if record does not exist
             #Update meets_criteria and num_results if it does
             #Increment points by importance level if there's at least one result
-            if num_results > 0 and locplcrit == None:
+            if (num_results > 0) and (locplcrit == None):
 
                 points += crit.importance
                 
                 self.add_lpcrit(crit.plcriterion_id, num_results, True)
 
-            elif num_results > 0 and locplcrit != None:
+            elif (num_results > 0) and (locplcrit != None):
                 
                 points += crit.importance
                 
                 locplcrit.meets_criterion == True
                 locplcrit.num_results = num_results
 
-            elif locplcrit == None:
-                
-                locplcrit.meets_criterion == False
-                locplcrit.num_results = num_results
-               
-            else: 
+            elif (num_results == 0) and (locplcrit == None):
                 
                 self.add_lpcrit(crit.plcriterion_id, data['total']) 
-            
+               
+            else:
+
+                locplcrit.meets_criterion == False
+                locplcrit.num_results = num_results
+
+            print('points', points)
+            print('maxpts', user.max_points)
+                
             evaluation['criteria'].append({'place_type': crit.place_type_id,
                                            'importance': crit.importance,
                                            'distance': crit.max_distance,
@@ -290,19 +319,21 @@ class PlaceCriterion(db.Model):
                         f'place_type_id={self.place_type_id} '
                         f'name={self.name}>'))
 
-    def attr_dict(self):
+    def serialize(self):
         """Return dictionary of object's key attributes"""
     
         return {'id': self.plcriterion_id, 
-                'place_type': self.place_type.title, 
+                'place_title': self.place_type.title,
+                'place_id': self.place_type_id,
                 'importance': self.importance,
                 'max_distance': self.max_distance,
-                'user_id': self.user_id,
                 'name': self.name}
 
     def get_yelp_response(self, latitude, longitude):
         """Make Yelp API call and get response based on PlaceCriterion 
         attributes"""
+
+        print(self.place_type_id)
 
         #Setting up arguments for Yelp API
         url = 'https://api.yelp.com/v3/businesses/search'
@@ -315,6 +346,16 @@ class PlaceCriterion(db.Model):
                    'term':self.place_type.place_category_id}
 
         return requests.get(url, headers=headers, params=payload).json()
+
+    def google_places(self, latitude, longitude):
+
+        location = {'lat': latitude, 'lng': longitude}
+
+        return gmaps.places_nearby(location=location,
+                                    radius=self.max_distance,
+                                    type=self.place_type_id,
+                                    name=self.name,
+                                    )
         
 
 class LocPlCriterion(db.Model):
@@ -382,6 +423,12 @@ class Score(db.Model):
     def __repr__(self):
         return f'<Score score_id={self.score_id}, score={self.score}>'
 
+    def serialize(self):
+        """Return dictionary of core attributes"""
+
+        return {'score_id': self.score_id, 'score': self.score, 
+                'address': self.location.address}
+
 
 def example_data():
     """Create some sample data"""
@@ -421,27 +468,8 @@ def example_data():
                  last_name='Gourdet', 
                  password='chicken')
 
-    db.session.add(melissa)
-    db.session.add(kevin)
-    db.session.add(stephanie)
-    db.session.add(bryan)
-    db.session.add(gregory)
+    db.session.add_all([melissa, kevin, stephanie, bryan, gregory])
     db.session.commit()
-
-    #Add place criteria
-    melissa.add_place_criterion('congee', 3, max_distance=8047)
-    melissa.add_place_criterion('grocery', 5, max_distance=8047)
-    melissa.add_place_criterion('sushi', 2, max_distance=8047)
-    melissa.add_place_criterion('ramen', 4)
-    melissa.update_max_points()
-
-    gregory.add_place_criterion('vegetarian', 5, max_distance=8047)
-    gregory.add_place_criterion('vegan', 5, max_distance=8047)
-    gregory.add_place_criterion('grocery', 5, max_distance=3218)
-    gregory.add_place_criterion('parks', 2)
-    gregory.add_place_criterion('recreation', 2)
-    gregory.add_place_criterion('publicmarkets', 4)
-    gregory.update_max_points()
 
 
 def connect_to_db(flask_app, db_uri='postgresql:///locus', echo=False):

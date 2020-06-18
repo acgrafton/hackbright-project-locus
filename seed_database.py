@@ -1,5 +1,6 @@
 import os
-import crud, model, server
+import model, server
+from crud import CATEGORIES
 from random import randint, choice
 import json
 
@@ -12,23 +13,41 @@ model.db.create_all()
 pc = model.PlaceCategory.query
 session = model.db.session
 
+
+
 with open('static/categories.json', 'r') as read_file:
     data = json.load(read_file)
     for category in data:
         yparent = category['parents']
-        if yparent and (pc.filter_by(place_category_id=yparent[0]).first() == None):
-            new_cat = model.PlaceCategory(place_category_id=yparent[0])
-            session.add(new_cat)
-            session.commit()
-            place_type = model.PlaceType(place_type_id=category['alias'], 
-                                     title=category['title'],
-                                     place_category_id=yparent[0])
+
+        if yparent and pc.filter_by(place_category_id=yparent[0]).first() == None:
+            if yparent[0] in CATEGORIES:
+                new_cat = model.PlaceCategory(place_category_id=yparent[0])
+                session.add(new_cat)
+                session.commit()
+                place_type = model.PlaceType(place_type_id=category['alias'], 
+                                         title=category['title'],
+                                         place_category_id=yparent[0])
         elif yparent:
             place_type = model.PlaceType(place_type_id=category['alias'], 
                                      title=category['title'],
                                      place_category_id=yparent[0])
-        else:
-            place_type = model.PlaceType(place_type_id=category['alias'], 
-                                     title=category['title'])
+
         session.add(place_type)
         session.commit()
+
+categories = model.PlaceCategory.query.all()
+places = model.PlaceType.query.all()
+
+grocery = model.PlaceCategory(place_category_id='grocery')
+session.add(grocery)
+session.commit()
+print(grocery)
+
+grocery_stores = ['grocery','intlgrocery','ethicgrocery','farmersmarket', 'importedfood']
+
+for place in places:
+    if place.place_type_id in grocery_stores:
+        place.place_category_id = 'grocery'
+
+session.commit()

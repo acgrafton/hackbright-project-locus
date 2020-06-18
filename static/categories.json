@@ -7,26 +7,6 @@
         ]
     },
     {
-        "alias": "abruzzese",
-        "title": "Abruzzese",
-        "parents": [
-            "italian"
-        ],
-        "country_whitelist": [
-            "IT"
-        ]
-    },
-    {
-        "alias": "absinthebars",
-        "title": "Absinthe Bars",
-        "parents": [
-            "bars"
-        ],
-        "country_whitelist": [
-            "CZ"
-        ]
-    },
-    {
         "alias": "acaibowls",
         "title": "Acai Bowls",
         "parents": [
@@ -170,76 +150,6 @@
         ]
     },
     {
-        "alias": "afrobrazilian",
-        "title": "Afro-Brazilian",
-        "parents": [
-            "religiousorgs"
-        ],
-        "country_whitelist": [
-            "BR"
-        ]
-    },
-    {
-        "alias": "agriturismi",
-        "title": "Agriturismi",
-        "parents": [
-            "hotels"
-        ],
-        "country_whitelist": [
-            "PL",
-            "ES",
-            "CZ",
-            "FR",
-            "IT",
-            "AT",
-            "CH",
-            "DE",
-            "MX",
-            "AR",
-            "CL",
-            "TW"
-        ]
-    },
-    {
-        "alias": "aircraftdealers",
-        "title": "Aircraft Dealers",
-        "parents": [
-            "auto"
-        ],
-        "country_whitelist": [
-            "CZ",
-            "US",
-            "PT"
-        ]
-    },
-    {
-        "alias": "aircraftrepairs",
-        "title": "Aircraft Repairs",
-        "parents": [
-            "auto"
-        ]
-    },
-    {
-        "alias": "airductcleaning",
-        "title": "Air Duct Cleaning",
-        "parents": [
-            "localservices"
-        ],
-        "country_whitelist": [
-            "MY",
-            "IE",
-            "ES",
-            "CA",
-            "IT",
-            "GB",
-            "US",
-            "PH",
-            "AU",
-            "SG",
-            "NZ"
-        ]
-    },
-    {
         "alias": "airlines",
         "title": "Airlines",
         "parents": [
@@ -282,41 +192,10 @@
         ]
     },
     {
-        "alias": "alentejo",
-        "title": "Alentejo",
-        "parents": [
-            "portuguese"
-        ],
-        "country_whitelist": [
-            "PT"
-        ]
-    },
-    {
-        "alias": "algarve",
-        "title": "Algarve",
-        "parents": [
-            "portuguese"
-        ],
-        "country_whitelist": [
-            "PT"
-        ]
-    },
-    {
         "alias": "allergist",
         "title": "Allergists",
         "parents": [
             "physicians"
-        ]
-    },
-    {
-        "alias": "alsatian",
-        "title": "Alsatian",
-        "parents": [
-            "french"
-        ],
-        "country_whitelist": [
-            "FR",
-            "DE"
         ]
     },
     {
@@ -345,16 +224,6 @@
         ]
     },
     {
-        "alias": "altoatesine",
-        "title": "Altoatesine",
-        "parents": [
-            "italian"
-        ],
-        "country_whitelist": [
-            "IT"
-        ]
-    },
-    {
         "alias": "amateursportsteams",
         "title": "Amateur Sports Teams",
         "parents": [
@@ -369,33 +238,6 @@
         "title": "Amusement Parks",
         "parents": [
             "active"
-        ]
-    },
-    {
-        "alias": "andalusian",
-        "title": "Andalusian",
-        "parents": [
-            "restaurants"
-        ],
-        "country_whitelist": [
-            "IT",
-            "ES"
-        ]
-    },
-    {
-        "alias": "anesthesiologists",
-        "title": "Anesthesiologists",
-        "parents": [
-            "physicians"
-        ],
-        "country_whitelist": [
-            "US",
-            "SE",
-            "BE",
-            "AU",
-            "PT",
-            "FR",
-            "IT"
         ]
     },
     {
@@ -459,17 +301,6 @@
         "title": "Appraisal Services",
         "parents": [
             "localservices"
-        ]
-    },
-    {
-        "alias": "apulian",
-        "title": "Apulian",
-        "parents": [
-            "italian"
-        ],
-        "country_whitelist": [
-            "FR",
-            "IT"
         ]
     },
     {
@@ -552,25 +383,6 @@
         ]
     },
     {
-        "alias": "armenian",
-        "title": "Armenian",
-        "parents": [
-            "restaurants"
-        ],
-        "country_whitelist": [
-            "PL",
-            "ES",
-            "CZ",
-            "FR",
-            "IT",
-            "GB",
-            "US",
-            "TR",
-            "BE",
-            "AR"
-        ]
-    },
-    {
         "alias": "arroceria_paella",
         "title": "Arroceria / Paella",
         "parents": [
@@ -606,22 +418,6 @@
         "title": "Artificial Turf",
         "parents": [
             "homeservices"
-        ]
-    },
-    {
-        "alias": "artinstallation",
-        "title": "Art Installation",
-        "parents": [
-            "localservices"
-        ],
-        "country_whitelist": [
-            "MY",
-            "US",
-            "DE",
-            "PL",
-            "PH",
-            "CH",
-            "AT"
         ]
     },
     {
@@ -661,23 +457,6 @@
         ]
     },
     {
-        "alias": "artspacerentals",
-        "title": "Art Space Rentals",
-        "parents": [
-            "realestate"
-        ],
-        "country_whitelist": [
-            "IE",
-            "JP",
-            "IT",
-            "GB",
-            "US",
-            "SE",
-            "HK",
-            "SG"
-        ]
-    },
-    {
         "alias": "artsupplies",
         "title": "Art Supplies",
         "parents": [
@@ -710,78 +489,6 @@
         "title": "Astrologers",
         "parents": [
             "psychic_astrology"
-        ]
-    },
-    {
-        "alias": "asturian",
-        "title": "Asturian",
-        "parents": [
-            "restaurants"
-        ],
-        "country_whitelist": [
-            "ES"
-        ]
-    },
-    {
-        "alias": "ateliers",
-        "title": "Ateliers",
-        "parents": [
-            "artsandcrafts"
-        ],
-        "country_whitelist": [
-            "JP",
-            "NL",
-            "NO",
-            "IT",
-            "DK",
-            "AT",
-            "DE",
-            "TR",
-            "BE",
-            "CH"
-        ]
-    },
-    {
-        "alias": "attractionfarms",
-        "title": "Attraction Farms",
-        "parents": [
-            "farms"
-        ],
-        "country_whitelist": [
-            "BR",
-            "ES",
-            "NO",
-            "IT",
-            "DK",
-            "AT",
-            "US",
-            "DE",
-            "SE",
-            "PT",
-            "CH"
-        ]
-    },
-    {
-        "alias": "atvrentals",
-        "title": "ATV Rentals/Tours",
-        "parents": [
-            "active"
-        ],
-        "country_whitelist": [
-            "PL",
-            "ES",
-            "NO",
-            "NL",
-            "AT",
-            "US",
-            "FI",
-            "DE",
-            "SE",
-            "MX",
-            "BE",
-            "AR",
-            "CL",
-            "CH"
         ]
     },
     {
@@ -862,17 +569,6 @@
         ]
     },
     {
-        "alias": "authorized_postal_representative",
-        "title": "Authorized Postal Representative",
-        "parents": [
-            "publicservicesgovt"
-        ],
-        "country_whitelist": [
-            "NO",
-            "SE"
-        ]
-    },
-    {
         "alias": "auto",
         "title": "Automotive",
         "parents": []
@@ -926,23 +622,6 @@
             "DE",
             "SE",
             "BE",
-            "PT"
-        ]
-    },
-    {
-        "alias": "autoelectric",
-        "title": "Auto Electric Services",
-        "parents": [
-            "auto"
-        ],
-        "country_whitelist": [
-            "BR",
-            "ES",
-            "CZ",
-            "IT",
-            "MX",
-            "AR",
-            "CL",
             "PT"
         ]
     },
@@ -2541,22 +2220,6 @@
         ]
     },
     {
-        "alias": "calligraphy",
-        "title": "Calligraphy",
-        "parents": [
-            "localservices"
-        ],
-        "country_whitelist": [
-            "US",
-            "TR",
-            "IT",
-            "BE",
-            "BR",
-            "ES",
-            "NL"
-        ]
-    },
-    {
         "alias": "cambodian",
         "title": "Cambodian",
         "parents": [
@@ -2742,34 +2405,6 @@
         ]
     },
     {
-        "alias": "carbuyers",
-        "title": "Car Buyers",
-        "parents": [
-            "auto"
-        ],
-        "country_whitelist": [
-            "PL",
-            "BR",
-            "CA",
-            "DK",
-            "AT",
-            "GB",
-            "CH",
-            "MY",
-            "IE",
-            "CZ",
-            "NO",
-            "NL",
-            "US",
-            "DE",
-            "BE",
-            "PH",
-            "AU",
-            "SG",
-            "NZ"
-        ]
-    },
-    {
         "alias": "cardioclasses",
         "title": "Cardio Classes",
         "parents": [
@@ -2942,30 +2577,6 @@
         ]
     },
     {
-        "alias": "castles",
-        "title": "Castles",
-        "parents": [
-            "arts"
-        ],
-        "country_whitelist": [
-            "ES",
-            "JP",
-            "CZ",
-            "NO",
-            "DK",
-            "FR",
-            "IT",
-            "AT",
-            "GB",
-            "FI",
-            "DE",
-            "SE",
-            "BE",
-            "PT",
-            "CH"
-        ]
-    },
-    {
         "alias": "catalan",
         "title": "Catalan",
         "parents": [
@@ -2988,20 +2599,6 @@
         "title": "Caterers",
         "parents": [
             "eventservices"
-        ]
-    },
-    {
-        "alias": "cellphoneaccessories",
-        "title": "Mobile Phone Accessories",
-        "parents": [
-            "shopping"
-        ],
-        "country_blacklist": [
-            "MY",
-            "FI",
-            "TR",
-            "PL",
-            "PH"
         ]
     },
     {
@@ -3323,38 +2920,6 @@
         ]
     },
     {
-        "alias": "churros",
-        "title": "Churros",
-        "parents": [
-            "food"
-        ],
-        "country_whitelist": [
-            "MX",
-            "BR",
-            "AR",
-            "CL",
-            "ES",
-            "PT"
-        ]
-    },
-    {
-        "alias": "cideries",
-        "title": "Cideries",
-        "parents": [
-            "food"
-        ],
-        "country_blacklist": [
-            "JP",
-            "FR",
-            "NL",
-            "NO",
-            "IT",
-            "DK",
-            "TR",
-            "BE"
-        ]
-    },
-    {
         "alias": "cigarbars",
         "title": "Cigar Bars",
         "parents": [
@@ -3372,23 +2937,6 @@
         ],
         "country_whitelist": [
             "US"
-        ]
-    },
-    {
-        "alias": "circusschools",
-        "title": "Circus Schools",
-        "parents": [
-            "specialtyschools"
-        ],
-        "country_whitelist": [
-            "BR",
-            "ES",
-            "FR",
-            "FI",
-            "MX",
-            "AR",
-            "CL",
-            "PT"
         ]
     },
     {
@@ -3626,24 +3174,6 @@
         ]
     },
     {
-        "alias": "communitybookbox",
-        "title": "Community Book Box",
-        "parents": [
-            "localservices"
-        ],
-        "country_blacklist": [
-            "MY",
-            "ES",
-            "JP",
-            "FR",
-            "IT",
-            "MX",
-            "PH",
-            "AR",
-            "CL"
-        ]
-    },
-    {
         "alias": "communitycenters",
         "title": "Community Centers",
         "parents": [
@@ -3695,29 +3225,6 @@
         ]
     },
     {
-        "alias": "concept_shops",
-        "title": "Concept Shops",
-        "parents": [
-            "shopping"
-        ],
-        "country_blacklist": [
-            "PL",
-            "BR",
-            "ES",
-            "CA",
-            "JP",
-            "IT",
-            "US",
-            "TR",
-            "SE",
-            "HK",
-            "AR",
-            "CL",
-            "SG",
-            "NZ"
-        ]
-    },
-    {
         "alias": "conciergemedicine",
         "title": "Concierge Medicine",
         "parents": [
@@ -3736,19 +3243,6 @@
         "country_blacklist": [
             "NZ",
             "AU"
-        ]
-    },
-    {
-        "alias": "congee",
-        "title": "Congee",
-        "parents": [
-            "chinese"
-        ],
-        "country_whitelist": [
-            "SG",
-            "MY",
-            "TW",
-            "HK"
         ]
     },
     {
@@ -3888,21 +3382,6 @@
         "title": "Costumes",
         "parents": [
             "artsandcrafts"
-        ]
-    },
-    {
-        "alias": "countertopinstall",
-        "title": "Countertop Installation",
-        "parents": [
-            "homeservices"
-        ],
-        "country_blacklist": [
-            "DE",
-            "CZ",
-            "FR",
-            "IT",
-            "CH",
-            "AT"
         ]
     },
     {
@@ -4083,16 +3562,6 @@
         ]
     },
     {
-        "alias": "cucinacampana",
-        "title": "Cucina campana",
-        "parents": [
-            "italian"
-        ],
-        "country_whitelist": [
-            "IT"
-        ]
-    },
-    {
         "alias": "culturalcenter",
         "title": "Cultural Center",
         "parents": [
@@ -4178,18 +3647,6 @@
             "PT",
             "CA",
             "NZ"
-        ]
-    },
-    {
-        "alias": "cypriot",
-        "title": "Cypriot",
-        "parents": [
-            "restaurants"
-        ],
-        "country_whitelist": [
-            "DE",
-            "CH",
-            "AT"
         ]
     },
     {
@@ -7154,31 +6611,6 @@
         ]
     },
     {
-        "alias": "handball",
-        "title": "Handball",
-        "parents": [
-            "active"
-        ],
-        "country_blacklist": [
-            "CA",
-            "GB",
-            "PT",
-            "MY",
-            "IE",
-            "CZ",
-            "US",
-            "DE",
-            "TR",
-            "MX",
-            "HK",
-            "PH",
-            "AU",
-            "SG",
-            "NZ",
-            "TW"
-        ]
-    },
-    {
         "alias": "handrolls",
         "title": "Hand Rolls",
         "parents": [
@@ -7264,23 +6696,6 @@
             "PT",
             "CZ",
             "DK"
-        ]
-    },
-    {
-        "alias": "hawkercentre",
-        "title": "Hawker Centre",
-        "parents": [
-            "food"
-        ],
-        "country_whitelist": [
-            "MY",
-            "MX",
-            "HK",
-            "PH",
-            "AR",
-            "CL",
-            "SG",
-            "TW"
         ]
     },
     {
@@ -7373,30 +6788,6 @@
         ]
     },
     {
-        "alias": "hearing_aids",
-        "title": "Hearing Aids",
-        "parents": [
-            "health"
-        ],
-        "country_whitelist": [
-            "PL",
-            "BR",
-            "ES",
-            "CZ",
-            "FR",
-            "NO",
-            "DK",
-            "AT",
-            "FI",
-            "DE",
-            "MX",
-            "AR",
-            "CL",
-            "PT",
-            "CH"
-        ]
-    },
-    {
         "alias": "hearingaidproviders",
         "title": "Hearing Aid Providers",
         "parents": [
@@ -7415,19 +6806,6 @@
             "AR",
             "CL",
             "CH"
-        ]
-    },
-    {
-        "alias": "henghwa",
-        "title": "Henghwa",
-        "parents": [
-            "chinese"
-        ],
-        "country_whitelist": [
-            "SG",
-            "MY",
-            "TW",
-            "HK"
         ]
     },
     {
@@ -7470,26 +6848,6 @@
         "title": "Herbs & Spices",
         "parents": [
             "gourmet"
-        ]
-    },
-    {
-        "alias": "hessian",
-        "title": "Hessian",
-        "parents": [
-            "german"
-        ],
-        "country_whitelist": [
-            "DE"
-        ]
-    },
-    {
-        "alias": "heuriger",
-        "title": "Heuriger",
-        "parents": [
-            "restaurants"
-        ],
-        "country_whitelist": [
-            "AT"
         ]
     },
     {
@@ -7562,19 +6920,6 @@
         "title": "Hockey Equipment",
         "parents": [
             "sportgoods"
-        ]
-    },
-    {
-        "alias": "hokkien",
-        "title": "Hokkien",
-        "parents": [
-            "chinese"
-        ],
-        "country_whitelist": [
-            "SG",
-            "MY",
-            "TW",
-            "HK"
         ]
     },
     {
@@ -7737,25 +7082,6 @@
             "BE",
             "PT",
             "CH"
-        ]
-    },
-    {
-        "alias": "homeopathic",
-        "title": "Homeopathic",
-        "parents": [
-            "physicians"
-        ],
-        "country_blacklist": [
-            "IE",
-            "CA",
-            "GB",
-            "US",
-            "TR",
-            "HK",
-            "AU",
-            "SG",
-            "NZ",
-            "TW"
         ]
     },
     {
@@ -7923,17 +7249,6 @@
         ]
     },
     {
-        "alias": "horumon",
-        "title": "Horumon",
-        "parents": [
-            "japanese"
-        ],
-        "country_whitelist": [
-            "JP",
-            "TW"
-        ]
-    },
-    {
         "alias": "hospice",
         "title": "Hospice",
         "parents": [
@@ -7994,21 +7309,6 @@
         "title": "Fast Food",
         "parents": [
             "restaurants"
-        ]
-    },
-    {
-        "alias": "hotel_bar",
-        "title": "Hotel bar",
-        "parents": [
-            "bars"
-        ],
-        "country_whitelist": [
-            "FI",
-            "SE",
-            "BR",
-            "PT",
-            "NO",
-            "DK"
         ]
     },
     {
@@ -8085,19 +7385,6 @@
             "DE",
             "AU",
             "CH"
-        ]
-    },
-    {
-        "alias": "housingcooperatives",
-        "title": "Housing Cooperatives",
-        "parents": [
-            "realestate"
-        ],
-        "country_blacklist": [
-            "MX",
-            "AR",
-            "IT",
-            "CL"
         ]
     },
     {
@@ -8448,16 +7735,6 @@
         ]
     },
     {
-        "alias": "island_pub",
-        "title": "Island Pub",
-        "parents": [
-            "restaurants"
-        ],
-        "country_whitelist": [
-            "SE"
-        ]
-    },
-    {
         "alias": "isps",
         "title": "Internet Service Providers",
         "parents": [
@@ -8528,16 +7805,6 @@
         ]
     },
     {
-        "alias": "jaliscan",
-        "title": "Jaliscan",
-        "parents": [
-            "mexican"
-        ],
-        "country_whitelist": [
-            "MX"
-        ]
-    },
-    {
         "alias": "japacurry",
         "title": "Japanese Curry",
         "parents": [
@@ -8598,28 +7865,6 @@
             "SG",
             "NZ",
             "TW"
-        ]
-    },
-    {
-        "alias": "jewish",
-        "title": "Jewish",
-        "parents": [
-            "restaurants"
-        ],
-        "country_whitelist": [
-            "IT",
-            "DE",
-            "PL"
-        ]
-    },
-    {
-        "alias": "jpsweets",
-        "title": "Japanese Sweets",
-        "parents": [
-            "food"
-        ],
-        "country_whitelist": [
-            "JP"
         ]
     },
     {

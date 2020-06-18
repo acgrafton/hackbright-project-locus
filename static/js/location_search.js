@@ -35,7 +35,7 @@ function initMap() {
         let place = autocomplete.getPlace();
         if (place.geometry) {
             map.panTo(place.geometry.location);
-            map.setZoom(15);
+            map.setZoom(10);
             
             let fetchData = {
                 method: 'POST',
@@ -48,26 +48,25 @@ function initMap() {
 
             console.log(fetchData);
 
-            fetch('/api/criteria', fetchData)
+            fetch('/api/score_location', fetchData)
                 .then(response => response.json())
                 .then(data => {
                     console.log(data)
 
-                    const criteria = data.criteria
+                    const criteria = data.criteria //list of criteria objects
                     const score = data.score //location's total score based on weighted avg
                     
-                     //list of criteria objects
-
                     for (const criterion of criteria) {
 
                         for (const place of criterion['results']) {
                             const infoContent = (`
                                 <div class="window-content">
                                   <ul class="place-info">
-                                    <li><b>Name: </b>${place.name}</li>
-                                    <li><b>Met Criteria: </b>${criterion.place_type}</li>
-                                    <li><b>Yelp Rating: </b>${place.rating}</li>
-                                    <li><b>Distance: </b>${place.distance}</li>
+                                    <li><b>place name: </b>${place.name}</li>
+                                    <li><b>your criteria: </b>${criterion.place_type}</li>
+                                    <li><b>yelp rating: </b>${place.rating}</li>
+                                    <li><b>distance to search location: </b>
+                                            ${place.distance}</li>
                                   </ul>
                                 </div>
                                 `);
@@ -77,7 +76,7 @@ function initMap() {
                                     lat: place.coordinates.latitude,
                                     lng: place.coordinates.longitude
                                 },
-                                title: `Place Name: ${place.name}`,
+                                title: `place name: ${place.name}`,
                                 map: map
                             });
 

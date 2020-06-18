@@ -3,14 +3,15 @@
 
 //Helper functions to show and hide elements on page---------------------------
 const cancelCritChgs = () => {
-    let card = document.querySelector('div#criterion-card.card');
+    let card = document.querySelector('div#crit-card.card');
     let form = document.querySelector('form#edit-crit-form');
+    let label = document.querySelector('#cat-label')
     card.removeChild(form);
     showCriteriaDetails()
 };
 
 const cancelAddCrit = () => {
-    let card = document.querySelector('div#criterion-card.card');
+    let card = document.querySelector('div#crit-card.card');
     let form = document.querySelector('form#criteria-form');
     card.removeChild(form);
     showCriteriaDetails();
@@ -35,6 +36,81 @@ const showCategories = () => {
 };
 //------------------------------------------------------------------------------
 
+const display_criteria = () => {
+
+    //Create unordered list element
+    const ul = document.createElement('ul');
+    ul.setAttribute('class', 'crit-det');
+
+    //Make ajax call to get scored location info
+    fetch('/api/criteria')
+    .then(response => response.json())
+    .then(data => {
+
+        console.log(data)
+
+        //Iterate through list of score dictionaries and create list elements
+        //to display address and score
+        for (const {id, importance, max_distance, name, 
+                    place_id, place_title} of data) {
+
+            const distance = Math.floor(max_distance / 1609);  
+
+            const li = document.createElement('li');
+            li.innerHTML = `Place Type:`;
+
+            const span = document.createElement('span');
+            span.setAttribute('id', `${place_id}-title`);
+            span.innerHTML = place_title;
+            li.appendChild(span);
+            ul.appendChild(li);
+
+            const li2 = document.createElement('li');
+            li2.innerHTML = `Importance:`;
+
+            const span2 = document.createElement('span');
+            span2.setAttribute('id', `${place_id}-importance`);
+            span2.innerHTML = importance;
+            li2.appendChild(span2);
+            li.after(li2);
+            
+            const li3 = document.createElement('li');
+            li3.innerHTML = `Max Distance:`;
+
+            const span3 = document.createElement('span');
+            span3.setAttribute('id', `${place_id}-distance`);
+            span3.innerHTML = distance;
+            li3.appendChild(span3);
+            li2.after(li3);
+
+            const editBtn = document.createElement('button');
+            editBtn.setAttribute('class', 'crud crit edit');
+            editBtn.setAttribute('id', `edit-${place_id}`);
+            editBtn.innerHTML = 'Edit';
+            ul.appendChild(editBtn);
+            editBtn.addEventListener('click', (evt) => {
+                evt.preventDefault();
+                editForm = createEditCritFrm(evt.target);
+                document.querySelector('div#crit-card.card').appendChild(editForm);
+                hideCriteriaDetails();
+            });
+
+            const saveBtn = document.createElement('button');
+            saveBtn.setAttribute('class', 'crud crit remove');
+            saveBtn.setAttribute('id', `remove-${place_id}`);
+            saveBtn.innerHTML = 'Remove';
+            ul.appendChild(saveBtn);
+
+            ul.appendChild(document.createElement('br'));
+            ul.appendChild(document.createElement('br'));
+
+        document.getElementById('crit-card').appendChild(ul);
+        }
+    })
+}
+
+
+
 
 //Generate buttons of place categories for user to select
 const createCategoryBtns = () => {
@@ -43,16 +119,24 @@ const createCategoryBtns = () => {
     fetch('/api/place_categories')
         .then(response => response.json())
         .then((data) => {
+            console.log(data)
+
+            //Create label
+            const label = document.createElement('label');
+            label.setAttribute('for', 'categories');
+            label.setAttribute('id', 'cat-label')
+            label.innerHTML = 'Place Categories';
 
             //Create fieldset to contain the category buttons
-            fdset = document.createElement('fieldset');
-            fdset.setAttribute('id', 'cat-fieldset')
+            const fdset = document.createElement('fieldset');
+            fdset.setAttribute('id', 'cat-fieldset');
+            fdset.setAttribute('name', 'categories');
 
             //Loop through categories and create buttons with event listeners
             //for each
             for (const category of data){
                 const btn = document.createElement('button');
-                btn.setAttribute('class', 'category')
+                btn.setAttribute('class', 'category');
                 btn.setAttribute('id', `${category}`);
                 btn.innerHTML = category;
 
@@ -63,9 +147,11 @@ const createCategoryBtns = () => {
                     const clickedBtn = evt.target.innerText;
                     createCritFrm(clickedBtn);
                 });
-                fdset.appendChild(btn);
+                fdset.append(btn);
 
-            document.querySelector('#criterion-card').append(fdset);
+            document.querySelector('#crit-card').prepend(fdset);
+            document.querySelector('#crit-card').prepend(label);
+            
             };
         });
 };
@@ -74,10 +160,10 @@ const createCategoryBtns = () => {
 //Create a form for user to set place criteria and importance
 const createCritFrm = (selectedCategory) => {
 
-    card = document.querySelector('#criterion-card')
+    category = document.querySelector('#cat-fieldset');
     
     //Create form element
-    const form = document.createElement('formorm');
+    const form = document.createElement('form');
     form.setAttribute("action", "/api/set_criteria");
     form.setAttribute("method", "POST");
     form.setAttribute("id", "criteria-form");
@@ -90,14 +176,13 @@ const createCritFrm = (selectedCategory) => {
     input.setAttribute('placeholder', 'Select Place Type');
     form.appendChild(input);
 
-    //Get place types json from server and convert back to array.
+    //Get place types json from server and convert back to array
     fetch(`/api/place_types/${selectedCategory}`)
     .then(response => response.json())
     .then(data => {
 
         //Array of place types in alpha order
         placeTypes = data[selectedCategory];
-        console.log(placeTypes)
 
         //Create dropdown menu and append to form
         let datalist = document.createElement('datalist');
@@ -115,13 +200,16 @@ const createCritFrm = (selectedCategory) => {
         form.appendChild(datalist);
 
         //Add importance menu
-        form.appendChild(generateImportanceMenu());
+        form.appendChild(createImportanceMenu());
+
+        //Add distance menu
+        form.appendChild(createDistanceMenu());
 
         //Add save and cancel buttons
         form.appendChild(createSaveBtn());
         form.appendChild(createCancelBtn(cancelAddCrit));
 
-        card.appendChild(form);
+        category.after(form);
 
         return form;
     });
@@ -129,7 +217,7 @@ const createCritFrm = (selectedCategory) => {
 
 
 //Create dropdown menu to select importance criteria
-const generateImportanceMenu = () => {
+const createImportanceMenu = () => {
 
     //Create input element
     const input = document.createElement('input');
@@ -156,12 +244,33 @@ const generateImportanceMenu = () => {
     return input;
 }
 
+//Create dropdown menu to select distance parameters
+const createDistanceMenu = () => {
 
-//Sets 'disabled' attribute of all place-category buttons to 'false'
-const resetCategories = () => {
-    categoryButtons = document.getElementById('cat-fieldset')
-    categoryButtons.setAttribute('disabled', false)
-};
+    //Create input element
+    const input = document.createElement('input');
+    input.setAttribute('id', 'distance');
+    input.setAttribute('name', 'distance');
+    input.setAttribute('list', 'select-distance');
+    input.setAttribute('placeholder', 'Select Distance (miles)');
+
+    const datalist = document.createElement('datalist');
+    datalist.setAttribute('id', 'select-distance');
+
+    //Loop through list of distance options array and make each of those an option
+    const dist_list = [3, 5, 10, 15, 20, 30]
+
+    for (const dist of dist_list) {
+        option = document.createElement('option');
+        option.setAttribute('value', dist.toString());
+        option.innerHTML = 'miles';
+        datalist.appendChild(option);
+    };
+
+    input.appendChild(datalist);
+
+    return input;
+}
 
 
 //Given user-clicked button html element, return a form to edit the selected criterion
@@ -169,6 +278,7 @@ const createEditCritFrm = (clickedBtn) => {
 
     //Get current criteria info
     placeID = clickedBtn.id.slice(5);
+    console.log(placeID)
     placeTitle = document.getElementById(`${placeID}-title`).innerHTML;
     placeImportance = document.getElementById(`${placeID}-importance`).innerHTML;
     placeDistance = document.getElementById(`${placeID}-distance`).innerHTML;
@@ -180,8 +290,6 @@ const createEditCritFrm = (clickedBtn) => {
     
     //Create form element
     const form = document.createElement('form');
-    form.setAttribute("action", "/api/edit_criteria");
-    form.setAttribute("method", "POST");
     form.setAttribute("id", "edit-crit-form");
 
     //Create Place Type Name field (non-editable)
@@ -208,7 +316,7 @@ const createEditCritFrm = (clickedBtn) => {
         form.appendChild(label);
 
         if (placeField === 'importance') {
-            form.appendChild(generateImportanceMenu());
+            form.appendChild(createImportanceMenu());
 
         } else {
             input = document.createElement('input');
@@ -225,7 +333,21 @@ const createEditCritFrm = (clickedBtn) => {
 
     //Create 'save' and 'cancel' buttons
     saveBtn = createSaveBtn();
-    saveBtn.setAttribute('form', 'edit-crit-form');
+    saveBtn.onsubmit = async (e) => {
+        e.preventDefault();
+
+        let critForm = document.querySelector('#edit-crit-form');
+
+        let response = await fetch('/api/edit_criteria', {
+            method: 'POST',
+            body: new FormData(critForm)
+        });
+
+        let result = await response.json();
+
+        alert('Criteria changes saved!')
+    };
+
     form.appendChild(saveBtn);
 
     cancelBtn = createCancelBtn(cancelCritChgs);
@@ -233,6 +355,14 @@ const createEditCritFrm = (clickedBtn) => {
 
     return form;
 };
+
+
+const saveCriteria = (clickedBtn) => {
+
+}
+
+
+
 
 //Delete criteria from database and reload page.
 const removeCriteria = (clickedBtn) => {
@@ -272,25 +402,10 @@ const removeCriteria = (clickedBtn) => {
     
     //Attach event listener with callback function to create category buttons
     addCritBtn.addEventListener('click', (evt)=> {
-        evt.preventDefault();
         document.querySelector('button#add-crit.crud').style.display = 'none';
         createCategoryBtns();
     });
 
-    //Get edit criteria buttons
-    const editCritBtns = document.querySelectorAll('button.crud.crit.edit');
-
-    //Add event listener to each button. 
-    //Callback function to show dropdown menu to select criteria
-    for (const editCritBtn of editCritBtns) {
-        editCritBtn.addEventListener('click', (evt) => {
-            evt.preventDefault();
-            editForm = createEditCritFrm(evt.target);
-            document.querySelector('div#criterion-card.card').appendChild(editForm);
-            hideCriteriaDetails();
-        });
-    };
-    
     //Get remove criteria buttons
     const removeCritBtns = document.querySelectorAll('button.crud.crit.remove');
 
@@ -302,7 +417,14 @@ const removeCriteria = (clickedBtn) => {
             removeCriteria(evt.target); 
         });
     };
+
+    display_criteria();
+
 })();
+
+        
+
+        
 
 
 

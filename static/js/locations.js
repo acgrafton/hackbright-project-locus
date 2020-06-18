@@ -1,11 +1,55 @@
 //crud script for adding or removing locations
 
-const removeLocation = (clickedBtn) => {
+//Display scored locations on profile page
+const displayLocations = () => {
 
-    console.log(clickedBtn)
-    console.log(clickedBtn.id)
+    //Create unordered list element
+    const ul = document.createElement('ul');
+    ul.setAttribute('class', 'loc-det');
+
+    //Make ajax call to get scored location info
+    fetch('/api/scored_locations')
+    .then(response => response.json())
+    .then(data => {
+
+        console.log(data)
+
+        //Iterate through list of score dictionaries and create list elements
+        //to display address and score
+        for (const {score_id, score, address} of data) {
+
+            console.log(score_id, score, address)
+
+            const li = document.createElement('li');
+            li.innerHTML = `Address: ${address}`;
+            ul.appendChild(li);
+            
+            const li2 = document.createElement('li');
+            li2.innerHTML = `Score: ${score}`;
+            ul.appendChild(li2);
+
+            const btn = document.createElement('button');
+            btn.setAttribute('class', 'crud loc remove');
+            btn.setAttribute('id', `remove-${score_id}`);
+            btn.innerHTML = 'Remove';
+            btn.addEventListener('click', (evt) => {
+                evt.preventDefault();
+                removeLocation(evt.target);
+                });
+            ul.appendChild(btn);
+
+
+            document.getElementById('loc-card').appendChild(ul);
+        }
+    })
+}
+
+
+
+const removeLocation = (clickedBtn) => {
     
     const scoreId = Number(clickedBtn.id.slice(7));
+    console.log(scoreId)
 
     const data = {'scoreId': scoreId};
 
@@ -20,7 +64,7 @@ const removeLocation = (clickedBtn) => {
     fetch('/api/remove_location', fetchData)
         .then(response => response.json())
         .then(data => {
-            document.location.reload();
+            document.location.reload(true);
         });
 };
 
@@ -32,23 +76,12 @@ const addLocation = () => {
 
 (function runLocations() {
 
+    displayLocations()
+
     //Attach event listener to "Add" location button
     //Callback function create form to add location
     const addLocBtn = document.querySelector('button#add-loc.crud');
-    
-    addLocBtn.addEventListener('click', addLocation);
-
-
-    // Attach event listener to "Remove" location button
-    // Callback function to create form to allow user to select location to remove
-    const removeLocBtns = document.querySelectorAll('button.crud.loc.remove');
-    
-    for (const removeLocBtn of removeLocBtns) {
-        removeLocBtn.addEventListener('click', (evt) => {
-        evt.preventDefault();
-        removeLocation(evt.target);
-        });
-    };
+    addLocBtn.onclick = addLocation;
 
     
 })();

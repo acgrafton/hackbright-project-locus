@@ -14,6 +14,7 @@ API_KEY = os.environ['GOOGLE_TOKEN']
 
 gmaps = googlemaps.Client(key=API_KEY)
 
+
 @app.route('/')
 def show_homepage():
     """Show homepage if not logged in, otherwise redirect to profile page"""
@@ -55,7 +56,7 @@ def register_user():
 
 
 @app.route('/api/login', methods=['POST'])
-def log_in_user():
+def login_user():
     """Provided correct email and password, log-in user"""
 
     #Retrieve formdata
@@ -84,6 +85,7 @@ def log_out_user():
     """Clear user out of session data"""
 
     session.pop('user', None)
+    session['logged_in'] = 'no'
     flash('You have logged out')
 
     return redirect('/')
@@ -93,13 +95,16 @@ def log_out_user():
 def save_user_changes():
     """Save user changes"""
 
+    #Get form data
     first_name = request.form.get('edit-first-name')
     last_name = request.form.get('edit-last-name')
     email = request.form.get('edit-email')
 
+    #Get usename from session and get User object
     username = session['user']
     user = crud.get_user(username)
     
+    #Track changes
     info_changed = False
 
     if user.first_name != first_name:
@@ -207,9 +212,21 @@ def save_user_criteria():
 
     user.add_place_criterion(place_type_id, selected_importance)
 
-    flash('Criteria saved!')
-
     return redirect(f'/profile/{username}')
+
+
+@app.route('/api/criteria')
+def get_criteria_json():
+    """Get json of criteria"""
+
+    username = session['user']
+    user = crud.get_user(username)
+
+    criteria = user.get_place_criteria()
+
+    print(criteria)
+
+    return jsonify(criteria)
 
 
 @app.route('/api/remove_criteria', methods=['POST'])
@@ -230,13 +247,14 @@ def remove_criteria():
         return jsonify({'success': True})
 
     except Exception as err:
+        
         return jsonify({'success': False,
                         'error': str(err)})
 
 
-@app.route('/api/criteria', methods=['POST'])
-def get_user_criteria_json():
-    """Return criteria in JSON"""
+@app.route('/api/score_location', methods=['POST'])
+def get_searched_location_json():
+    """Return criteria in JSON and score location"""
 
     #Geocode info from searched location
     geocode = request.json
@@ -254,6 +272,18 @@ def display_location_search():
 
     return render_template('location.html',
                             key=API_KEY)
+
+
+@app.route('/api/scored_locations')
+def get_scored_locations_json():
+    """Get json of scored locations"""
+
+    username = session['user']
+    user = crud.get_user(username)
+
+    scored_locations = user.get_scores()
+
+    return jsonify(scored_locations)
 
 
 @app.route('/api/remove_location', methods=['POST'])
@@ -277,8 +307,6 @@ def remove_location():
     except Exception as err:
         return jsonify({'success': False,
                         'error': str(err)})
-
-
 
 if __name__ == '__main__':
     connect_to_db(app)

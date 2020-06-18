@@ -3,14 +3,15 @@
 
 {% block body %}
 <header>
-    <button class='logout' value='Log Out' id='logout'>Log Out</button>
+    
 </header>
 
   <section id="profile">
-    <h3>User Information</h3>
+    <h3><span id="username">{{user.username}}</span>
+      
+    </h3>
     <div class='card' id='user-card'>
       <ul class='user-det'>
-        <li> username: <span id="username">{{user.username}}</span></li>
         <li>first name: <span id="fname">{{user.first_name}}</span></li>
         <li>last name: <span id="lname">{{user.last_name}}</span> </li>
         <li>email: <span id="email">{{user.email}}</span></li>
@@ -18,50 +19,26 @@
       <fieldset id='edit-user'>
         <button class='crud'  id='edit-user-btn'>Edit User</button>
         <button class='crud' id='remove-user-btn'>Remove User</button>
+        <button class='logout' value='Log Out' id='logout'>Log Out</button>
       </fieldset>
     </div>
   </section>
   <hr>
   <section id="criteria">
-    <h3>Criteria</h3>
-    <div class='card' id='criterion-card'>
-      <ul class='crit-det'>
-        {% for criterion in criteria %}
-          <li>Place Type: 
-              <span id='{{criterion.place_type.place_type_id}}-title'> 
-                {{criterion.place_type.title}}
-              </span>
-            </li>
-          <li>Importance: 
-            <span id='{{criterion.place_type.place_type_id}}-importance'>
-              {{criterion.importance}}
-            </span>
-          </li>
-          <li>Max Distance: 
-            <span id='{{criterion.place_type.place_type_id}}-distance'>
-              {{criterion.max_distance}} </span> meters
-          </li>
-          <button class='crud crit edit' id='edit-{{criterion.place_type.place_type_id}}'>Edit</button>
-          <button class='crud crit remove' id='remove-{{criterion.place_type.place_type_id}}'>Remove</button>
-          <br>
-          <br>  
-        {% endfor %}
-          <button class='crud' id='add-crit'>Add</button>
-      </ul>
+    <h3>Criteria 
+      <button class='crud' id='add-crit'>Add</button>
+    </h3>
+    <div class='card' id='crit-card'>
     </div>
   </section>
   <hr>
   <section id="locations">
-    <h3>Scored Locations</h3>
+    <h3>Scored Locations    
+      <button class='crud loc add' id='add-loc'>Add</button>
+    </h3>
     <div class='card' id='loc-card'>
-      <ul class='loc-det'>
-    {% for score in scores %}
-        <li>Address: {{score.location.address}}</li>
-        <li>Score: {{score.score}}</li>
-        <button class='crud loc remove'cr id='remove-{{score.score_id}}'>Remove Location</button>
-        <br>
-    {% endfor %}
-    <button class='crud loc remove' id='add-loc'>Add Location</button>
+
+
     </div>
   </section>
 

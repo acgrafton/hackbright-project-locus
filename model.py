@@ -9,6 +9,8 @@ import requests
 GOOGLE_TOKEN = os.environ['GOOGLE_TOKEN']
 YELP_TOKEN = os.environ['YELP_TOKEN']
 
+# camille was here
+
 
 gmaps = googlemaps.Client(key=GOOGLE_TOKEN)
 
@@ -46,7 +48,7 @@ class User(db.Model):
                 'first_name': first_name, 'last_name': last_name}
 
 
-    @staticmethod    
+    @staticmethod
     def create_loc(geocode):
         """Given geocode dict (including point, lat, long, address)"""
 
@@ -61,7 +63,7 @@ class User(db.Model):
         return location
 
 
-    def add_place_criterion(self, place_type_id, importance, 
+    def add_place_criterion(self, place_type_id, importance,
                            max_distance=16093, name=None):
 
         criterion = PlaceCriterion(place_type_id=place_type_id,
@@ -86,7 +88,7 @@ class User(db.Model):
 
     def del_score(self, score_id):
         """Delete a score object from a user"""
-        
+
         score = Score.query.get(score_id)
 
         db.session.delete(score)
@@ -94,7 +96,7 @@ class User(db.Model):
 
 
     def update_max_points(self):
-        """Return maximum points to be used to calculate location 
+        """Return maximum points to be used to calculate location
         score for user"""
 
         points = 0
@@ -182,9 +184,9 @@ class User(db.Model):
     def get_place_criteria(self):
         """Return a list of criteria dictionaries"""
 
-        return [place_criterion.serialize() 
+        return [place_criterion.serialize()
                 for place_criterion in self.place_criteria]
- 
+
 
 class Location(db.Model):
     """User locations i.e. 'home', 'work'."""
@@ -208,7 +210,7 @@ class Location(db.Model):
     def serialize(self):
         """Return a dictionary of core attributes"""
 
-        return {'id': self.location_id, 'label': self.label, 
+        return {'id': self.location_id, 'label': self.label,
                 'address': self.address,'lng': longitude, 'lat': latitude}
 
 
@@ -226,13 +228,13 @@ class Location(db.Model):
 
 
     def evaluate(self, user):
-        """Given a user, return a dictionary with final score 
+        """Given a user, return a dictionary with final score
           and criteria evaluated"""
 
         #Shortcut
         locplcritq = LocPlCriterion.query
 
-        #Tally points based on results, track criteria 
+        #Tally points based on results, track criteria
         points = 0
         evaluation = {'criteria':[]}
 
@@ -248,31 +250,31 @@ class Location(db.Model):
 
 
             if crit.place_type_id in ['banks', 'grocery', 'hospitals']:
-                        
+
                 #Key=miles, Value= points
                 name_rubric = {1: 5, 3: 4, 5: 3, 10: 2}
                 gen_rubric = { 1: 4, 3: 3, 5:2, 10:1}
 
                 #Loop through the 3 distance parameters (1 mile, 3 miles, 5 miles)
                 for dist in gen_rubric.keys():
-                    
+
                     #API call to pull data from google
-                    data = crit.google_places(self.latitude, 
+                    data = crit.google_places(self.latitude,
                                                     self.longitude,
                                                     distance=dist)
                     results = data['results']
                     num_results = len(results)
-                    
+
                     #Calculate points based whether criterion has specific name
                     if crit.name != None:
-                        points = (name_rubric[dist] 
+                        points = (name_rubric[dist]
                                  if num_results > 0 else gen_rubric[dist])
 
                     if not locplcrit and not num_results:
                         self.add_lpcrit(crit.plcriterion_id, num_results, True)
 
                     elif not locplcrit and num_results:
-                        self.add_lpcrit(crit.plcriterion_id, num_results) 
+                        self.add_lpcrit(crit.plcriterion_id, num_results)
 
                 evaluation['criteria'].append({'place_type': crit.place_type_id,
                                            'importance': crit.importance,
@@ -286,32 +288,32 @@ class Location(db.Model):
                 #Get yelp business search endpoint data
                 data = crit.yelp(self.latitude, self.longitude)
                 num_results = data['total']
-                
+
                 #Create new Loc Place Criterion object if record does not exist
                 #Update meets_criteria and num_results if it does
                 #Increment points by importance level if there's at least one result
                 if (num_results > 0) and (locplcrit == None):
 
                     points += crit.importance
-                    
+
                     self.add_lpcrit(crit.plcriterion_id, num_results, True)
 
                 elif (num_results > 0) and (locplcrit != None):
-                    
+
                     points += crit.importance
-                    
+
                     locplcrit.meets_criterion == True
                     locplcrit.num_results = num_results
 
                 elif (num_results == 0) and (locplcrit == None):
-                    
-                    self.add_lpcrit(crit.plcriterion_id, num_results) 
-                   
+
+                    self.add_lpcrit(crit.plcriterion_id, num_results)
+
                 else:
 
                     locplcrit.meets_criterion == False
                     locplcrit.num_results = num_results
-                
+
                 evaluation['criteria'].append({'place_type': crit.place_type_id,
                                                'importance': crit.importance,
                                                'distance': crit.max_distance,
@@ -353,8 +355,8 @@ class PlaceCriterion(db.Model):
 
     def serialize(self):
         """Return dictionary of object's key attributes"""
-    
-        return {'id': self.plcriterion_id, 
+
+        return {'id': self.plcriterion_id,
                 'place_title': self.place_type.title,
                 'place_id': self.place_type_id,
                 'importance': self.importance,
@@ -362,14 +364,14 @@ class PlaceCriterion(db.Model):
                 'name': self.name}
 
     def yelp(self, latitude, longitude):
-        """Make Yelp API call and get response based on PlaceCriterion 
+        """Make Yelp API call and get response based on PlaceCriterion
         attributes"""
 
         print(self.place_type_id)
 
         #Setting up arguments for Yelp API
         url = 'https://api.yelp.com/v3/businesses/search'
-        headers = {'Authorization': ('Bearer '+ YELP_TOKEN)} 
+        headers = {'Authorization': ('Bearer '+ YELP_TOKEN)}
         payload = {'latitude': latitude,
                    'longitude': longitude,
                    'radius': self.max_distance,
@@ -388,7 +390,7 @@ class PlaceCriterion(db.Model):
                                     type=self.place_type_id,
                                     name=self.name,
                                     )
-        
+
 
 class LocPlCriterion(db.Model):
 
@@ -417,7 +419,7 @@ class PlaceType(db.Model):
 
     place_type_id = db.Column(db.String, primary_key=True, unique=True)
     title = db.Column(db.String)
-    place_category_id = db.Column(db.String, 
+    place_category_id = db.Column(db.String,
                                   db.ForeignKey('place_categories.place_category_id'),
                                   )
 
@@ -458,7 +460,7 @@ class Score(db.Model):
     def serialize(self):
         """Return dictionary of core attributes"""
 
-        return {'score_id': self.score_id, 'score': self.score, 
+        return {'score_id': self.score_id, 'score': self.score,
                 'address': self.location.address}
 
 
@@ -474,30 +476,30 @@ def example_data():
 
     #Add sample users Top Chef season 17 theme
     melissa = User(email='melissak@tc.com',
-                 username='mking', 
-                 first_name='Melissa', 
-                 last_name='King', 
+                 username='mking',
+                 first_name='Melissa',
+                 last_name='King',
                  password='scallops')
     kevin = User(email='kgillespie@tc.com',
-                 username='kgillespie@tc.com', 
-                 first_name='Kevin', 
-                 last_name='Gillespie', 
+                 username='kgillespie@tc.com',
+                 first_name='Kevin',
+                 last_name='Gillespie',
                  password='pork')
     stephanie = User(email='stephaniec@tc.com',
-                 username='stephaniec', 
-                 first_name='Stephanie', 
-                 last_name='lamb', 
+                 username='stephaniec',
+                 first_name='Stephanie',
+                 last_name='lamb',
                  password='pasta')
     bryan = User(email='bryanv@tc.com',
-                 username='bryanv', 
-                 first_name='Bryan', 
-                 last_name='Voltaggio', 
+                 username='bryanv',
+                 first_name='Bryan',
+                 last_name='Voltaggio',
                  password='carrots')
 
     gregory = User(email='gregoryg@tc.com',
-                 username='gregoryg', 
-                 first_name='Gregory', 
-                 last_name='Gourdet', 
+                 username='gregoryg',
+                 first_name='Gregory',
+                 last_name='Gourdet',
                  password='chicken')
 
     db.session.add_all([melissa, kevin, stephanie, bryan, gregory])

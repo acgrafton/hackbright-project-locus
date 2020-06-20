@@ -87,6 +87,8 @@ function initMap() {
                             });
                         };
                     };
+
+                    
                 })
         } else {
             document.getElementById('autocomplete').placeholder = 'Add Location'

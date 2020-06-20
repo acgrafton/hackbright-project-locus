@@ -1,10 +1,10 @@
 """Models for locus app."""
 
-from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
-import googlemaps
 import os
+from flask_sqlalchemy import SQLAlchemy
+import googlemaps
 import requests
+import score_logic
 
 GOOGLE_TOKEN = os.environ['GOOGLE_TOKEN']
 YELP_TOKEN = os.environ['YELP_TOKEN']
@@ -36,14 +36,14 @@ class User(db.Model):
 
     def __repr__(self):
         return "".join((f'<User user_id={self.user_id} ',
-                f'name={self.first_name}_{self.last_name} ',
-                f'email={self.email}>'))
+              f'name={self.first_name}_{self.last_name} ',
+              f'email={self.email}>'))
 
     def serialize(self):
         """Return a dictionary of core user attributes"""
 
-        return {'username': username, 'email': email,
-                'first_name': first_name, 'last_name': last_name}
+        return {'username': self.username, 'email': self.email,
+                'first_name': self.first_name, 'last_name': self.last_name}
 
 
     @staticmethod    
@@ -61,12 +61,13 @@ class User(db.Model):
         return location
 
 
-    def add_place_criterion(self, place_type_id, importance, 
-                           max_distance=16093, name=None):
+    def add_place_criterion(self, place_type_id, importance=5, name=None):
+        """Add a place criterion for a user"""
 
-        criterion = PlaceCriterion(place_type_id=place_type_id,
-                                importance=importance, max_distance=max_distance,
-                                name=name, user_id=self.user_id)
+        criterion = PlaceCriterion(user_id=self.user_id,
+                                   place_type_id=place_type_id,
+                                   name=name, 
+                                   importance=importance)
 
         db.session.add(criterion)
         db.session.commit()
@@ -76,20 +77,12 @@ class User(db.Model):
 
 
     def del_place_crit(self, place_type_id):
+        """Delete PlaceCriterion object"""
 
-        criterion = plcritq.filter(PlaceCriterion.place_type_id==place_type_id,
-                              PlaceCriterion.user_id==self.user_id).first()
+        criterion = PlaceCriterion.query.filter(PlaceCriterion.place_type_id ==place_type_id,
+                                   PlaceCriterion.user_id ==self.user_id).first()
 
         db.session.delete(criterion)
-        db.session.commit()
-
-
-    def del_score(self, score_id):
-        """Delete a score object from a user"""
-        
-        score = Score.query.get(score_id)
-
-        db.session.delete(score)
         db.session.commit()
 
 
@@ -118,7 +111,7 @@ class User(db.Model):
         location = locq.filter(Location.address == geocode['address']).first()
 
         #If no record for location exists, create a new one
-        if location == None:
+        if location is None:
             location = self.create_loc(geocode)
 
         #Get record from Score table
@@ -129,7 +122,7 @@ class User(db.Model):
         evaluation = location.evaluate(self)
 
         #If no score record exists, create a new one
-        if score == None:
+        if score is None:
             score = Score(score=evaluation['score'],
               location_id=location.location_id,
               user_id=self.user_id,
@@ -247,32 +240,39 @@ class Location(db.Model):
                                 ).first()
 
 
-            if crit.place_type_id in ['banks', 'grocery', 'hospitals']:
-                        
-                #Key=miles, Value= points
-                name_rubric = {1: 5, 3: 4, 5: 3, 10: 2}
-                gen_rubric = { 1: 4, 3: 3, 5:2, 10:1}
-
-                #Loop through the 3 distance parameters (1 mile, 3 miles, 5 miles)
-                for dist in gen_rubric.keys():
-                    
+            if crit.place_type_id in ['banks', 'pharmacy', 'hospitals']:
+                   
                     #API call to pull data from google
-                    data = crit.google_places(self.latitude, 
-                                                    self.longitude,
-                                                    distance=dist)
+                    data = gmaps.places_nearby(
+                                    location={'lat': self.latitude, 
+                                              'lng': self.longitude},
+                                    radius=dist,
+                                    type=self.place_type_id,
+                                    name=crit.name,
+                                    )
                     results = data['results']
                     num_results = len(results)
-                    
+                   
                     #Calculate points based whether criterion has specific name
-                    if crit.name != None:
+                    if not crit.name:
                         points = (name_rubric[dist] 
                                  if num_results > 0 else gen_rubric[dist])
 
+                    #Create a new Location Place Criterion object if not already
+                    #in table
                     if not locplcrit and not num_results:
                         self.add_lpcrit(crit.plcriterion_id, num_results, True)
 
                     elif not locplcrit and num_results:
-                        self.add_lpcrit(crit.plcriterion_id, num_results) 
+                        self.add_lpcrit(crit.plcriterion_id, num_results)
+
+                    elif num_results and locplcrit:
+                        locplcrit.meets_criterion == True
+                        locplcrit.num_results = num_results
+
+                    else:
+                        locplcrit.meets_criterion == False
+                        locplcrit.num_results = num_results
 
                 evaluation['criteria'].append({'place_type': crit.place_type_id,
                                            'importance': crit.importance,
@@ -290,26 +290,26 @@ class Location(db.Model):
                 #Create new Loc Place Criterion object if record does not exist
                 #Update meets_criteria and num_results if it does
                 #Increment points by importance level if there's at least one result
-                if (num_results > 0) and (locplcrit == None):
+                if num_results and not locplcrit:
 
                     points += crit.importance
                     
                     self.add_lpcrit(crit.plcriterion_id, num_results, True)
 
-                elif (num_results > 0) and (locplcrit != None):
+                elif num_results and locplcrit:
                     
                     points += crit.importance
                     
-                    locplcrit.meets_criterion == True
+                    locplcrit.meets_criterion = True
                     locplcrit.num_results = num_results
 
-                elif (num_results == 0) and (locplcrit == None):
+                elif not num_results and not locplcrit:
                     
                     self.add_lpcrit(crit.plcriterion_id, num_results) 
                    
                 else:
 
-                    locplcrit.meets_criterion == False
+                    locplcrit.meets_criterion = False
                     locplcrit.num_results = num_results
                 
                 evaluation['criteria'].append({'place_type': crit.place_type_id,
@@ -378,16 +378,6 @@ class PlaceCriterion(db.Model):
                    'term':self.place_type.place_category_id}
 
         return requests.get(url, headers=headers, params=payload).json()
-
-    def google_places(self, latitude, longitude, distance=8049):
-
-        location = {'lat': latitude, 'lng': longitude}
-
-        return gmaps.places_nearby(location=location,
-                                    radius=distance,
-                                    type=self.place_type_id,
-                                    name=self.name,
-                                    )
         
 
 class LocPlCriterion(db.Model):

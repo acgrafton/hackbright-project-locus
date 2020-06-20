@@ -190,8 +190,6 @@ const logOut = () => {
 }
 
 
-
-
 (function runUsers() {
     const editUserBtn = document.querySelector('button#edit-user-btn.crud');
 

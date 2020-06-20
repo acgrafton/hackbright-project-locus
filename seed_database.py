@@ -14,13 +14,12 @@ pc = model.PlaceCategory.query
 session = model.db.session
 
 
-
 with open('static/categories.json', 'r') as read_file:
     data = json.load(read_file)
     for category in data:
         yparent = category['parents']
 
-        if yparent and pc.filter_by(place_category_id=yparent[0]).first() == None:
+        if yparent and not pc.filter_by(place_category_id=yparent[0]).first():
             if yparent[0] in CATEGORIES:
                 new_cat = model.PlaceCategory(place_category_id=yparent[0])
                 session.add(new_cat)
@@ -42,12 +41,12 @@ places = model.PlaceType.query.all()
 grocery = model.PlaceCategory(place_category_id='grocery')
 session.add(grocery)
 session.commit()
-print(grocery)
 
 grocery_stores = ['grocery','intlgrocery','ethicgrocery','farmersmarket', 'importedfood']
 
 for place in places:
     if place.place_type_id in grocery_stores:
         place.place_category_id = 'grocery'
+        session.commit()
 
-session.commit()
+

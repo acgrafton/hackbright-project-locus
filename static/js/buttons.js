@@ -11,6 +11,7 @@ const createCancelBtn = (cancelFunction) => {
     return btn;
 };
 
+
 //Return an 'Add More' button that resets categories when clicked 
 const addMoreButton = () => {
     btn = document.createElement('button');

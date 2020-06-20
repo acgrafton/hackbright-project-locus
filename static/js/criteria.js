@@ -54,34 +54,51 @@ const display_criteria = () => {
         for (const {id, importance, max_distance, name, 
                     place_id, place_title} of data) {
 
-            const distance = Math.floor(max_distance / 1609);  
+            const distance = Math.floor(max_distance / 1609);
+
+            attributes = {{'formal': 'Place Type', 'id': 'title', 'name': place_title},
+                          {'formal': `My ${place_title}`, 'id': 'name', 'name': name},
+                          {'formal': 'Importance', 'id': 'importance', 'name': importance},
+                          {'formal': 'Max Distance', 'id': 'distance', 'name': distance},
+                          }; 
+
+            for (attribute of attributes):
 
             const li = document.createElement('li');
-            li.innerHTML = `Place Type:`;
+            li.innerHTML = `${attribute['formal']}:`;
 
             const span = document.createElement('span');
-            span.setAttribute('id', `${place_id}-title`);
-            span.innerHTML = place_title;
+            span.setAttribute('id', `${place_id}-${attribute['id']}`);
+            span.innerHTML = attribute['name'];
             li.appendChild(span);
             ul.appendChild(li);
 
-            const li2 = document.createElement('li');
-            li2.innerHTML = `Importance:`;
+            // const li2 = document.createElement('li');
+            // li2.innerHTML = `My Favorite:`;
 
-            const span2 = document.createElement('span');
-            span2.setAttribute('id', `${place_id}-importance`);
-            span2.innerHTML = importance;
-            li2.appendChild(span2);
-            li.after(li2);
+            // const span2 = document.createElement('span');
+            // span2.setAttribute('id', `${place_id}-name`);
+            // span2.innerHTML = name;
+            // li2.appendChild(span);
+            // li.after(li2);
+
+            // const li3 = document.createElement('li');
+            // li3.innerHTML = `Importance:`;
+
+            // const span3 = document.createElement('span');
+            // span3.setAttribute('id', `${place_id}-importance`);
+            // span3.innerHTML = importance;
+            // li3.appendChild(span3);
+            // li2.after(li3);
             
-            const li3 = document.createElement('li');
-            li3.innerHTML = `Max Distance:`;
+            // const li4 = document.createElement('li');
+            // li4.innerHTML = `Max Distance:`;
 
-            const span3 = document.createElement('span');
-            span3.setAttribute('id', `${place_id}-distance`);
-            span3.innerHTML = distance;
-            li3.appendChild(span3);
-            li2.after(li3);
+            // const span4 = document.createElement('span');
+            // span4.setAttribute('id', `${place_id}-distance`);
+            // span4.innerHTML = distance;
+            // li4.appendChild(span4);
+            // li3.after(li4);
 
             const editBtn = document.createElement('button');
             editBtn.setAttribute('class', 'crud crit edit');

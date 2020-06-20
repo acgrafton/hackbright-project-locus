@@ -1,9 +1,9 @@
+import os
+
 from flask import (Flask, render_template, request, flash, session, redirect, jsonify)
 from model import connect_to_db
 import crud
-import os
 import googlemaps
-
 from jinja2 import StrictUndefined 
 
 app = Flask(__name__)
@@ -23,10 +23,9 @@ def show_homepage():
 
         return render_template("homepage.html")
 
-    else:
-        username = session['user']
+    username = session['user']
 
-        return redirect(f'/profile/{username}')
+    return redirect(f'/profile/{username}')
 
 
 @app.route('/new_user', methods=['POST'])
@@ -64,18 +63,18 @@ def login_user():
     password = request.form.get('password')
 
     #Check email in database
-    if crud.get_user(username) == None:
+    if crud.get_user(username) is None:
         flash('Incorrect username.')
 
     #Check password match
-    elif crud.verify_password(username, password) == False:
+    elif crud.verify_password(username, password) is False:
         flash('Incorrect password.') 
 
     #Save user to session
     else: 
         session['user'] = username
         session['logged_in'] = 'yes'
-        flash(f'You are logged in')
+        flash('You are logged in')
 
     return redirect(f'/profile/{username}')
 
@@ -117,7 +116,7 @@ def save_user_changes():
         user.update_email(email)
         info_changed = True
 
-    if info_changed == True:
+    if info_changed:
         flash('Changes saved')
     else:
         flash('No change')
@@ -172,8 +171,7 @@ def show_profile(username):
                                 criteria=criteria,
                                 scores=scores,
                                 )
-    else:
-        return redirect('/')
+    return redirect('/')
 
 
 @app.route('/api/place_categories')
@@ -199,8 +197,8 @@ def get_place_types_json(selected_category):
     return jsonify({selected_category: place_type})
 
 
-@app.route('/api/set_criteria', methods=['POST'])
-def save_user_criteria():
+@app.route('/api/edit_criteria', methods=['POST'])
+def save_criteria_edits():
     """Save users criteria into database"""
 
     username = session['user']

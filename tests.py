@@ -15,7 +15,7 @@ class FlaskTests(TestCase):
   def test_home(self):
     """Tests the '/' route"""
 
-    result. = self.client.get('/')
+    result = self.client.get('/')
     self.assertEqual(result.status_code, 200)
     self.assetIn(b'sign up', result.data)
 

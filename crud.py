@@ -1,10 +1,10 @@
 """CRUD Operations"""
 
-from model import (User, Location, LocPlCriterion, PlaceCriterion, 
-                   PlaceType, PlaceCategory, db, connect_to_db)
 import os
-import googlemaps
 import re
+from model import (User, Location, PlaceType, PlaceCategory, Score, db, connect_to_db)
+import googlemaps
+
 
 API_KEY = os.environ['GOOGLE_TOKEN']
 
@@ -14,7 +14,7 @@ CATEGORIES = ['active', 'airports', 'arts', 'restaurants', 'grocery',
                  'homeandgarden', 'education', 'utilities', 'auto', 
                  'localservices', 'financialservices', 'laundryservices',
                  'petservices', 'beautysvc', 'parks', 'gym', 'publicservicesgovt',
-                 'religiousorgs', 'shopping', 'martialarts']
+                 'religiousorgs', 'shopping', 'martialarts', 'food']
 
 def create_user(email, username, first_name, last_name, password):
     """Create and return new user."""
@@ -27,6 +27,11 @@ def create_user(email, username, first_name, last_name, password):
                     )
     db.session.add(new_user)
     db.session.commit()
+
+    #Automatically add these criteria as core criteria
+    new_user.add_place_criterion('banks')
+    new_user.add_place_criterion('hospitals')
+    new_user.add_place_criterion('pharmacy')
 
     return new_user
 
@@ -56,13 +61,13 @@ def modify_email(user, new_email):
     return user
 
 
-def modify_password(user, new_password):
-    """Given user object and new_email, modify user's password"""
+# def modify_password(user, new_password):
+#     """Given user object and new_email, modify user's password"""
 
-    user.password = new_email
+#     user.password = new_email
 
-    return user_id
-        
+#     return user.user_id
+      
 
 def verify_password(username, password):
     """Return boolean whether password given user provided email and password"""
@@ -70,14 +75,6 @@ def verify_password(username, password):
     user = get_user(username)
 
     return user.password == password
-
-
-def delete_user(username):
-    """Delete a user provided the user's email"""
-
-    user = get_user(username)
-    db.session.delete(user)
-    db.session.commit()
 
 
 def delete_user_location(user_location):
@@ -120,6 +117,15 @@ def get_place_type_id_by_title(place_type_title):
     ptq = PlaceType.query
 
     return ptq.filter(PlaceType.title == place_type_title).first().place_type_id
+
+
+def del_score(score_id):
+    """Delete a score object from a user"""
+  
+    score = Score.query.get(score_id)
+
+    db.session.delete(score)
+    db.session.commit()
 
 
 if __name__ == '__main__':

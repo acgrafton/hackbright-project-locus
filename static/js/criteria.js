@@ -185,7 +185,7 @@ const createCritFrm = (selectedCategory) => {
     form.setAttribute("method", "POST");
     form.setAttribute("id", "criteria-form");
 
-    input = document.createElement('input');
+   const input = document.createElement('input');
     input.setAttribute('type','text');
     input.setAttribute('id', 'place-type');
     input.setAttribute('name', 'place-type');

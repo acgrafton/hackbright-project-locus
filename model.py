@@ -218,114 +218,109 @@ class Location(db.Model):
         return lpcrit
 
 
-    def evaluate(self, user):
-        """Given a user, return a dictionary with final score 
-          and criteria evaluated"""
+    # def evaluate(self, user):
+    #     """Given a user, return a dictionary with final score 
+    #       and criteria evaluated"""
 
-        #Shortcut
-        locplcritq = LocPlCriterion.query
+    #     #Shortcut
+    #     locplcritq = LocPlCriterion.query
 
-        #Tally points based on results, track criteria 
-        points = 0
-        evaluation = {'criteria':[]}
+    #     #Tally points based on results, track criteria 
+    #     points = 0
+    #     evaluation = {'criteria':[]}
 
-        #Loop through criteria and add points based on if results are found.
-        #Add each criteria and its results to evaluation dictionary.
-        for crit in user.place_criteria:
+    #     #Loop through criteria and add points based on if results are found.
+    #     #Add each criteria and its results to evaluation dictionary.
+    #     for crit in user.place_criteria:
 
-            #Get Location Place Criterion
-            locplcrit = locplcritq.filter(
-                                LocPlCriterion.location_id == self.location_id,
-                                LocPlCriterion.plcriterion_id == crit.plcriterion_id
-                                ).first()
+    #         #Get Location Place Criterion
+    #         locplcrit = locplcritq.filter(
+    #                             LocPlCriterion.location_id == self.location_id,
+    #                             LocPlCriterion.plcriterion_id == crit.plcriterion_id
+    #                             ).first()
 
 
-            if crit.place_type_id in ['banks', 'pharmacy', 'hospitals']:
+    #         if crit.place_type_id in ['banks', 'pharmacy', 'hospitals']:
                    
-                    #API call to pull data from google
-                    data = gmaps.places_nearby(
-                                    location={'lat': self.latitude, 
-                                              'lng': self.longitude},
-                                    radius=dist,
-                                    type=self.place_type_id,
-                                    name=crit.name,
-                                    )
-                    results = data['results']
-                    num_results = len(results)
+    #                 #API call to pull data from google
+    #                 data = gmaps.places_nearby(
+    #                                 location={'lat': self.latitude, 
+    #                                           'lng': self.longitude},
+    #                                 radius=dist,
+    #                                 type=self.place_type_id,
+    #                                 name=crit.name,
+    #                                 )
+    #                 results = data['results']
+    #                 num_results = len(results)
                    
-                    #Calculate points based whether criterion has specific name
-                    if not crit.name:
-                        points = (name_rubric[dist] 
-                                 if num_results > 0 else gen_rubric[dist])
+    #                 #Calculate points based whether criterion has specific name
+    #                 if not crit.name:
+    #                     points = (name_rubric[dist] 
+    #                              if num_results > 0 else gen_rubric[dist])
 
-                    #Create a new Location Place Criterion object if not already
-                    #in table
-                    if not locplcrit and not num_results:
-                        self.add_lpcrit(crit.plcriterion_id, num_results, True)
+    #                 #Create a new Location Place Criterion object if not already
+    #                 #in table
+    #                 if not locplcrit and not num_results:
+    #                     self.add_lpcrit(crit.plcriterion_id, num_results, True)
 
-                    elif not locplcrit and num_results:
-                        self.add_lpcrit(crit.plcriterion_id, num_results)
+    #                 elif not locplcrit and num_results:
+    #                     self.add_lpcrit(crit.plcriterion_id, num_results)
 
-                    elif num_results and locplcrit:
-                        locplcrit.meets_criterion == True
-                        locplcrit.num_results = num_results
+    #                 elif num_results and locplcrit:
+    #                     locplcrit.meets_criterion == True
+    #                     locplcrit.num_results = num_results
 
-                    else:
-                        locplcrit.meets_criterion == False
-                        locplcrit.num_results = num_results
+    #                 else:
+    #                     locplcrit.meets_criterion == False
+    #                     locplcrit.num_results = num_results
 
-                evaluation['criteria'].append({'place_type': crit.place_type_id,
-                                           'importance': crit.importance,
-                                           'distance': crit.max_distance,
-                                           'google': results,
-                                           'yelp': None
-                                          })
+    #         evaluation['criteria'].append({'place_type': crit.place_type_id,'importance': crit.importance, 'distance': crit.max_distance,'google': results,'yelp': None})
 
-            else:
+    #         else:
 
-                #Get yelp business search endpoint data
-                data = crit.yelp(self.latitude, self.longitude)
-                num_results = data['total']
+    #             #Get yelp business search endpoint data
+    #             data = crit.yelp(self.latitude, self.longitude)
+    #             num_results = data['total']
                 
-                #Create new Loc Place Criterion object if record does not exist
-                #Update meets_criteria and num_results if it does
-                #Increment points by importance level if there's at least one result
-                if num_results and not locplcrit:
+    #             #Create new Loc Place Criterion object if record does not exist
+    #             #Update meets_criteria and num_results if it does
+    #             #Increment points by importance level if there's at least one result
+    #             if num_results and not locplcrit:
 
-                    points += crit.importance
+    #                 points += crit.importance
                     
-                    self.add_lpcrit(crit.plcriterion_id, num_results, True)
+    #                 self.add_lpcrit(crit.plcriterion_id, num_results, True)
 
-                elif num_results and locplcrit:
+    #             elif num_results and locplcrit:
                     
-                    points += crit.importance
+    #                 points += crit.importance
                     
-                    locplcrit.meets_criterion = True
-                    locplcrit.num_results = num_results
+    #                 locplcrit.meets_criterion = True
+    #                 locplcrit.num_results = num_results
 
-                elif not num_results and not locplcrit:
+    #             elif not num_results and not locplcrit:
                     
-                    self.add_lpcrit(crit.plcriterion_id, num_results) 
+    #                 self.add_lpcrit(crit.plcriterion_id, num_results) 
                    
-                else:
+    #             else:
 
-                    locplcrit.meets_criterion = False
-                    locplcrit.num_results = num_results
+    #                 locplcrit.meets_criterion = False
+    #                 locplcrit.num_results = num_results
                 
-                evaluation['criteria'].append({'place_type': crit.place_type_id,
-                                               'importance': crit.importance,
-                                               'distance': crit.max_distance,
-                                               'google': None,
-                                               'yelp': data['businesses'],
-                                              })
+    #             evaluation['criteria'].append({'place_type': crit.place_type_id,
+    #                                            'importance': crit.importance,
+    #                                            'distance': crit.max_distance,
+    #                                            'google': None,
+    #                                            'yelp': data['businesses'],
+    #                                           })
 
-        #Calculate points out of max and multiply by 100
-        points = (points / user.max_points) * 100
+    #     #Calculate points out of max and multiply by 100
+    #     points = (points / user.max_points) * 100
 
-        #Add to evaluation dictionary
-        evaluation['score'] = points
+    #     #Add to evaluation dictionary
+    #     evaluation['score'] = points
 
-        return evaluation
+    #     return evaluation
 
 
 class PlaceCriterion(db.Model):

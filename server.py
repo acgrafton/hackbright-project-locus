@@ -250,6 +250,20 @@ def remove_criteria():
                         'error': str(err)})
 
 
+@app.route('/questionaire')
+def display_questionaire():
+    """Display questionaire"""
+
+    return render_template('questionaire.html')
+
+
+@app.route('/api/questionaire', methods=['POST'])
+def process_questionaire():
+    """Process questionaire"""
+
+    return jsonify()
+
+
 @app.route('/api/score_location', methods=['POST'])
 def get_searched_location_json():
     """Return criteria in JSON and score location"""

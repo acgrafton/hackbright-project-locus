@@ -4,7 +4,7 @@ from flask import (Flask, render_template, request, flash, session, redirect, js
 from model import connect_to_db
 import crud
 import googlemaps
-from jinja2 import StrictUndefined 
+from jinja2 import StrictUndefined
 
 app = Flask(__name__)
 app.secret_key = "dev"
@@ -31,7 +31,7 @@ def show_homepage():
 @app.route('/new_user', methods=['POST'])
 def register_user():
     """Register new user"""
-    
+
     #Retrieve formdata
     email = request.form.get('email')
     username = request.form.get('username')
@@ -42,15 +42,15 @@ def register_user():
     #Alert if email already exists
     if crud.get_user(email):
         flash('This email already exists. Please login')
-    
+
     #Otherwise, create new user account, add to session, and redirect to profile
-    else: 
-        user = crud.create_user(email, username, first_name, last_name, password)
+    else:
+        crud.create_user(email, username, first_name, last_name, password)
         session['user'] = username
         session['logged_in'] = 'yes'
-        flash('Your account has been successfuly created.', 
+        flash('Your account has been successfully created.',
               'Get started by setting your location criteria.')
-        
+
     return redirect('profile/<username>')
 
 
@@ -68,10 +68,10 @@ def login_user():
 
     #Check password match
     elif crud.verify_password(username, password) is False:
-        flash('Incorrect password.') 
+        flash('Incorrect password.')
 
     #Save user to session
-    else: 
+    else:
         session['user'] = username
         session['logged_in'] = 'yes'
         flash('You are logged in')
@@ -102,7 +102,7 @@ def save_user_changes():
     #Get usename from session and get User object
     username = session['user']
     user = crud.get_user(username)
-    
+
     #Track changes
     info_changed = False
 
@@ -119,7 +119,7 @@ def save_user_changes():
     if info_changed:
         flash('Changes saved')
     else:
-        flash('No change')
+        flash('No changes saved')
 
     return redirect(f'/profile/{username}')
 
@@ -152,7 +152,7 @@ def save_password_changes():
         user.update_password(password)
         flash('Password changed')
     else:
-        flash('No change')
+        flash('No changes saved')
 
     return redirect(f'/profile/{username}')
 
@@ -166,7 +166,7 @@ def show_profile(username):
         criteria = user.place_criteria #list of PlaceCriteria objects
         scores = user.scores #list of Location object
 
-        return render_template('profile.html', 
+        return render_template('profile.html',
                                 user=user,
                                 criteria=criteria,
                                 scores=scores,
@@ -180,10 +180,10 @@ def get_place_categories_json():
 
     categories = crud.get_place_categories()
 
-    list_categories = []
+    list_categories = [category.place_category_id for category in categories]
 
-    for category in categories:
-        list_categories.append(category.place_category_id)
+    # for category in categories:
+    #     list_categories.append(category.place_category_id)
 
     return jsonify(list_categories)
 
@@ -222,7 +222,6 @@ def get_criteria_json():
 
     criteria = user.get_place_criteria()
 
-    print(criteria)
 
     return jsonify(criteria)
 
@@ -245,7 +244,7 @@ def remove_criteria():
         return jsonify({'success': True})
 
     except Exception as err:
-        
+
         return jsonify({'success': False,
                         'error': str(err)})
 
@@ -270,10 +269,10 @@ def get_searched_location_json():
 
     #Geocode info from searched location
     geocode = request.json
-    
+
     #Retrieve user
     user = crud.get_user(session['user'])
-    
+
     #Get dictionary of score and criteria
     return jsonify(user.score_location(geocode))
 

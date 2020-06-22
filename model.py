@@ -29,7 +29,7 @@ class User(db.Model):
     first_name = db.Column(db.String, nullable=False)
     last_name = db.Column(db.String, nullable=False)
     password = db.Column(db.String, nullable=False)
-    max_points = db.Column(db.Integer, default=0)
+    max_points = db.Column(db.Integer, default=0) #max points based on # of criteria
 
     #place_criteria = a list of PlaceCriteria objects
     #scores = a list of score objects
@@ -61,13 +61,13 @@ class User(db.Model):
         return location
 
 
-    def add_place_criterion(self, place_type_id, importance=5, name=None):
+    def add_place_criterion(self, place_type_id, name=None):
         """Add a place criterion for a user"""
 
         criterion = PlaceCriterion(user_id=self.user_id,
                                    place_type_id=place_type_id,
-                                   name=name, 
-                                   importance=importance)
+                                   name=name,
+                                   )
 
         db.session.add(criterion)
         db.session.commit()
@@ -101,57 +101,21 @@ class User(db.Model):
         return points
 
 
-    def score_location(self, geocode):
-        """Scores a location and returns a dictionary of results"""
-
-        locq = Location.query
-        scoreq = Score.query
-
-        #Get record from Location table
-        location = locq.filter(Location.address == geocode['address']).first()
-
-        #If no record for location exists, create a new one
-        if location is None:
-            location = self.create_loc(geocode)
-
-        #Get record from Score table
-        score = scoreq.filter(Score.location_id == location.location_id,
-                              Score.user_id == self.user_id).first()
-
-        #Evaluate the location
-        evaluation = location.evaluate(self)
-
-        #If no score record exists, create a new one
-        if score is None:
-            score = Score(score=evaluation['score'],
-              location_id=location.location_id,
-              user_id=self.user_id,
-              )
-            db.session.add(score)
-            db.session.commit()
-
-        #Otherwise, update score record
-        else:
-            score.score = evaluation['score']
-
-        return evaluation
-
-
-    def update_first_name(self, email):
+    def update_first_name(self):
         """Update first name"""
 
-        self.first_name = first_name
+        self.first_name = self.first_name
         db.session.commit()
 
-        return first_name
+        return self.first_name
 
-    def update_last_name(self, email):
+    def update_last_name(self):
         """Update last name"""
 
-        self.last_name = last_name
+        self.last_name = self.last_name
         db.session.commit()
 
-        return last_name
+        return self.last_name
 
     def update_email(self, email):
         """Update email"""
@@ -202,125 +166,24 @@ class Location(db.Model):
         """Return a dictionary of core attributes"""
 
         return {'id': self.location_id, 'label': self.label, 
-                'address': self.address,'lng': longitude, 'lat': latitude}
+                'address': self.address,'lng': self.longitude, 'lat': self.latitude}
 
 
-    def add_lpcrit(self, plcriterion_id, num_results, meets_criterion=False):
+    def add_lpcrit(self, plcrit_id, eval_pts, gresults=None, yresults=None, 
+                   closest_dist=None):
         """Add Location Place Criterion"""
 
         lpcrit = LocPlCriterion(location_id=self.location_id,
-                                              plcriterion_id=plcriterion_id,
-                                              num_results=num_results,
-                                              meets_criterion=meets_criterion)
+                                plcriterion_id=plcrit_id,
+                                eval_points=eval_pts,
+                                gresults=gresults,
+                                yresults=yresults,
+                                closest_dist=closest_dist,
+                                )
         db.session.add(lpcrit)
         db.session.commit()
 
         return lpcrit
-
-
-    # def evaluate(self, user):
-    #     """Given a user, return a dictionary with final score 
-    #       and criteria evaluated"""
-
-    #     #Shortcut
-    #     locplcritq = LocPlCriterion.query
-
-    #     #Tally points based on results, track criteria 
-    #     points = 0
-    #     evaluation = {'criteria':[]}
-
-    #     #Loop through criteria and add points based on if results are found.
-    #     #Add each criteria and its results to evaluation dictionary.
-    #     for crit in user.place_criteria:
-
-    #         #Get Location Place Criterion
-    #         locplcrit = locplcritq.filter(
-    #                             LocPlCriterion.location_id == self.location_id,
-    #                             LocPlCriterion.plcriterion_id == crit.plcriterion_id
-    #                             ).first()
-
-
-    #         if crit.place_type_id in ['banks', 'pharmacy', 'hospitals']:
-                   
-    #                 #API call to pull data from google
-    #                 data = gmaps.places_nearby(
-    #                                 location={'lat': self.latitude, 
-    #                                           'lng': self.longitude},
-    #                                 radius=dist,
-    #                                 type=self.place_type_id,
-    #                                 name=crit.name,
-    #                                 )
-    #                 results = data['results']
-    #                 num_results = len(results)
-                   
-    #                 #Calculate points based whether criterion has specific name
-    #                 if not crit.name:
-    #                     points = (name_rubric[dist] 
-    #                              if num_results > 0 else gen_rubric[dist])
-
-    #                 #Create a new Location Place Criterion object if not already
-    #                 #in table
-    #                 if not locplcrit and not num_results:
-    #                     self.add_lpcrit(crit.plcriterion_id, num_results, True)
-
-    #                 elif not locplcrit and num_results:
-    #                     self.add_lpcrit(crit.plcriterion_id, num_results)
-
-    #                 elif num_results and locplcrit:
-    #                     locplcrit.meets_criterion == True
-    #                     locplcrit.num_results = num_results
-
-    #                 else:
-    #                     locplcrit.meets_criterion == False
-    #                     locplcrit.num_results = num_results
-
-    #         evaluation['criteria'].append({'place_type': crit.place_type_id,'importance': crit.importance, 'distance': crit.max_distance,'google': results,'yelp': None})
-
-    #         else:
-
-    #             #Get yelp business search endpoint data
-    #             data = crit.yelp(self.latitude, self.longitude)
-    #             num_results = data['total']
-                
-    #             #Create new Loc Place Criterion object if record does not exist
-    #             #Update meets_criteria and num_results if it does
-    #             #Increment points by importance level if there's at least one result
-    #             if num_results and not locplcrit:
-
-    #                 points += crit.importance
-                    
-    #                 self.add_lpcrit(crit.plcriterion_id, num_results, True)
-
-    #             elif num_results and locplcrit:
-                    
-    #                 points += crit.importance
-                    
-    #                 locplcrit.meets_criterion = True
-    #                 locplcrit.num_results = num_results
-
-    #             elif not num_results and not locplcrit:
-                    
-    #                 self.add_lpcrit(crit.plcriterion_id, num_results) 
-                   
-    #             else:
-
-    #                 locplcrit.meets_criterion = False
-    #                 locplcrit.num_results = num_results
-                
-    #             evaluation['criteria'].append({'place_type': crit.place_type_id,
-    #                                            'importance': crit.importance,
-    #                                            'distance': crit.max_distance,
-    #                                            'google': None,
-    #                                            'yelp': data['businesses'],
-    #                                           })
-
-    #     #Calculate points out of max and multiply by 100
-    #     points = (points / user.max_points) * 100
-
-    #     #Add to evaluation dictionary
-    #     evaluation['score'] = points
-
-    #     return evaluation
 
 
 class PlaceCriterion(db.Model):
@@ -330,7 +193,6 @@ class PlaceCriterion(db.Model):
 
     plcriterion_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     place_type_id = db.Column(db.String, db.ForeignKey('place_types.place_type_id'))
-    importance = db.Column(db.Integer, default=5)
     max_distance = db.Column(db.Integer, default=8049) #default set to 5 miles
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     name = db.Column(db.String, default=None)
@@ -346,42 +208,29 @@ class PlaceCriterion(db.Model):
                         f'place_type_id={self.place_type_id} '
                         f'name={self.name}>'))
 
+
     def serialize(self):
         """Return dictionary of object's key attributes"""
     
         return {'id': self.plcriterion_id, 
                 'place_title': self.place_type.title,
                 'place_id': self.place_type_id,
-                'importance': self.importance,
                 'max_distance': self.max_distance,
                 'name': self.name}
 
-    def yelp(self, latitude, longitude):
-        """Make Yelp API call and get response based on PlaceCriterion 
-        attributes"""
 
-        print(self.place_type_id)
-
-        #Setting up arguments for Yelp API
-        url = 'https://api.yelp.com/v3/businesses/search'
-        headers = {'Authorization': ('Bearer '+ YELP_TOKEN)} 
-        payload = {'latitude': latitude,
-                   'longitude': longitude,
-                   'radius': self.max_distance,
-                   'limit': 10,
-                   'categories':self.place_type_id,
-                   'term':self.place_type.place_category_id}
-
-        return requests.get(url, headers=headers, params=payload).json()
         
 
 class LocPlCriterion(db.Model):
+    """aka LPC"""
 
     __tablename__ = "location_place_criteria"
 
     lpc_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    meets_criterion = db.Column(db.Boolean, nullable=False)
-    num_results = db.Column(db.Integer, nullable=False)
+    eval_points = db.Column(db.Integer, nullable=False)
+    gresults = db.Column(db.PickleType)
+    yresults = db.Column(db.PickleType)
+    closest_dist = db.Column(db.Integer)
     location_id = db.Column(db.Integer, db.ForeignKey('locations.location_id'))
     plcriterion_id = db.Column(db.Integer, db.ForeignKey('place_criteria.plcriterion_id'))
 
@@ -390,8 +239,8 @@ class LocPlCriterion(db.Model):
 
     def __repr__(self):
         return "".join((f'<LocationPlaceCriteria id={self.lpc_id} ',
-                        f'meets_criteria={self.meets_criterion} '
-                        f'place_criteria_id={self.plcriterion_id} '
+                        f'eval_points={self.eval_points} ',
+                        f'place_criteria_id={self.plcriterion_id} ',
                         f'location_id={self.location_id}>'))
 
 

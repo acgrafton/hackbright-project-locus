@@ -56,13 +56,13 @@ const display_criteria = () => {
 
             const distance = Math.floor(max_distance / 1609);
 
-            attributes = {{'formal': 'Place Type', 'id': 'title', 'name': place_title},
+            attributes = [{'formal': 'Place Type', 'id': 'title', 'name': place_title},
                           {'formal': `My ${place_title}`, 'id': 'name', 'name': name},
                           {'formal': 'Importance', 'id': 'importance', 'name': importance},
                           {'formal': 'Max Distance', 'id': 'distance', 'name': distance},
-                          }; 
+                          ]; 
 
-            for (attribute of attributes):
+            for (attribute of attributes) {
 
             const li = document.createElement('li');
             li.innerHTML = `${attribute['formal']}:`;
@@ -72,33 +72,6 @@ const display_criteria = () => {
             span.innerHTML = attribute['name'];
             li.appendChild(span);
             ul.appendChild(li);
-
-            // const li2 = document.createElement('li');
-            // li2.innerHTML = `My Favorite:`;
-
-            // const span2 = document.createElement('span');
-            // span2.setAttribute('id', `${place_id}-name`);
-            // span2.innerHTML = name;
-            // li2.appendChild(span);
-            // li.after(li2);
-
-            // const li3 = document.createElement('li');
-            // li3.innerHTML = `Importance:`;
-
-            // const span3 = document.createElement('span');
-            // span3.setAttribute('id', `${place_id}-importance`);
-            // span3.innerHTML = importance;
-            // li3.appendChild(span3);
-            // li2.after(li3);
-            
-            // const li4 = document.createElement('li');
-            // li4.innerHTML = `Max Distance:`;
-
-            // const span4 = document.createElement('span');
-            // span4.setAttribute('id', `${place_id}-distance`);
-            // span4.innerHTML = distance;
-            // li4.appendChild(span4);
-            // li3.after(li4);
 
             const editBtn = document.createElement('button');
             editBtn.setAttribute('class', 'crud crit edit');
@@ -123,8 +96,8 @@ const display_criteria = () => {
 
         document.getElementById('crit-card').appendChild(ul);
         }
-    })
-}
+    }
+});
 
 
 
@@ -349,7 +322,7 @@ const createEditCritFrm = (clickedBtn) => {
     };
 
     //Create 'save' and 'cancel' buttons
-    saveBtn = createSaveBtn();
+    const saveBtn = createSaveBtn();
     saveBtn.onsubmit = async (e) => {
         e.preventDefault();
 

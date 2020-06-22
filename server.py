@@ -30,7 +30,7 @@ def show_homepage():
 
 @app.route('/new_user', methods=['POST'])
 def register_user():
-    """Register new user"""
+    """Register new user."""
     
     #Retrieve formdata
     email = request.form.get('email')
@@ -51,7 +51,7 @@ def register_user():
         flash('Your account has been successfuly created.', 
               'Get started by setting your location criteria.')
         
-    return redirect('profile/<username>')
+    return redirect('questionaire.html')
 
 
 @app.route('/api/login', methods=['POST'])
@@ -259,7 +259,9 @@ def display_questionaire():
 
 @app.route('/api/questionaire', methods=['POST'])
 def process_questionaire():
-    """Process questionaire"""
+    """Process questionaire by creating Place Criterion for user in database"""
+
+
 
     return jsonify()
 

@@ -1,6 +1,6 @@
 """Logic for scoring locatons based on User criteria"""
 
-#Scoring rubric for banks, hospitals, and pharmacies. The key represents the
+#Scoring rubric for banks and hospitals. The key represents the
 #number of miles away but translated to meters. The values are points given
 #based on the distance. '
 #For example, a place 1 mile away would get 5 points if it's 
@@ -23,26 +23,21 @@ def points_lookup(distance, table='general'):
     return 0
 
 
-def affiliate_points(num_results, distance):
-  """Given the number of results and distance of the closest match, 
+def affl_points(distance):
+  """Given the distance of the closest match, 
   return points to be used for the overall Location Score"""
-
-  if not num_results:
-    return 0
 
   return points_lookup(distance, 'affiliated')
 
 
-def general_points(num_results, distance):
-  """Given the number of results and distance of the closest match, 
+def gen_points(distance):
+  """Given the distance of the closest match, 
   return points to be used for the overall Location Score"""
-
-  if not num_results:
-    return 0
 
   return points_lookup(distance, 'general')
 
-def index_(loc_points, user_max_points):
+  
+def conv_index(loc_points, user_max_points):
   """Given a location's points and a user's max points, convert it to an index
   based off 100 max"""
 

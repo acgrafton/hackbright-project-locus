@@ -179,8 +179,9 @@ const logOut = () => {
     fetch('/api/logout', fetchData)
     .then(response => response.json())
     .then(data => {
+        console.log(data)
         if (data['success'] === true) {
-            alert('You are logged out')
+            alert('Goodbye!')
             document.location.assign('/')
         } else {
             alert(`${data['error']}`);

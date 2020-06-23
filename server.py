@@ -83,11 +83,15 @@ def login_user():
 def log_out_user():
     """Clear user out of session data"""
 
-    session.pop('user', None)
-    session['logged_in'] = 'no'
-    flash('You have logged out')
+    try:
+        session.pop('user', None)
+        session['logged_in'] = 'no'
 
-    return redirect('/')
+        return jsonify({'success': True})
+
+    except Exception as err:
+        return jsonify({'success': False,
+                        'error': str(err)})
 
 
 @app.route('/api/edit_user', methods=['POST'])

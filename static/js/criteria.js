@@ -51,15 +51,12 @@ const display_criteria = () => {
 
         //Iterate through list of score dictionaries and create list elements
         //to display address and score
-        for (const {id, importance, max_distance, name, 
+        for (const {id, importance, name, 
                     place_id, place_title} of data) {
 
-            const distance = Math.floor(max_distance / 1609);
-
             attributes = [{'formal': 'Place Type', 'id': 'title', 'name': place_title},
-                          {'formal': `My ${place_title}`, 'id': 'name', 'name': name},
+                          {'formal': `Preferred`, 'id': 'name', 'name': name},
                           {'formal': 'Importance', 'id': 'importance', 'name': importance},
-                          {'formal': 'Max Distance', 'id': 'distance', 'name': distance},
                           ]; 
 
             for (attribute of attributes) {
@@ -72,6 +69,8 @@ const display_criteria = () => {
             span.innerHTML = attribute['name'];
             li.appendChild(span);
             ul.appendChild(li);
+            
+            };
 
             const editBtn = document.createElement('button');
             editBtn.setAttribute('class', 'crud crit edit');
@@ -96,8 +95,8 @@ const display_criteria = () => {
 
         document.getElementById('crit-card').appendChild(ul);
         }
-    }
-});
+    });
+};
 
 
 
@@ -192,8 +191,8 @@ const createCritFrm = (selectedCategory) => {
         //Add importance menu
         form.appendChild(createImportanceMenu());
 
-        //Add distance menu
-        form.appendChild(createDistanceMenu());
+        // //Add distance menu
+        // form.appendChild(createDistanceMenu());
 
         //Add save and cancel buttons
         form.appendChild(createSaveBtn());
@@ -414,17 +413,4 @@ const removeCriteria = (clickedBtn) => {
 
         
 
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
+    

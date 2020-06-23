@@ -4,11 +4,10 @@ import os
 import re
 import pickle
 import requests
-from model import (User, Location, PlaceType, PlaceCategory, Score, LocPlCriterion,
-                   db, connect_to_db)
+from model import (User, Location, PlaceType, PlaceCategory, Score, LocPlCriterion, db, connect_to_db)
 from score_logic import affl_points, gen_points, conv_index
 import googlemaps
-from datetime import datetime
+# from datetime import datetime
 
 
 API_KEY = os.environ['GOOGLE_TOKEN']
@@ -37,9 +36,8 @@ def create_user(email, username, first_name, last_name, password):
     db.session.commit()
 
     #Automatically add these criteria as core criteria
-    new_user.add_place_criterion('banks')
-    new_user.add_place_criterion('hospitals')
-    new_user.add_place_criterion('pharmacy')
+    new_user.add_place_criterion('banks', 5)
+    new_user.add_place_criterion('hospitals', 5)
 
     return new_user
 
@@ -149,7 +147,7 @@ def yelp(place_criterion, location, plcrit_name=None):
                'categories':place_criterion.place_type_id,
                'term': (plcrit_name 
                         if plcrit_name is not None 
-                        else place_criterion.place_criterion_id)}
+                        else place_criterion.plcriterion_id)}
 
     return requests.get(url, headers=headers, params=payload).json()
 
@@ -169,10 +167,13 @@ def googledm(location, destination):
     """Given a location object and a place_id for the destination, return
     a dictionary with the distance and duration"""
 
-    data = gmaps.distance_matrix(origin=[location.latitude,location.longitude],
-                                  destination=destination)
+    print(location)
+    print(destination)
 
-    return data['rows'][0]['elements']
+    data = gmaps.distance_matrix(origins=(location.latitude, location.longitude),
+                                  destinations=destination)
+
+    return data['rows'][0]['elements'][0]
 
 
 def update_lpc_wresults(location, lpc, plcriterion, points, closest_match_dist, 
@@ -188,7 +189,7 @@ def update_lpc_wresults(location, lpc, plcriterion, points, closest_match_dist,
         lpc.closest_dist = closest_match_dist
 
     else: 
-        lpc = location.add_plcrit(plcrit_id=plcriterion.placecriterion_id, 
+        lpc = location.add_lpcrit(plcrit_id=plcriterion.plcriterion_id, 
                                   eval_pts=points,
                                   gresults=gresults,
                                   yresults=yresults,
@@ -209,7 +210,7 @@ def update_lpc_noresults(location, lpc, plcriterion, points):
         lpc.eval_points = points
 
     else: 
-        lpc = location.add_plcrit(plcrit_id=plcriterion.placecriterion_id, 
+        lpc = location.add_lpcrit(plcrit_id=plcriterion.plcriterion_id, 
                                   eval_pts=points)
         db.session.add(lpc)
 
@@ -226,16 +227,19 @@ def evaluate(user, location):
     points = 0
 
     #List of LPC objects
-    evaluated_lpc = set()
+    evaluated_lpc = []
+
+    print(user.place_criteria)
 
     #Loop through each criterion and get points based on score logic.
     #Increment points variable for each criteria and create a LPC object to
     #store results.
-    for crit in User.place_criteria:
+    for crit in user.place_criteria:
+        print(crit)
 
-        locplcrit = LocPlCriterion.query.filter(LocPlCriterion.location_id == location.location_id,
-                                                LocPlCriterion.plcriterion_id == crit.plcriterion_id
-                                                ).first()
+        locplcrit = LocPlCriterion.query.filter(LocPlCriterion.location_id == location.location_id, LocPlCriterion.plcriterion_id == crit.plcriterion_id).first()
+
+        print(locplcrit)
 
         core_cat = crit.place_type_id in CORE_CAT
         targeted = bool(crit.name)
@@ -259,16 +263,16 @@ def evaluate(user, location):
 
             #If still no results, create an lpc object and go to next criterion
             if not results:
-                evaluated_lpc.add(update_lpc_noresults(location, locplcrit, crit, 0))
+                evaluated_lpc.append(update_lpc_noresults(location, locplcrit, crit, 0))
                 continue
 
         #Pull place_id or latlng of the closest match
         closest_match = (pl_data['results']['place_id'] if api == 'google'
-                         else (pl_data['businesses']['coordinates']['latitude'],
-                               pl_data['businesses']['coordinates']['longitude']))
+                         else (pl_data['businesses'][0]['coordinates']['latitude'],
+                               pl_data['businesses'][0]['coordinates']['longitude']))
 
         #Get the distance from the closest match
-        clm_dist = googledm(location, closest_match)['distance']
+        clm_dist = googledm(location, closest_match)['distance']['value']
 
         #Using the distance as an argument, get the points
         crit_pts = affl_points(clm_dist) if targeted else gen_points(clm_dist)
@@ -281,17 +285,17 @@ def evaluate(user, location):
 
         #Update LPC with result and add to evaluated lpc set
         if api == 'google':
-            evaluated_lpc.add(update_lpc_wresults(location, locplcrit, crit,
+            evaluated_lpc.append(update_lpc_wresults(location, locplcrit, crit,
                                                   crit_pts, clm_dist,
-                                                  gresults=pickled_results))
+                                                  gresults=pickled_results).serialize())
         else:
-            evaluated_lpc.add(update_lpc_wresults(location, locplcrit, crit,
+            evaluated_lpc.append(update_lpc_wresults(location, locplcrit, crit,
                                                   crit_pts, clm_dist,
-                                                  yresults=pickled_results))
+                                                  yresults=pickled_results).serialize())
 
         points = conv_index(points, user.max_points)
 
-    return {'score': points, 'crit_w_results': evaluated_lpc}
+    return {'score': points, 'criteria': evaluated_lpc}
 
 def score_location(user, geocode):
     """Scores a location and returns a list of lpc objects"""
@@ -310,6 +314,7 @@ def score_location(user, geocode):
     score = scoreq.filter(Score.location_id == location.location_id,
                           Score.user_id == user.user_id).first()
 
+    print(user, location)
     #Evaluate the location
     evaluation = evaluate(user, location)
 

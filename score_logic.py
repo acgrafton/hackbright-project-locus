@@ -15,26 +15,26 @@ ESSENTIAL_SVC = {'affiliated': {1609: 5, 4828: 4, 8047: 3, 16093: 2},
 def points_lookup(distance, table='general'):
   """Return number of points from the affiliated table based on the distance"""
 
-  for threshold in ESSENTIAL_SVC[table]:
+  for threshold in ESSENTIAL_SVC[table].keys():
     
     if distance < threshold:
       return ESSENTIAL_SVC[table][threshold]
 
-    return 0
+  return 0
 
 
 def affl_points(distance):
   """Given the distance of the closest match, 
   return points to be used for the overall Location Score"""
 
-  return points_lookup(distance, 'affiliated')
+  return points_lookup(distance, table='affiliated')
 
 
 def gen_points(distance):
   """Given the distance of the closest match, 
   return points to be used for the overall Location Score"""
 
-  return points_lookup(distance, 'general')
+  return points_lookup(distance, table='general')
 
   
 def conv_index(loc_points, user_max_points):

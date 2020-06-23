@@ -197,6 +197,25 @@ def get_place_types_json(selected_category):
     return jsonify({selected_category: place_type})
 
 
+
+@app.route('/api/set_criteria', methods=['POST'])
+def save_user_criteria():
+    """Save users criteria into database"""
+
+    username = session['user']
+    user = crud.get_user(username)
+    selected_place_type = request.form.get('place-type')
+    selected_importance = request.form.get('importance')
+
+    place_type_id = crud.get_place_type_id_by_title(selected_place_type)
+
+    user.add_place_criterion(place_type_id, selected_importance)
+
+    flash('Criteria saved!')
+
+    return redirect(f'/profile/{username}')
+
+
 @app.route('/api/edit_criteria', methods=['POST'])
 def save_criteria_edits():
     """Save users criteria into database"""
@@ -277,7 +296,7 @@ def get_searched_location_json():
     user = crud.get_user(session['user'])
     
     #Get dictionary of score and criteria
-    return jsonify(user.score_location(geocode))
+    return jsonify(crud.score_location(user, geocode))
 
 
 @app.route('/search_location')
@@ -307,14 +326,10 @@ def remove_location():
     #Retrieve data in parsed JSON form
     data = request.json
 
-    #Retrieve user
-    username = session['user']
-    user = crud.get_user(username)
-
     score_id = data['scoreId']
 
     try:
-        user.del_score(score_id)
+        crud.del_score(score_id)
 
         return jsonify({'success': True})
 

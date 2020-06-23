@@ -1,6 +1,34 @@
 //crud script for adding or removing locations
 
 //Display scored locations on profile page
+
+const removeLocation = (clickedBtn) => {
+    
+    const scoreId = Number(clickedBtn.id.slice(7));
+
+    const data = {'scoreId': scoreId};
+
+    let fetchData = {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    };
+
+    fetch('/api/remove_location', fetchData)
+        .then(response => response.json())
+        .then(data => {
+            if (data['success']) {
+                document.location.reload(true);
+            } else {
+                alert(data['error'])
+            }
+            
+        });
+};
+
+
 const displayLocations = () => {
 
     //Create unordered list element
@@ -44,29 +72,6 @@ const displayLocations = () => {
     })
 }
 
-
-
-const removeLocation = (clickedBtn) => {
-    
-    const scoreId = Number(clickedBtn.id.slice(7));
-    console.log(scoreId)
-
-    const data = {'scoreId': scoreId};
-
-    let fetchData = {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: {
-            'Content-Type': 'application/json'
-        },
-    };
-
-    fetch('/api/remove_location', fetchData)
-        .then(response => response.json())
-        .then(data => {
-            document.location.reload(true);
-        });
-};
 
 
 const addLocation = () => {

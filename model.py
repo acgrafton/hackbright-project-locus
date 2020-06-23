@@ -2,6 +2,7 @@
 
 import os
 from flask_sqlalchemy import SQLAlchemy
+import pickle
 import googlemaps
 import requests
 import score_logic
@@ -61,11 +62,12 @@ class User(db.Model):
         return location
 
 
-    def add_place_criterion(self, place_type_id, name=None):
+    def add_place_criterion(self, place_type_id, importance, name=None):
         """Add a place criterion for a user"""
 
         criterion = PlaceCriterion(user_id=self.user_id,
                                    place_type_id=place_type_id,
+                                   importance=importance,
                                    name=name,
                                    )
 
@@ -194,6 +196,7 @@ class PlaceCriterion(db.Model):
     plcriterion_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     place_type_id = db.Column(db.String, db.ForeignKey('place_types.place_type_id'))
     max_distance = db.Column(db.Integer, default=8049) #default set to 5 miles
+    importance = db.Column(db.Integer, default=5)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     name = db.Column(db.String, default=None)
 
@@ -215,6 +218,7 @@ class PlaceCriterion(db.Model):
         return {'id': self.plcriterion_id, 
                 'place_title': self.place_type.title,
                 'place_id': self.place_type_id,
+                'importance': self.importance,
                 'max_distance': self.max_distance,
                 'name': self.name}
 
@@ -235,13 +239,25 @@ class LocPlCriterion(db.Model):
     plcriterion_id = db.Column(db.Integer, db.ForeignKey('place_criteria.plcriterion_id'))
 
     location = db.relationship('Location', backref='location_place_criteria')
-    place_criteria = db.relationship('PlaceCriterion', backref='location_place_criteria')
+    place_criterion = db.relationship('PlaceCriterion', backref='location_place_criteria')
 
     def __repr__(self):
         return "".join((f'<LocationPlaceCriteria id={self.lpc_id} ',
                         f'eval_points={self.eval_points} ',
                         f'place_criteria_id={self.plcriterion_id} ',
                         f'location_id={self.location_id}>'))
+
+    def serialize(self):
+        """Return dictionary of object's key attributes for delivery to user
+        display"""
+    
+        return {'criterion': self.plcriterion_id, 
+                'eval_points': self.eval_points,
+                'importance': self.place_criterion.importance,
+                'gresults': None if not self.gresults else pickle.loads(self.gresults),
+                'yresults': None if not self.yresults else pickle.loads(self.yresults),
+                'closest_dist': self.closest_dist,
+                'name': self.place_criterion.name}
 
 
 class PlaceType(db.Model):

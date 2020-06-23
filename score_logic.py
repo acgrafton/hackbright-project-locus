@@ -41,7 +41,7 @@ def conv_index(loc_points, user_max_points):
   """Given a location's points and a user's max points, convert it to an index
   based off 100 max"""
 
-  return (loc_points / user_max_points) * 100
+  return int((loc_points / user_max_points) * 100)
 
   
 

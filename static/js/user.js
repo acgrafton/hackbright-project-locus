@@ -179,7 +179,7 @@ const logOut = () => {
     fetch('/api/logout', fetchData)
     .then(response => response.json())
     .then(data => {
-        console.log(data)
+
         if (data['success'] === true) {
             alert('Goodbye!')
             document.location.assign('/')

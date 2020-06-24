@@ -19,7 +19,7 @@ CATEGORIES = ['active', 'airports', 'arts', 'restaurants', 'grocery',
                  'homeandgarden', 'education', 'utilities', 'auto', 
                  'localservices', 'financialservices', 'laundryservices',
                  'petservices', 'beautysvc', 'parks', 'gym', 'publicservicesgovt',
-                 'religiousorgs', 'shopping', 'martialarts', 'food']
+                 'religiousorgs', 'shopping', 'martialarts', 'food', 'health']
 
 CORE_CAT = ['banks', 'hospitals']
 
@@ -156,11 +156,12 @@ def googleplnb(place_criterion, location, plcrit_name=None):
     """Make Google API call and return response based on Place Criterion and 
     Location"""
 
+    keyword = plcrit_name if plcrit_name else place_criterion.place_type_id
+
     return gmaps.places_nearby(location={'lat': location.latitude, 
                                          'lng': location.longitude},
                                radius=16093,
-                               type=place_criterion.place_type_id,
-                               name=plcrit_name,
+                               keyword=keyword,
                                )
 
 def googledm(location, destination):
@@ -255,25 +256,25 @@ def evaluate(user, location):
 
             #If still no results, create an lpc object and go to next criterion
             if not results:
-                evaluated_lpc.append(update_lpc_noresults(location, locplcrit, crit, 0).serialize())
+                print(crit, 'no results')
+                update_lpc_noresults(location, locplcrit, crit, 0).serialize()
                 continue
 
-        #Pull place_id or latlng of the closest match
-        closest_match = (pl_data['results']['place_id'] if api == 'google'
-                         else (pl_data['businesses'][0]['coordinates']['latitude'],
-                               pl_data['businesses'][0]['coordinates']['longitude']))
+        #Pull latlng of the closest match
+        closest_match = (results[0]['geometry']['location'] if api == 'google'
+                         else (results[0]['coordinates']['latitude'],
+                               results[0]['coordinates']['longitude']))
 
         #Get the distance from the closest match
         clm_dist = googledm(location, closest_match)['distance']['value']
 
         #Using the distance as an argument, get the points
         crit_pts = affl_points(clm_dist) if targeted else gen_points(clm_dist)
-        print('crit_pts', crit_pts)
-        print('importance', crit.importance)
+        print(crit, 'crit_pts', crit_pts)
 
         #Tally overall location points and factor in importance
         points += ((crit_pts + crit.importance) / 2)
-        print('points', points)
+        print(points)
 
         #Pickle the search results for db storage
         pickled_results = pickle.dumps(results)

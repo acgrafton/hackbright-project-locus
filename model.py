@@ -251,7 +251,7 @@ class LocPlCriterion(db.Model):
         """Return dictionary of object's key attributes for delivery to user
         display"""
     
-        return {'criterion': self.plcriterion_id, 
+        return {'criterion': self.place_criterion.place_type_id, 
                 'eval_points': self.eval_points,
                 'importance': self.place_criterion.importance,
                 'gresults': None if not self.gresults else pickle.loads(self.gresults),

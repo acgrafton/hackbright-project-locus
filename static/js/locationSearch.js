@@ -46,8 +46,6 @@ function initMap() {
                 },
             };
 
-            console.log(fetchData);
-
             fetch('/api/score_location', fetchData)
                 .then(response => response.json())
                 .then(data => {
@@ -58,42 +56,82 @@ function initMap() {
                     
                     for (const criterion of criteria) {
 
-                        for (const place of criterion['results']) {
-                            const infoContent = (`
-                                <div class="window-content">
-                                  <ul class="place-info">
-                                    <li><b>place name: </b>${place.name}</li>
-                                    <li><b>your criteria: </b>${criterion.place_type}</li>
-                                    <li><b>yelp rating: </b>${place.rating}</li>
-                                    <li><b>distance to search location: </b>
-                                            ${place.distance}</li>
-                                  </ul>
-                                </div>
-                                `);
+                        console.log(criterion);
+                        console.log(criterion.gresults);
 
-                            const marker = new google.maps.Marker({
-                                position: {
-                                    lat: place.coordinates.latitude,
-                                    lng: place.coordinates.longitude
-                                },
-                                title: `place name: ${place.name}`,
-                                map: map
-                            });
+                        if (criterion.gresults) {
+                            for (const place of criterion.gresults) {
+                                const infoContent = (`
+                                    <div class="window-content">
+                                      <ul class="place-info">
+                                        <li><b>place name: </b>${place.name}</li>
+                                        <li><b>your criteria: </b>${criterion.place_type}</li>
+                                        <li><b>google rating: </b>${place.rating}</li>
+                                      </ul>
+                                    </div>
+                                    `);
 
-                            marker.addListener('click', () => {
-                                infoWindow.close();
-                                infoWindow.setContent(infoContent);
-                                infoWindow.open(map, marker)
-                            });
-                        };
-                    };
+                                const marker = new google.maps.Marker({
+                                    position: {
+                                        lat: place.geometry.location.lat,
+                                        lng: place.geometry.location.lng
+                                    },
+                                    title: `place name: ${place.name}`,
+                                    map: map
+                                });
+                            }
+                        } else {
+                            for (const place of criterion.yresults) {
+                                const infoContent = (`
+                                    <div class="window-content">
+                                      <ul class="place-info">
+                                        <li><b>place name: </b>${place.name}</li>
+                                        <li><b>your criteria: </b>${criterion.criterion}</li>
+                                        <li><b>yelp rating: </b>${place.rating}</li>
+                                        <li><b>distance to search location: </b>
+                                                ${place.distance}</li>
+                                      </ul>
+                                    </div>
+                                    `);
 
-                    
-                })
+                                const marker = new google.maps.Marker({
+                                    position: {
+                                        lat: place.coordinates.latitude,
+                                        lng: place.coordinates.longitude
+                                    },
+                                    title: `place name: ${place.name}`,
+                                    map: map
+                                });
+
+                                marker.addListener('click', () => {
+                                    infoWindow.close();
+                                    infoWindow.setContent(infoContent);
+                                    infoWindow.open(map, marker);
+                                });
+                            }
+                        }
+                    }
+
+                });
         } else {
             document.getElementById('autocomplete').placeholder = 'Add Location'
         }
     }
-
-    
 }
+
+const backToProfile = () => {
+    document.location.assign('/profile/<username>');
+}
+
+
+(function runLocationSearch() {
+    const backBtn = document.querySelector('button#back');
+    backBtn.onclick = backToProfile
+})();
+
+
+
+
+
+
+

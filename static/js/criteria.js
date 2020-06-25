@@ -84,11 +84,15 @@ const display_criteria = () => {
                 hideCriteriaDetails();
             });
 
-            const saveBtn = document.createElement('button');
-            saveBtn.setAttribute('class', 'crud crit remove');
-            saveBtn.setAttribute('id', `remove-${place_id}`);
-            saveBtn.innerHTML = 'Remove';
-            ul.appendChild(saveBtn);
+            const removeBtn = document.createElement('button');
+            removeBtn.setAttribute('class', 'crud crit remove');
+            removeBtn.setAttribute('id', `remove-${place_id}`);
+            removeBtn.innerHTML = 'Remove';
+            removeBtn.addEventListener('click', (evt) => {
+                evt.preventDefault();
+                removeCriteria(evt.target); 
+            });
+            ul.appendChild(removeBtn);
 
             ul.appendChild(document.createElement('br'));
             ul.appendChild(document.createElement('br'));
@@ -270,12 +274,9 @@ const createEditCritFrm = (clickedBtn) => {
     console.log(placeID)
     placeTitle = document.getElementById(`${placeID}-title`).innerHTML;
     placeImportance = document.getElementById(`${placeID}-importance`).innerHTML;
-    placeDistance = document.getElementById(`${placeID}-distance`).innerHTML;
 
     //Insert data into an object for easy access
-    placeInfo = {'importance': placeImportance,
-                 'max distance': placeDistance,
-                }
+    placeInfo = {'importance': placeImportance}
     
     //Create form element
     const form = document.createElement('form');
@@ -386,6 +387,8 @@ const removeCriteria = (clickedBtn) => {
 
 (function runCriteria() {
 
+    display_criteria();
+
     //Get Add Criteria button
     const addCritBtn = document.querySelector('button#add-crit.crud');
     
@@ -394,20 +397,6 @@ const removeCriteria = (clickedBtn) => {
         document.querySelector('button#add-crit.crud').style.display = 'none';
         createCategoryBtns();
     });
-
-    //Get remove criteria buttons
-    const removeCritBtns = document.querySelectorAll('button.crud.crit.remove');
-
-    //Attach event listener to each button
-    //Callback function to create form to allow user to select criteria to remove
-    for (const removeCritBtn of removeCritBtns) {
-        removeCritBtn.addEventListener('click', (evt) => {
-            evt.preventDefault();
-            removeCriteria(evt.target); 
-        });
-    };
-
-    display_criteria();
 
 })();
 

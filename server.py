@@ -160,6 +160,30 @@ def save_password_changes():
 
     return redirect(f'/profile/{username}')
 
+@app.route('/api/add_commute_loc')
+def save_commute_location():
+    """Save commute location"""
+
+    data = request.json
+
+    username = session['user']
+    user = crud.get_user(username)
+
+    try:
+        user.add_commute_loc(address = data['address'],
+                            name = data['name'],
+                            latitude=data['latitude'],
+                            longitude=data['longitude'])
+
+        return jsonify({'success': True})
+
+    except Exception as err:
+        return jsonify({'success': False,
+                        'error': str(err)})
+
+
+
+
 
 @app.route('/profile/<username>')
 def show_profile(username):

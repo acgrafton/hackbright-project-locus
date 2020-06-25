@@ -4,7 +4,8 @@ import os
 import re
 import pickle
 import requests
-from model import (User, Location, PlaceType, PlaceCategory, Score, LocPlCriterion, db, connect_to_db)
+from model import (User, Location, PlaceType, PlaceCategory, Score, 
+                   LocPlCriterion, CommuteLocation, db, connect_to_db)
 from score_logic import affl_points, gen_points, conv_index
 import googlemaps
 # from datetime import datetime
@@ -250,6 +251,9 @@ def evaluate(user, location):
                        if core_cat else yelp(crit, location, plcrit_name=None))
 
             api = 'google' if 'results' in pl_data.keys() else 'yelp'
+
+            print(pl_data)
+            print(api)
 
             results = pl_data['results'] if api == 'google' else pl_data['businesses']
             targeted = False

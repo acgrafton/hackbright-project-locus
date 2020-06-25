@@ -11,16 +11,18 @@
       
     </h3>
     <div class='card' id='user-card'>
-      <ul class='user-det'>
-        <li>first name: <span id="fname">{{user.first_name}}</span></li>
-        <li>last name: <span id="lname">{{user.last_name}}</span> </li>
-        <li>email: <span id="email">{{user.email}}</span></li>
-      </ul>
-      <fieldset id='edit-user'>
-        <button class='crud'  id='edit-user-btn'>Edit User</button>
-        <button class='crud' id='remove-user-btn'>Remove User</button>
-        <button class='logout' value='Log Out' id='logout'>Log Out</button>
-      </fieldset>
+      <div class='card-body user-det'>
+        <p class='card-text'>first name: <span id="fname">{{user.first_name}}</span></p>
+        <p class='card-text'>last name: <span id="lname">{{user.last_name}}</span> </p>
+{#         <li>commute location: <span id="cloc">{{user.commute_locations[0].address}}</span></li> #}
+        <p class='card-text'>email: <span id="email">{{user.email}}</span></p>
+      </div>
+      <div class='btn-group' role='group' id='edit-user'>
+        <button type='button' class='btn btn-secondary crud'  id='edit-user-btn'>Edit User</button>
+        <button type='button' class='btn btn-secondary crud' id='remove-user-btn'>Remove User</button>
+        <button type='button' class='btn btn-secondary crud' id='add-commute-loc-btn'>Add Commute Location</button>
+        <button type='button' class='btn btn-secondary logout' value='Log Out' id='logout'>Log Out</button>
+      </div>
     </div>
   </section>
   <hr>

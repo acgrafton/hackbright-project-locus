@@ -51,8 +51,8 @@ const createEditUserForm = () => {
             };
     
     //Hide edit user buttons and existing details
-    document.querySelector('fieldset#edit-user').style.display = 'none';
-    document.querySelector('ul.user-det').style.display = 'none';
+    document.querySelector('#edit-user').style.display = 'none';
+    document.querySelector('div.user-det').style.display = 'none';
 
     //Create Form
     form = document.createElement('form');
@@ -145,8 +145,74 @@ const createEditPasswordForm = () => {
 //Make user information changes submitted by user
 const editUser = () => {
     btn = document.querySelector('#save-user-chg');
-    btn.addEventListener('click')
-}
+    btn.addEventListener('click');
+};
+
+
+const showCLocAutoComplete = () => {
+
+    //Hide edit user buttons and existing details
+    document.querySelector('#edit-user').style.display = 'none';
+    document.querySelector('div.user-det').style.display = 'none';
+
+    //Get profile section
+    const section = document.querySelector('#profile');
+
+    //Create autocomplete and attach to profile section
+    const acdiv = document.createElement('div');
+    acdiv.setAttribute('id', 'autocomplete');
+
+    const autocomplete = new google.maps.places.Autocomplete(
+        acdiv, {
+        componentRestrictions: {'country': 'us'}
+        });
+
+    autocomplete.addEventListener('place_changed', saveCLocBtn);
+
+    section.appendChild(acdiv);
+};
+
+const saveCLocBtn = () => {
+
+    document.getElementById('autocomplete');
+
+    const place = autocomplete.getPlace();
+
+    const btn = createElement('button');
+    btn.setAttribute('type', 'submit');
+    btn.setAttribute('class', 'btn');
+    btn.setAttribute('onclick', saveCLoc);
+    btn.innerHTML = 'Save';
+
+    return place
+};
+
+const saveCLoc = (place) => {
+
+    const data = {'address': place.formatted_address,
+                  'latitude': place.geometry.latitude,
+                  'longitude': place.geometry.longitude,
+                  'name': place.name};
+
+    let fetchData = {
+        method:'POST',
+        body: JSON.stringify(data),
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    };
+
+    fetch('/api/save_commute_loc', fetchData)
+    .then(response => response.json())
+    .then(response => {
+        if (data['success'] === true) {
+            document.reload();
+        } else {
+            alert(`Error: ${data['error']}`)
+        }
+    })
+};
+
 
 //Delete user from database and load homepage
 const removeUser = () => {
@@ -204,6 +270,11 @@ const logOut = () => {
 
     const logOutBtn = document.querySelector('button#logout');
     logOutBtn.onclick = logOut;
+
+    const addCommuteBtn = document.querySelector('button#add-commute-loc-btn');
+    addCommuteBtn.addEventListener('click', () => {
+        evt.preventDefault();
+        showCLocAutoComplete()});
 
 
 })();

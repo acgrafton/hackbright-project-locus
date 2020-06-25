@@ -69,8 +69,8 @@ const displayLocations = () => {
 
             document.getElementById('loc-card').appendChild(ul);
         }
-    })
-}
+    });
+};
 
 
 
@@ -81,7 +81,7 @@ const addLocation = () => {
 
 (function runLocations() {
 
-    displayLocations()
+    displayLocations();
 
     //Attach event listener to "Add" location button
     //Callback function create form to add location

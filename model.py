@@ -34,6 +34,7 @@ class User(db.Model):
 
     #place_criteria = a list of PlaceCriteria objects
     #scores = a list of score objects
+    #commute_locations = a list of commute locations
 
     def __repr__(self):
         return "".join((f'<User user_id={self.user_id} ',
@@ -76,6 +77,17 @@ class User(db.Model):
         self.update_max_points()
 
         return criterion
+
+
+    def add_commute_location(self, address, name=None):
+        """Add commute location to profile"""
+
+        new_cloc = CommuteLocation(address=address, name=name, 
+                                   latitude=data['geometry']['latitude'],
+                                   longitude=data['geometry']['longitude'],
+                                   user_id = self.user_id)
+
+        return new_cloc
 
 
     def del_place_crit(self, place_type_id):
@@ -144,9 +156,28 @@ class User(db.Model):
         return [place_criterion.serialize() 
                 for place_criterion in self.place_criteria]
  
+class CommuteLocation(db.Model):
+    """User work location"""
+    __tablename__ = "commute_locations"
+
+    cloc_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    name = db.Column(db.String)
+    address = db.Column(db.String, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+
+    user = db.relationship('User', backref='commute_locations')
+
+    def __repr__(self):
+        return "".join((f'<CommuteLocation cloc_id={self.cloc_id}',
+                        f'name {self.name}',
+                        f'address {self.address}'))
+
+
 
 class Location(db.Model):
-    """User locations i.e. 'home', 'work'."""
+    """Potential move locations"""
 
     __tablename__ = "locations"
 

@@ -2,3 +2,4 @@ env
 secrets.sh
 *.DS_store
 *pyc*
+node_modules

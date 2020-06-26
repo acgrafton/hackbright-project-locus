@@ -28,30 +28,31 @@ def show_homepage():
     return redirect(f'/profile/{username}')
 
 
-@app.route('/new_user', methods=['POST'])
+@app.route('/api/new_user', methods=['POST'])
 def register_user():
     """Register new user."""
     
+    data = request.json
+    print(data)
+
     #Retrieve formdata
-    email = request.form.get('email')
-    username = request.form.get('username')
-    first_name = request.form.get('first-name')
-    last_name = request.form.get('last-name')
-    password = request.form.get('password')
+    email = data['email']
+    username = data['username']
+    first_name = data['firstName']
+    last_name = data['lastName']
+    password = data['password']
 
     #Alert if email already exists
     if crud.get_user(email):
-        flash('This email already exists. Please login')
+        return jsonify({'success': False})
     
     #Otherwise, create new user account, add to session, and redirect to profile
-    else: 
-        user = crud.create_user(email, username, first_name, last_name, password)
+    else:
+        print('hello') 
+        print(crud.create_user(email, username, first_name, last_name, password))
         session['user'] = username
         session['logged_in'] = 'yes'
-        flash('Your account has been successfuly created.', 
-              'Get started by setting your location criteria.')
-        
-    return redirect('questionaire.html')
+        return jsonify({'success': True})
 
 
 @app.route('/api/login', methods=['POST'])
@@ -180,9 +181,6 @@ def save_commute_location():
     except Exception as err:
         return jsonify({'success': False,
                         'error': str(err)})
-
-
-
 
 
 @app.route('/profile/<username>')

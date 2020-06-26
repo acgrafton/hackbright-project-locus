@@ -1,8 +1,12 @@
 {% extends 'base.html' %}
 {% block title %}Locus: Is this location right for you?{% endblock %}
+{% block head %}
+
+{% endblock %}
 
 {% block body %}
-  <h2>sign up</h2>
+  <div id='root'></div>
+{#   <h2>sign up</h2>
     <form action="/new_user" method="POST">
       <fieldset class = "new-user-fs">
         email <input type="email" name="email"><br>
@@ -21,9 +25,10 @@
         password <input type="password" name="password"><br>
       </fieldset>
       <input type="submit">
-    </form>
+    </form> #}
 
 {% endblock %}
 
 {% block js %}
+  <script type="text/babel" src="/static/jsx/homepage.jsx"></script>
 {% endblock %}

@@ -38,7 +38,6 @@ def create_user(email, username, first_name, last_name, password):
 
     #Automatically add these criteria as core criteria
     new_user.add_place_criterion('banks', 5)
-    new_user.add_place_criterion('hospitals', 5)
 
     return new_user
 

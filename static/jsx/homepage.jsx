@@ -1,5 +1,16 @@
 "use strict";
 
+class App extends React.Component {
+  render(){
+    return (
+      <div>
+        <RegisterForm />
+        <LoginForm />
+      </div> 
+    )
+  }
+}
+
 
 class RegisterForm extends React.Component {
   constructor(props) {
@@ -123,17 +134,96 @@ class RegisterForm extends React.Component {
   }
 }
 
-// class Login extends React.Component {
+class LoginForm extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {username: '', 
+                  password: '',
+                  isLoggedIn: false};
 
-// }
+    this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+
+  }
+  handleInputChange(event) {
+
+    const target = event.target;
+    const value = target.value;
+    const name = target.name;
+
+    this.setState({
+      [name]: value
+    });
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+
+    const data = {
+      username: this.state.username,
+      password: this.state.password,
+    };
+
+    let fetchData = {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    };
+
+    fetch('/api/login', fetchData)
+    .then(response => response.json())
+    .then(data => {
+      if (data['success'] === true) {
+        alert('You have successfully signed up.')
+        this.setState({isLoggedIn: true})
+      } else {
+        alert('This username/password combination is invalid. Try again.')
+        this.setState({username: '', 
+                      password: '',
+                      isLoggedIn: false,
+        })
+      }
+    })
+  }
+
+  render() {
+    return (
+      <div>
+        <h2>log in</h2>
+        <form onSubmit={this.handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="username">
+              username: 
+              <input
+                name='username'
+                type='text'
+                value={this.state.username}
+                onChange={this.handleInputChange} />
+            </label>
+            <br />
+            <label htmlFor="password">
+              password: 
+              <input
+                name='password'
+                type='password'
+                value={this.state.password}
+                onChange={this.handleInputChange} />
+            </label>
+            <br/>
+          </div>
+          <input type='submit' className='btn btn-login' value='Submit'/>
+        </form>
+      </div>
+    );
+  }
+
+}
 
 
 
-// class Homepage extends React.Component {
-//   render(){
-//     pass;
-//   }
-// }
+
 
 
 // class Questionaire extends React.Component {
@@ -165,4 +255,4 @@ class RegisterForm extends React.Component {
 // class ScoredLocations extends React.Component {
 
 // }
-ReactDOM.render(<RegisterForm />, document.getElementById('root'));
+ReactDOM.render(<App />, document.getElementById('root'));

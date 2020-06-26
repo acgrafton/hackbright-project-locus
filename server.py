@@ -33,7 +33,6 @@ def register_user():
     """Register new user."""
     
     data = request.json
-    print(data)
 
     #Retrieve formdata
     email = data['email']
@@ -58,24 +57,26 @@ def register_user():
 @app.route('/api/login', methods=['POST'])
 def login_user():
     """Provided correct email and password, log-in user"""
+    
+    data = request.json
 
     #Retrieve formdata
-    username = request.form.get('username')
-    password = request.form.get('password')
+    username = data['username']
+    password = data['password']
 
     #Check email in database
     if crud.get_user(username) is None:
-        flash('Incorrect username.')
+        print('Incorrect username.')
 
     #Check password match
     elif crud.verify_password(username, password) is False:
-        flash('Incorrect password.') 
+        print('Incorrect password.') 
 
     #Save user to session
     else: 
         session['user'] = username
         session['logged_in'] = 'yes'
-        flash('You are logged in')
+        print('You are logged in')
 
     return redirect(f'/profile/{username}')
 

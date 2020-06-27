@@ -1,5 +1,5 @@
-const GROCER = {'Q': 'grocery store', 
-'grocers': ['Safeway', 'Albertsons', 'Vons', 'Jewel-Osco', 'Acme Markets', 'Shaw\'s',
+const GROCERY_STORES = {'Q': 'grocery store', 'dbPlaceType': 'grocery',
+'options': ['Safeway', 'Albertsons', 'Vons', 'Jewel-Osco', 'Acme Markets', 'Shaw\'s',
 'Andronico\'s', 'Carrs', 'Haggen', 'Lucky', 'Pavilions', 'Randalls', 
 'Star Market', 'Tom Thumb', 'United Supermarkets', 'Food Lion', 'Stop & Shop', 
 'Giant Food Stores', 'Hannaford', 'Giant Food', 'Kroger', 'Harris Teeter', 
@@ -9,40 +9,40 @@ const GROCER = {'Q': 'grocery store',
 'Pay Less Super Markets', 'Ralphs', 'Target', 'Walmart', 'The Fresh Market',
 'Sprouts Farmers Market', 'Trader Joe\'s', 'Whole Foods']};
 
-const BANKS = {'Q': 'bank', 'banks': ['Huntington National Bank', 
+const BANKS = {'Q': 'bank', 'dbPlaceType': 'banks', 'options': ['Huntington National Bank', 
 'Wells Fargo Bank', 'Chase Bank', 'Allahabad Bank', 'U.S. Bank', 'PNC Bank', 
 'BB&T', 'Regions Bank', 'SunTrust Bank', 'TD Bank', 'Fifth Third Bank',   
 'KeyBank', 'Citizens Bank', 'M&T Bank', 'Citibank', 'Capital One Bank',
 'Woodforest National Bank', 'Huntington Bank', 'Scotia Bank', 'Compass Bank']};
 
-const AMER_RESTAURANTS = {'Q': 'american restaurant category', 
-'amerRest': ['Barbeque', 'Breakfast and Brunch', 'Burgers',
+const AMER_RESTAURANTS = {'Q': 'american restaurant category', 'dbPlaceType': 'restaurants',
+'options': ['Barbeque', 'Breakfast and Brunch', 'Burgers',
 'Buffets', 'Fast Food', 'Fish & Chips']};
 
-const ETHNIC_RESTAURANTS = {'Q': 'ethnic restaurant category', 
-'ethnicRest': ['Asian Fusion', 'Chinese', 'Ethiopian', 'French', 'Italian',
+const ETHNIC_RESTAURANTS = {'Q': 'ethnic restaurant category', 'dbPlaceType': 'restaurants',
+'options': ['Asian Fusion', 'Chinese', 'Ethiopian', 'French', 'Italian',
 'Indian', 'Japanese', 'Korean', 'Mexican', 'Mediteranean']}
 
-const COFFEE = {'Q': 'coffee and tea', 'coffee': ['Starbucks', 'Dunkin', 
+const COFFEE = {'Q': 'coffee and tea', 'dbPlaceType': 'coffee', 'options': ['Starbucks', 'Dunkin', 
 'Dutch Bros. Coffee', 'Seattle\'s Best Coffee', 'Caribbou Cofee', 
 'Peet\'s Coffee and Tea', 'The Coffee Bean & Tea Leaf', 
 'Dunn Bros Coffee', 'Tully\'s Coffee', 'PJ\'s Coffee of New Orleans']};
 
-const HMO = {'Q': 'HMO', 'hospitals': ['Kaiser Permanente', 'Sharp', 'GroupHealth']};
+const HMO = {'Q': 'HMO', 'dbPlaceType': 'hospitals', 'options': ['Kaiser Permanente', 'Sharp', 'GroupHealth']};
 
-const ACTIVITIES = {'Q': 'leisure activities', 'leisure': {'Air Travel': 'airports',
+const ACTIVITIES = {'Q': 'leisure activities', 'options': {'Air Travel': 'airports',
 'Beach': 'beaches','Hiking': 'hiking', 'Movie': 'movietheaters', 'Museums': 'museums',  
 'Nightlife': 'nightlife', 'Parks': 'parks', 'Shopping': 'shopping'}};
 
-const CHILDCARE = {'Q': 'childcare', 'childcare': {'Daycare': 'childcare', 
+const CHILDCARE = {'Q': 'childcare', 'options': {'Daycare': 'childcare', 
 'Preschool': 'preschools'}};
 
 const EDUCATION = {'Q': 'schools', 
-                 'schools': {'Elementary Schools': 'elementaryschools', 
+                 'options': {'Elementary Schools': 'elementaryschools', 
                             'Middle Schools': 'highschools', 
                             'High School': 'highschools'}}; 
 
-const CATEGORY_SET1 = [GROCER, BANKS, AMER_RESTAURANTS, ETHNIC_RESTAURANTS, 
+const CATEGORY_SET1 = [GROCERY_STORES, BANKS, AMER_RESTAURANTS, ETHNIC_RESTAURANTS, 
 COFFEE, HMO];
 
 const CATEGORY_SET2 = [ACTIVITIES, CHILDCARE, EDUCATION];

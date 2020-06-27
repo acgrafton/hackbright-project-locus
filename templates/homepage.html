@@ -6,6 +6,7 @@
 
 {% block body %}
   <div id='root'></div>
+  <div id='q'></div>
 {#   <h2>sign up</h2>
     <form action="/new_user" method="POST">
       <fieldset class = "new-user-fs">
@@ -30,5 +31,8 @@
 {% endblock %}
 
 {% block js %}
+  <script src="/static/js/categoriesAndChoices.js"></script>
   <script type="text/babel" src="/static/jsx/homepage.jsx"></script>
+  <script type="text/babel" src="/static/jsx/q.jsx"></script>
+  
 {% endblock %}

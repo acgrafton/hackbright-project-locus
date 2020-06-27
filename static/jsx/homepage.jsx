@@ -1,6 +1,13 @@
 "use strict";
 
 class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isNewUser: false,
+    }
+  }
+
   render(){
     return (
       <div>
@@ -222,27 +229,42 @@ class LoginForm extends React.Component {
 }
 
 
+class Questionaire extends React.Component {
+  constructor(props) {
+    super(props);
 
+    this.state = {
+      criteria: {}
+    };
+  }
 
+  renderCategory1() {
+    const form = (
+      <div form-group></div>
+    )
+    const categories = [];
+    for (const cat of CATEGORY_SET1)
+      let typeName = Object.keys(cat)[1];
+      let thisQ = cat['Q'];
+      let thisCat = typeName;
+      let theseChoices = (cat[typeName]).sort();
 
+      categories.push(
 
-// class Questionaire extends React.Component {
-//   constructor(props) {
-//     super(props);
+      )
+  }
 
-//     this.state = {
-//       criteria: {}
-//     };
-//   }
-//   render(){
-//     return(
-//         <div>
-//         <form action="/questionaire" method="POST" id='q-form'>
-//         </form>
-//       </div>
-//     );
-//   }
-// }
+  render(){
+    return(
+        <div className='form-group'>
+          <label htmlFor={category}>{category}</label>
+          <input type="text" id={category} />
+        <form>
+        </form>
+      </div>
+    );
+  }
+}
 
 // class Profile extends React.Component {
 

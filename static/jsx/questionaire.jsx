@@ -1,11 +1,4 @@
 class Questionaire extends React.Component {
-    constructor(props) {
-      super(props);
-  
-      this.state = {
-        criteria: {}
-      };
-    }
     render(){
         const questions = [];
         
@@ -16,9 +9,9 @@ class Questionaire extends React.Component {
         });
 
         return(
-
+            <div>
                 <form>
-
+                    {questions}
                 </form>
             </div>
       );
@@ -66,5 +59,5 @@ class QuestionCat1 extends React.Component {
 
   
 
-ReactDOM.render(<QuestionCat1 
-                  extCategory={GROCERY_STORES} />, document.getElementById('q'));
+ReactDOM.render(<Questionaire  
+                  category1={CATEGORY_SET1} />, document.getElementById('q'));

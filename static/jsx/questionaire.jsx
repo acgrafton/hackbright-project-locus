@@ -1,4 +1,46 @@
+"use strict";
+
 class Questionaire extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {selectedCriteria: []}
+
+        this.handleSelect = this.handleSelect.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    handleSelect(event) {
+        this.setState((prevState) => {
+            return {
+                selectedCriteria: prevState.selectedCriteria + [event.target.value]
+            }
+        });
+    }
+
+    handleSubmit(event) {
+        const data = {
+            'criteria': this.state.selectedCriteria
+        };
+
+        let fetchData = {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        };
+
+        fetch('/api/questionaire', fetchData)
+        .then(response => response.json())
+        .then(data => {
+            if (data['success'] === true) {
+                alert('Your initial preferences have been sent')
+            } else {
+                alert('Error')
+            }
+        });
+    }
+
     render(){
         const questions = [];
         
@@ -16,6 +58,9 @@ class Questionaire extends React.Component {
 
         return(
             <div>
+                <header><h1>get started</h1></header>
+                <h3>select criteria that is important to you</h3>
+                <h5>feel free to skip any categories that do not apply to you</h5>
                 <form>
                     {questions}
                     <button className="btn btn-primary" type="submit">Save</button>
@@ -95,8 +140,7 @@ class QuestionCat1 extends React.Component {
                     <select className='custom-select' 
                             id={label}
                             key={label}
-                            value = {this.selectedOption} 
-                            onChange={e => this.setState({selectedOption: e.target.value})}>
+                            onChange={this.props.handleSelect}>
                         {this.state.categoryOptions.map((catOption) => 
                         <option key={catOption.value} value={catOption.value}>{catOption.display}</option>)}
                     </select>
@@ -107,5 +151,5 @@ class QuestionCat1 extends React.Component {
 
   
 
-ReactDOM.render(<Questionaire  
-                  category1={CATEGORY_SET1} category2={CATEGORY_SET2} />, document.getElementById('q'));
+// ReactDOM.render(<Questionaire  
+//                   category1={CATEGORY_SET1} category2={CATEGORY_SET2} />, document.getElementById('q'));

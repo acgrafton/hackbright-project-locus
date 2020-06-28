@@ -4,15 +4,45 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      isNewUser: false,
+      isNewUser: true,
+      isLoggedIn: false,
+      justRegistered: false,
+      completedQuestionaire: false,
     }
+    this.setRegistered = this.setRegistered.bind(this);
+    this.setLoggedIn = this.setLoggedIn.bind(this);
+    this.setCompletedQuestionaire = this.setCompletedQuestionaire.bind(this);
+  }
+
+  setRegistered() {
+    this.setState({isNewUser: false,
+                   justRegistered: true});
+  }
+
+  setLoggedIn() {
+    this.setState({isLoggedIn: true})
+  }
+
+  setCompletedQuestionaire(){
+    this.setState({completedQuestionaire: true})
   }
 
   render(){
+    const isNewUser = this.state.isNewUser;
+    console.log(isNewUser)
+    let userForm;
+    if (isNewUser) {
+      userForm = <RegisterForm onRegistered={this.setRegistered} /> 
+    } else {
+      userForm = <LoginForm />
+    }
+
+    let showQuestionaire = (this.state.justRegistered && !this.state.completedQuestionaire)
+
     return (
       <div>
-        <RegisterForm />
-        <LoginForm />
+        {userForm}
+        {showQuestionaire ? <Questionaire category1={CATEGORY_SET1} category2={CATEGORY_SET2} /> : ""}
       </div> 
     )
   }
@@ -55,6 +85,8 @@ class RegisterForm extends React.Component {
       password: this.state.password,
     };
 
+    console.log(data)
+
     let fetchData = {
       method: 'POST',
       body: JSON.stringify(data),
@@ -68,7 +100,8 @@ class RegisterForm extends React.Component {
     .then(data => {
       if (data['success'] === true) {
         alert('You have successfully signed up.')
-        this.setState({isRegistered: true})
+        this.setState({isRegistered: true, justRegistered: true})
+        this.props.onRegistered;
       } else {
         alert('Unable to create account. Please try again.')
         this.setState({email: '',
@@ -76,7 +109,6 @@ class RegisterForm extends React.Component {
                       firstName: '',
                       lastName: '',
                       password: '',
-                      isRegistered: false,
         })
       }
     })
@@ -136,6 +168,8 @@ class RegisterForm extends React.Component {
           </div>
           <input type='submit' className='btn btn-reg' value='Submit'/>
         </form>
+        <p>Already have an account?</p>
+        <button className="btn btn-primary" type="submit">Login</button>
       </div>
     );
   }
@@ -145,8 +179,7 @@ class LoginForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {username: '', 
-                  password: '',
-                  isLoggedIn: false};
+                  password: ''};
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -185,6 +218,7 @@ class LoginForm extends React.Component {
       if (data['success'] === true) {
         alert('You have successfully signed up.')
         this.setState({isLoggedIn: true})
+        this.props.setLoggedIn()
       } else {
         alert('This username/password combination is invalid. Try again.')
         this.setState({username: '', 
@@ -229,42 +263,7 @@ class LoginForm extends React.Component {
 }
 
 
-class Questionaire extends React.Component {
-  constructor(props) {
-    super(props);
 
-    this.state = {
-      criteria: {}
-    };
-  }
-
-  renderCategory1() {
-    const form = (
-      <div form-group></div>
-    )
-    const categories = [];
-    for (const cat of CATEGORY_SET1)
-      let typeName = Object.keys(cat)[1];
-      let thisQ = cat['Q'];
-      let thisCat = typeName;
-      let theseChoices = (cat[typeName]).sort();
-
-      categories.push(
-
-      )
-  }
-
-  render(){
-    return(
-        <div className='form-group'>
-          <label htmlFor={category}>{category}</label>
-          <input type="text" id={category} />
-        <form>
-        </form>
-      </div>
-    );
-  }
-}
 
 // class Profile extends React.Component {
 

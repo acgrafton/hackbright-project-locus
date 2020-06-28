@@ -19,13 +19,7 @@ gmaps = googlemaps.Client(key=API_KEY)
 def show_homepage():
     """Show homepage if not logged in, otherwise redirect to profile page"""
 
-    if session.get('user') is None:
-
-        return render_template("homepage.html")
-
-    username = session['user']
-
-    return redirect(f'/profile/{username}')
+    return render_template("homepage.html")
 
 
 @app.route('/api/new_user', methods=['POST'])
@@ -307,9 +301,16 @@ def display_questionaire():
 def process_questionaire():
     """Process questionaire by creating Place Criterion for user in database"""
 
+    new_user_criteria = request.json
 
+    user = crud.get_user(session['user'])
 
-    return jsonify()
+    try:
+        crud.batch_add_pl_crit(user, new_user_criteria)
+
+    except:
+        return jsonify({'success': False,
+                        'error': str(err)})
 
 
 @app.route('/api/score_location', methods=['POST'])

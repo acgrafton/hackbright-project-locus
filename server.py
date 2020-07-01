@@ -25,15 +25,15 @@ def show_homepage():
 @app.route('/api/new_user', methods=['POST'])
 def register_user():
     """Register new user."""
-    
-    data = request.json
 
     #Retrieve formdata
-    email = data['email']
-    username = data['username']
-    first_name = data['firstName']
-    last_name = data['lastName']
-    password = data['password']
+    email = request.form.get('email')
+    print(email)
+    username = request.form.get('username')
+    print(username)
+    first_name = request.form.get('firstName')
+    last_name = request.form.get('lastName')
+    password = request.form.get('password')
 
     #Alert if email already exists
     if crud.get_user(email):
@@ -51,28 +51,27 @@ def register_user():
 @app.route('/api/login', methods=['POST'])
 def login_user():
     """Provided correct email and password, log-in user"""
-    
-    data = request.json
 
     #Retrieve formdata
-    username = data['username']
-    password = data['password']
+    username = request.form.get('username')
+    print(username)
+    password = request.form.get('password')
 
     #Check email in database
     if crud.get_user(username) is None:
-        print('Incorrect username.')
+        return jsonify(({'success': False, 'err': "Invalid username"}))
 
     #Check password match
     elif crud.verify_password(username, password) is False:
-        print('Incorrect password.') 
+        return jsonify(({'success': False, 'err': "Incorrect password"}))
 
     #Save user to session
     else: 
         session['user'] = username
+        first_name = crud.get_user(username).first_name
         session['logged_in'] = 'yes'
-        print('You are logged in')
 
-    return redirect(f'/profile/{username}')
+        return jsonify(({'success': True, 'first_name': first_name, 'username': session['user']}))
 
 
 @app.route('/api/logout', methods=['POST'])
@@ -301,16 +300,37 @@ def display_questionaire():
 def process_questionaire():
     """Process questionaire by creating Place Criterion for user in database"""
 
-    new_user_criteria = request.json
+    username = session['user']
+    user = crud.get_user(username)
 
-    user = crud.get_user(session['user'])
+    #specific names
+    grocery = {'grocery': request.form.get('grocery')} if request.form.get('grocery') else None
+    bank = {'banks': request.form.get('banks')} if request.form.get('banks') else None
+    coffee = {'coffee': request.form.get('coffee')} if request.form.get('coffee') else None
 
-    try:
-        crud.batch_add_pl_crit(user, new_user_criteria)
+    chains = [grocery, bank, coffee]
+    print(chains)
 
-    except:
-        return jsonify({'success': False,
-                        'error': str(err)})
+    for chain in chains:
+        print(chain.keys())
+        if list(chain.values())[0]:
+            user.add_place_criterion(list(chain.keys())[0], 5, list(chain.values())[0])
+
+    #place types
+    leisure = request.form.get('leisure')
+    childcare = request.form.get('childcare')
+    education = request.form.get('education')
+
+    place_types = [leisure, childcare, education]
+
+    crud.batch_add_pl_crit(user, place_types)
+
+    return redirect(f'/profile/{username}')
+
+    
+
+    
+
 
 
 @app.route('/api/score_location', methods=['POST'])

@@ -129,8 +129,10 @@ def batch_add_pl_crit(user, place_types):
     """Given a user and a dictionary of with place_types as keys and
     specific business name as the value, create Place Crit objects and return
     a list"""
+    
+    print(place_types)
 
-    return [user.add_place_criterion(place, name) for place, name in place_types.items()]
+    return [user.add_place_criterion(place, 5) for place in place_types]
 
 
 def yelp(place_criterion, location, plcrit_name=None):

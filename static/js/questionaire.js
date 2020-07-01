@@ -1,41 +1,67 @@
 "use strict";
 
-
 //Given a list of items, put them into a dropdown list
-const createQLabel = (question, category) => {
+const createInputGrp = (category) => {
 
+    const div = document.createElement('div');
+    div.setAttribute('class', 'input-group-prepend');
     const label = document.createElement('label');
     label.setAttribute('for', category);
-    label.innerHTML = question
+    label.setAttribute('class', 'input-group-text');
+    label.innerHTML = category;
+    div.appendChild(label);
 
-    return label;
+    return div;
 };
 
-const createQInput = (category) => {
+const createSelect = (category, choices) => {
 
-    const input = document.createElement('input');
-    input.setAttribute('type','text');
-    input.setAttribute('id', category);
-    input.setAttribute('name', category);
-    input.setAttribute('list', `${category}-list`);
+    let select = document.createElement('select');
+    select.setAttribute('class', `custom-select ${category}`);
+    select.setAttribute('id', category);
+    select.setAttribute('name', category)
 
-    return input;
+    let defaultOption = document.createElement('option');
+    defaultOption.setAttribute('selected', true);
+    defaultOption.setAttribute('disabled', true);
+    defaultOption.innerHTML = "choose";
+    select.appendChild(defaultOption);
+
+    //Loop through placeTypes array and make each of those an option
+    for (const choice of choices) {
+        let option = document.createElement('option');
+        option.setAttribute('value', choice);
+        option.innerHTML = choice;
+        select.appendChild(option);
+    }
+
+    return select;
 };
 
-const createQDatalist = (category, choices) => {
+const createSelect2 = (category, options) => {
 
-    let datalist = document.createElement('datalist');
-        datalist.setAttribute('id', `${category}-list`);
+    console.log(options)
 
-        //Loop through placeTypes array and make each of those an option
-        for (const choice of choices) {
-            let option = document.createElement('option');
-            option.setAttribute('value', choice);
-            option.innerHTML = choice;
-            datalist.appendChild(option);
-        }
+    let select = document.createElement('select');
+    select.setAttribute('class', 'custom-select');
+    select.setAttribute('id', `${category}`);
+    select.setAttribute('name', category)
 
-    return datalist;
+    let defaultOption = document.createElement('option');
+    defaultOption.setAttribute('selected', true);
+    defaultOption.setAttribute('disabled', true);
+    defaultOption.innerHTML = "choose";
+    select.appendChild(defaultOption);
+
+    //Loop through placeTypes array and make each of those an option
+    for (const [display, value] of Object.entries(options)) {
+        let option = document.createElement('option');
+        option.setAttribute('value', value);
+        option.innerHTML = display;
+        select.appendChild(option);
+    }
+
+    return select;
 };
 
 
@@ -43,58 +69,54 @@ const createQForm = () => {
 
     //Create form element
     const form = document.createElement('form');
-    form.setAttribute("action", "/questionaire");
+    form.setAttribute("action", "/api/questionaire");
     form.setAttribute("method", "POST");
-    form.setAttribute("id", "q-form");
 
     for (const cat of CATEGORY_SET1) {
+
+        let typeName = cat['dbPlaceType'];
+        let theseChoices = (cat['options']).sort();
+
+        let div = document.createElement('div');
+        div.setAttribute('class', 'input-group mb-3');
+
+        div.appendChild(createInputGrp(typeName));
+        div.appendChild(createSelect(typeName, theseChoices));
         
-        let typeName = Object.keys(cat)[1];
-        let thisQ = cat['Q'];
-        let thisCat = typeName;
-        let theseChoices = (cat[typeName]).sort();
-        form.appendChild(createQLabel(thisQ, thisCat));
-        form.appendChild(createQInput(thisCat));
-        form.appendChild(createQDatalist(thisCat, theseChoices));
-        let br = document.createElement('br');
-        form.appendChild(br);
+        form.appendChild(div);
     }
 
     for (const cat of CATEGORY_SET2) {
 
-        let typeName = Object.keys(cat)[1];
+        let typeName = cat['label'];
         let thisQ = cat['Q'];
-        let thisCat = typeName;
-        let theseChoices = Object.keys((cat[typeName]));
-        form.appendChild(createQLabel(thisQ, thisCat));
-        form.appendChild(createQInput(thisCat));
-        form.appendChild(createQDatalist(thisCat, theseChoices));
+        let theseChoices = cat['options'];
+
+
+        let div = document.createElement('div');
+        div.setAttribute('class', 'input-group mb-3');
+
+        div.appendChild(createInputGrp(typeName));
+        div.appendChild(createSelect2(typeName, theseChoices));
+        
         let br = document.createElement('br');
-        form.appendChild(br);
+        form.appendChild(div);
     }
 
-    //Create 'save' and 'cancel' buttons
-    const saveBtn = createSaveBtn();
-    saveBtn.onsubmit = async (e) => {
-        e.preventDefault();
+    const submit = document.createElement('input');
+        submit.setAttribute('type', 'submit');
+        submit.setAttribute('class', 'btn btn-reg');
+        submit.setAttribute('value', 'submit');
 
-        let response = await fetch('/api/questionaire', {
-            method: 'POST',
-            body: new FormData(form)
-        });
-
-        let result = await response.json();
-
-        alert('Criteria changes saved!')
-    };
-    form.appendChild(saveBtn);
+    form.appendChild(submit);
 
     return form;
 }
 
+
 (function runQuestionaire() {
     
-    let q = document.querySelector('div#questionaire');
+    let q = document.getElementById('questionaire');
 
     q.appendChild(createQForm());
 

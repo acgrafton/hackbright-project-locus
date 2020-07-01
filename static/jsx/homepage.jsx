@@ -100,7 +100,7 @@ class RegisterForm extends React.Component {
     .then(data => {
       if (data['success'] === true) {
         alert('You have successfully signed up.')
-        this.setState({isRegistered: true, justRegistered: true})
+        // this.setState({isRegistered: true, justRegistered: true})
         this.props.onRegistered;
       } else {
         alert('Unable to create account. Please try again.')

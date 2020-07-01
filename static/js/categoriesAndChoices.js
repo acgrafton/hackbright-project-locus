@@ -41,7 +41,6 @@ const EDUCATION = {'Q': 'schools', 'label': 'education',
                  'options': {'Elementary Schools': 'elementaryschools', 
                             'Middle Schools and High Schools': 'highschools'}}; 
 
-const CATEGORY_SET1 = [GROCERY_STORES, BANKS, AMER_RESTAURANTS, ETHNIC_RESTAURANTS, 
-COFFEE, HMO];
+const CATEGORY_SET1 = [GROCERY_STORES, BANKS, COFFEE];
 
 const CATEGORY_SET2 = [ACTIVITIES, CHILDCARE, EDUCATION];

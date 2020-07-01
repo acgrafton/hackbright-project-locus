@@ -258,6 +258,9 @@ const logOut = () => {
 
 
 (function runUsers() {
+
+    const container = document.getElementById('container');
+
     const editUserBtn = document.querySelector('button#edit-user-btn.crud');
 
     editUserBtn.onclick = () => {

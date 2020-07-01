@@ -42,7 +42,7 @@ function initMap() {
         let place = autocomplete.getPlace();
         if (place.geometry) {
             map.panTo(place.geometry.location);
-            map.setZoom(16);
+            map.setZoom(12);
             
         } else {
             document.getElementById('autocomplete').placeholder = 'Add Location'

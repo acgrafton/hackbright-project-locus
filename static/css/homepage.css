@@ -1,7 +1,15 @@
-#homepage-carousel {
-    width: 100%;
+.carousel-inner {
+    height: 48vw;
+}
+
+.carousel-caption {
+    font-family: 'Martel Sans', sans-serif;
+    bottom: 30%
 }
 
 body {
     background-color: whitesmoke;
 }
+
+
+

@@ -34,13 +34,20 @@ const createSignUpForm = () => {
     
     form.appendChild(formGroup);
 
-    form.addEventListener('submit', (e) => {
+    div.appendChild(form);
+
+    return div;
+}
+
+const addSignUpListener = (btn) => {
+
+    btn.addEventListener('click', (e) => {
         console.log(e);
         e.preventDefault();
     
         let fetchData = {
             method: 'POST',
-            body: new FormData(form),
+            body: new FormData(btn.form),
         };
     
         fetch('/api/new_user', fetchData)
@@ -54,10 +61,6 @@ const createSignUpForm = () => {
             }
         });
     });
-
-    div.appendChild(form);
-
-    return div;
 }
 
 const createLogInForm = () => {
@@ -91,13 +94,20 @@ const createLogInForm = () => {
     }
     
     form.appendChild(formGroup);
-    
-    form.addEventListener('submit', (e) => {
+
+    div.appendChild(form);
+
+    return div
+}
+
+const addLogInListener = (btn) => {
+
+    btn.addEventListener('click', (e) => {
         e.preventDefault();
 
         let fetchData = {
             method: 'POST',
-            body: new FormData(form),
+            body: new FormData(btn.form),
         };
         
         fetch('/api/login', fetchData)
@@ -111,10 +121,6 @@ const createLogInForm = () => {
             }
         });
     })
-
-    div.appendChild(form);
-
-    return div
 }
 
 const createModalAccessBtn = () => {
@@ -134,11 +140,13 @@ const setHomeNavBarBtns = () => {
     const formLookUp = {'signup-btn': {'greeting': 'welcome to locus',
                                     'form': createSignUpForm,
                                     'formid': 'sign-up-form',
-                                    'name': 'sign up'},
+                                    'name': 'sign up',
+                                    'submit': addSignUpListener},
                         'login-btn': {'greeting': 'welcome back',
                                    'form': createLogInForm,
                                    'formid': 'login-form',
-                                    'name': 'log in'}}
+                                    'name': 'log in',
+                                    'submit': addLogInListener}}
 
     for (const id of Object.keys(formLookUp)) {
 
@@ -154,7 +162,8 @@ const setHomeNavBarBtns = () => {
             body.appendChild(form);
             const saveBtn = document.getElementById('modal-save');
             saveBtn.innerHTML = 'continue'
-            saveBtn.setAttribute('form',formLookUp[id]['formid']);
+            saveBtn.setAttribute('form',formLookUp[id]['formid'])
+            formLookUp[id]['submit'](saveBtn);
         });
 
         navform.appendChild(btn);

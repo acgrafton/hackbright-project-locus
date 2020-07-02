@@ -1,15 +1,19 @@
 {% extends 'base.html' %}
-{% block title %}What I need{% endblock %}
+
+{%block head %}
+<link rel="stylesheet" href="/static/css/questionaire.css"/>
+{% endblock %}
 
 {% block body %}
-
-<header><h1>get started</h1></header>
-<h3>set your preferences</h3>
-<h5>skip if you don't have one or if it doesn't apply</h5>
-<div class='container' id='questionaire'></div>
-
-
-
+<div class='container-fluid d-flex justify-content-center' id='questionaire'>
+    <div class='col-8'>
+        <div class='row' id='h1-row'>
+            <h1>get started</h1><br>
+        </div>
+        <div class='row'><h3>set your preferences</h3></div>
+        <div class='row' id='q-row'></div>
+    </div>
+</div>
 
 {% endblock body %}
 {% block js %}

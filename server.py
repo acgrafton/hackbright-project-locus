@@ -19,7 +19,12 @@ gmaps = googlemaps.Client(key=API_KEY)
 def show_homepage():
     """Show homepage if not logged in, otherwise redirect to profile page"""
 
-    return render_template("homepage.html")
+    if session['user']:
+        username = session['user']
+        return redirect(f'/profile/{username}')
+    
+    else:
+        return render_template("homepage.html")
 
 
 @app.route('/api/new_user', methods=['POST'])
@@ -54,7 +59,6 @@ def login_user():
 
     #Retrieve formdata
     username = request.form.get('username')
-    print(username)
     password = request.form.get('password')
 
     #Check email in database

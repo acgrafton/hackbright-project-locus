@@ -64,13 +64,6 @@ const createEditUserForm = () => {
     fs = document.createElement('fieldset');
     fs.setAttribute('id', 'edit-user');
 
-    //Create username field (non-editable)
-    span = document.createElement('span');
-    span.innerHTML = username;
-    fs.appendChild(span);
-    br1 = document.createElement('br');
-    fs.appendChild(br1);
-
     //Add hidden input elements containing user info prior to changes
     for (const userField in userInfo) {
         input = document.createElement('input');
@@ -96,16 +89,22 @@ const createEditUserForm = () => {
     };
 
     //Create 'save', 'cancel', and 'change password' buttons
+    const btnGrp = document.createElement('div');
+    btnGrp.setAttribute('class', 'btn-group');
+    btnGrp.setAttribute('role', 'group');
+    btnGrp.setAttribute('id', 'edit-user-bgrp');
     saveBtn = createSaveBtn();
     saveBtn.setAttribute('form', 'user-form');
     saveBtn.setAttribute('id', 'save-user-chg');
-    fs.appendChild(saveBtn);
+    btnGrp.appendChild(saveBtn);
 
     cancelBtn = createCancelBtn(cancelUserChgs);
-    fs.appendChild(cancelBtn);
+    btnGrp.appendChild(cancelBtn);
 
     pwdBtn = createPasswordBtn();
-    fs.appendChild(pwdBtn);
+    btnGrp.appendChild(pwdBtn);
+
+    fs.appendChild(btnGrp);
 
     //Append fieldset to form
     form.appendChild(fs);
@@ -149,28 +148,28 @@ const editUser = () => {
 };
 
 
-const showCLocAutoComplete = () => {
+// const showCLocAutoComplete = () => {
 
-    //Hide edit user buttons and existing details
-    document.querySelector('#edit-user').style.display = 'none';
-    document.querySelector('div.user-det').style.display = 'none';
+//     //Hide edit user buttons and existing details
+//     document.querySelector('#edit-user').style.display = 'none';
+//     document.querySelector('div.user-det').style.display = 'none';
 
-    //Get profile section
-    const section = document.querySelector('#profile');
+//     //Get profile section
+//     const section = document.querySelector('#profile');
 
-    //Create autocomplete and attach to profile section
-    const acdiv = document.createElement('div');
-    acdiv.setAttribute('id', 'autocomplete');
+//     //Create autocomplete and attach to profile section
+//     const acdiv = document.createElement('div');
+//     acdiv.setAttribute('id', 'autocomplete');
 
-    const autocomplete = new google.maps.places.Autocomplete(
-        acdiv, {
-        componentRestrictions: {'country': 'us'}
-        });
+//     const autocomplete = new google.maps.places.Autocomplete(
+//         acdiv, {
+//         componentRestrictions: {'country': 'us'}
+//         });
 
-    autocomplete.addEventListener('place_changed', saveCLocBtn);
+//     autocomplete.addEventListener('place_changed', saveCLocBtn);
 
-    section.appendChild(acdiv);
-};
+//     section.appendChild(acdiv);
+// };
 
 const saveCLocBtn = () => {
 
@@ -187,31 +186,31 @@ const saveCLocBtn = () => {
     return place
 };
 
-const saveCLoc = (place) => {
+// const saveCLoc = (place) => {
 
-    const data = {'address': place.formatted_address,
-                  'latitude': place.geometry.latitude,
-                  'longitude': place.geometry.longitude,
-                  'name': place.name};
+//     const data = {'address': place.formatted_address,
+//                   'latitude': place.geometry.latitude,
+//                   'longitude': place.geometry.longitude,
+//                   'name': place.name};
 
-    let fetchData = {
-        method:'POST',
-        body: JSON.stringify(data),
-        headers: {
-            'Content-Type': 'application/json'
-        },
-    };
+//     let fetchData = {
+//         method:'POST',
+//         body: JSON.stringify(data),
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//     };
 
-    fetch('/api/save_commute_loc', fetchData)
-    .then(response => response.json())
-    .then(response => {
-        if (data['success'] === true) {
-            document.reload();
-        } else {
-            alert(`Error: ${data['error']}`)
-        }
-    })
-};
+//     fetch('/api/save_commute_loc', fetchData)
+//     .then(response => response.json())
+//     .then(response => {
+//         if (data['success'] === true) {
+//             document.reload();
+//         } else {
+//             alert(`Error: ${data['error']}`)
+//         }
+//     })
+// };
 
 
 //Delete user from database and load homepage
@@ -236,25 +235,7 @@ const removeUser = () => {
 };
 
 
-const logOut = () => {
 
-    fetchData = {
-        method:'POST'
-    };
-
-    fetch('/api/logout', fetchData)
-    .then(response => response.json())
-    .then(data => {
-
-        if (data['success'] === true) {
-            alert('Goodbye!')
-            document.location.assign('/')
-        } else {
-            alert(`${data['error']}`);
-            document.location.reload();
-        }
-    })
-}
 
 
 (function runUsers() {
@@ -271,13 +252,17 @@ const logOut = () => {
     const removeUserBtn = document.querySelector('button#remove-user-btn.crud');
     removeUserBtn.onclick = removeUser;
 
-    const logOutBtn = document.querySelector('button#logout');
+    const navform = document.getElementById('nav-base');
+    const logOutBtn = createLogOutBtn()
+    navform.appendChild(logOutBtn)
     logOutBtn.onclick = logOut;
 
-    const addCommuteBtn = document.querySelector('button#add-commute-loc-btn');
-    addCommuteBtn.addEventListener('click', () => {
-        evt.preventDefault();
-        showCLocAutoComplete()});
+    // const addCommuteBtn = document.querySelector('button#add-commute-loc-btn');
+    // addCommuteBtn.addEventListener('click', () => {
+    //     evt.preventDefault();
+    //     showCLocAutoComplete()});
+
+    
 
 
 })();

@@ -34,9 +34,6 @@ function initMap() {
     const scoreBtn = document.querySelector('button#btn-score');
     scoreBtn.onclick = getScore;
 
-    const backBtn = document.querySelector('button#back');
-    backBtn.onclick = backToProfile;
-
     function onPlaceChanged() {
 
         let place = autocomplete.getPlace();
@@ -196,14 +193,21 @@ function clearResults() {
 }      
 
 
-
-
-const backToProfile = () => {
-    document.location.assign('/profile/<username>');
-}
-
-
 (function runLocationSearch() {
+
+    const navform = document.getElementById('nav-form');
+
+    const backBtn = document.createElement('button');
+    backBtn.setAttribute('type', 'button');
+    backBtn.setAttribute('class', 'btn btn-outline-info btn-sm');
+    backBtn.innerHTML = 'back'
+    backBtn.onclick = backToProfile;
+    navform.appendChild(backBtn);
+
+    
+    const logOutBtn = createLogOutBtn()
+    navform.appendChild(logOutBtn)
+    logOutBtn.onclick = logOut;
     
 })();
 

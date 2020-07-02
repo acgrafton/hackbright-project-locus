@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang='en'>
   <head>
-    <title> {% block title %}{% endblock %} </title>
+    <title> Locus </title>
         <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -9,17 +9,19 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
-    <script src="/static/js/buttons.js"></script>
+    <script src="/static/js/base.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Martel+Sans&family=Montserrat&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/base.css">
 
     {% block head %}{% endblock %}
   </head>
 <body>
-  <nav class="navbar navbar-light bg-light" id='nav-base'>
-    <a class="navbar-brand" href="#">Locus</a>
-    <form class="form-inline" id='nav-form'></form>
+  <header>
+  <nav class="navbar navbar-light flex-row-reverse" style="background-color: #13BF13;" id='nav-base'>
+    <a class="navbar-brand" href="/">Locus</a>
+    <form class="form-inline flex-row-reverse" id='nav-form'></form>
   </nav>
+  </header>
 
   <!-- Include the page's content with this block. -->
   {% block body %}

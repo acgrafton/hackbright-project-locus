@@ -1,43 +1,22 @@
 {% extends 'base.html' %}
 
-
 {%block head %}
-
-
 <link rel="stylesheet" href="/static/css/location.css"/>
 {% endblock %}
 
-
-{% block title %}Find and Add a Location{% endblock %}
-
 {% block body %}
-  <header>
-    <nav>
-      <button id="log out">Log Out</button>
-      <button id="back">Back</button>
-    </nav>
-    </header> 
-    <main>
-      <div class="location-search">
-        <div id="find-location">
-        </div>
-
-        <div id="locationField">
+  <div class='container-fluid'>
+    <div class="row location-search">
+      <div id="locationField">
         <input id="autocomplete" placeholder="Enter a location" type="text" />
-        <button class="btn btn-score" type='button' id='btn-score'>Score this Location</button>
+        <button class="btn btn-dark" type='button' id='btn-score'>get locus score</button>
       </div>
     </div>
-
-      <section class="map">
-        <div id="map"></div>
-      </section>
-
-      <section id="results"></section>
-    </main>
-
-
-
-
+    <section class="map">
+      <div id="map"></div>
+    </section>
+    <section id="results"></section>
+  </div>
 {% endblock body %}
 
 {% block js %}

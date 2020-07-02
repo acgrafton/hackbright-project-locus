@@ -2,7 +2,8 @@
 
 const createCancelBtn = (cancelFunction) => {
     const btn = document.createElement('button');
-    btn.setAttribute('class', 'cancel');
+    btn.setAttribute('type', 'button');
+    btn.setAttribute('class', 'btn btn-outline-info btn-sm cancel');
     btn.addEventListener('click', (evt) => {
         evt.preventDefault();
         cancelFunction();
@@ -24,6 +25,7 @@ const addMoreButton = () => {
 const createSaveBtn = () => {
     let btn = document.createElement('button');
     btn.setAttribute('type', 'submit');
+    btn.setAttribute('class', 'btn btn-outline-success btn-sm')
     btn.innerHTML = 'Save';
     return btn;
 }
@@ -31,6 +33,8 @@ const createSaveBtn = () => {
 const createPasswordBtn = () => {
     let btn = document.createElement('button');
     btn.setAttribute('id', 'change-password');
+    btn.setAttribute('type', 'button');
+    btn.setAttribute('class', 'btn btn-outline-dark btn-sm')
     btn.addEventListener('click', (evt)=>{
         evt.preventDefault();
         hideUserForm();
@@ -51,7 +55,51 @@ const createAddButton = (addFunction) => {
     return btn
 }
 
+const logOut = () => {
 
-(function runButtons() {
+    fetchData = {
+        method:'POST'
+    };
+
+    fetch('/api/logout', fetchData)
+    .then(response => response.json())
+    .then(data => {
+
+        if (data['success'] === true) {
+            alert('Goodbye!')
+            document.location.assign('/')
+        } else {
+            alert(`${data['error']}`);
+            document.location.reload();
+        }
+    })
+}
+
+const createLogOutBtn = () => {
+    const btn = document.createElement('button');
+    btn.setAttribute('type', 'button');
+    btn.setAttribute('class', 'btn btn-outline-secondary btn-sm');
+    btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        logOut();
+    })
+    btn.innerHTML = 'log out';
+    return btn;
+}
+
+const createCard = () => {
+    const card = document.createElement('div')
+    card.setAttribute('class', 'card')
+    const header = document.createElement('div')
+    header.setAttribute('class', 'card-header h-50')
+    card.appendChild(header)
+    return card
+}
+
+const backToProfile = () => {
+    document.location.assign('/');
+}
+
+(function runBase() {
 
 })();

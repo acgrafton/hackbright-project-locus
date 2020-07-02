@@ -36,9 +36,6 @@ def create_user(email, username, first_name, last_name, password):
     db.session.add(new_user)
     db.session.commit()
 
-    #Automatically add these criteria as core criteria
-    new_user.add_place_criterion('banks', 5)
-
     return new_user
 
 

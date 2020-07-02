@@ -1,0 +1,51 @@
+body {
+    background-image: url("/static/images/leaves.png");
+}
+
+.edit {
+    width: 7.5rem;
+    vertical-align: middle;
+    color: #4226BF;
+    border: #4226BF;
+}
+
+.container-fluid {
+    margin-top: 1rem
+}
+
+#view-crit-row {
+    padding-top: .5rem;
+}
+
+#add-crit #add-loc {
+    width: 14rem;
+}
+
+
+#place-type-row {
+    margin-top: 1rem;
+}
+
+.nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
+    color: whitesmoke;
+    background-color: #BF5400;
+    border-color: #dee2e6 #dee2e6 #fff;
+}
+
+.nav {
+    background-color: #00F289
+}
+
+#add-loc-row {
+    margin-bottom: 1rem;
+}
+
+.loc-header {
+    background-color: #265CBF;
+    color: white
+}
+
+.crit-header {
+    background-color: #931DBF;
+    color: white
+}

@@ -1,15 +1,29 @@
-.carousel-inner {
-    height: 48vw;
+.carousel {
+    margin-bottom: 4rem;
 }
+/* .carousel-inner {
+    height: 48vw;
+} */
 
 .carousel-caption {
-    font-family: 'Martel Sans', sans-serif;
+    font-family: 'Montserrat', sans-serif;
     bottom: 30%
 }
+
+.carousel-item {
+    height: 40rem;
+}
+
+.carousel-item > img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    min-width: 100%;
+    height: 40rem;
+  }
 
 body {
     background-color: whitesmoke;
 }
-
 
 

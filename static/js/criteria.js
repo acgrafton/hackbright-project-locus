@@ -38,10 +38,6 @@ const showCategories = () => {
 
 const display_criteria = () => {
 
-    //Create unordered list element
-    const ul = document.createElement('ul');
-    ul.setAttribute('class', 'crit-det');
-
     //Make ajax call to get scored location info
     fetch('/api/criteria')
     .then(response => response.json())
@@ -58,48 +54,73 @@ const display_criteria = () => {
                           {'formal': `Preferred`, 'id': 'name', 'name': name},
                           {'formal': 'Importance', 'id': 'importance', 'name': importance},
                           ]; 
+            
+            const card = createCard()
+            // card.classList.add('flex-row')
+            card.classList.add('rounded')
+            const header = card.firstChild
+            header.innerHTML = attributes[0]['name'];
+            header.classList.add('crit-header')
 
-            for (attribute of attributes) {
+            //Create unordered list element
+            const ul = document.createElement('ul');
+            ul.setAttribute('class', 'list-group crit-det');
+                          
+            if (attributes[1]['name']) {
+                const li = document.createElement('li');
+                li.setAttribute('class', 'list-group-item flex-fill')
+                const span = document.createElement('span');
+                span.setAttribute('id', `${place_id}-${attributes[1]['id']}`);
+                span.innerHTML = attribute[1]['name'];
+                li.appendChild(span);
+                ul.appendChild(li);
+                card.appendChild(ul)
+            }
 
             const li = document.createElement('li');
-            li.innerHTML = `${attribute['formal']}:`;
+            li.setAttribute('class', 'list-group-item flex-fill')
+            li.innerHTML = `${attributes[2]['formal']}:`;
 
             const span = document.createElement('span');
-            span.setAttribute('id', `${place_id}-${attribute['id']}`);
-            span.innerHTML = attribute['name'];
+            span.setAttribute('id', `${place_id}-${attributes[2]['id']}`);
+            span.innerHTML = attributes[2]['name'];
             li.appendChild(span);
             ul.appendChild(li);
-            
-            };
+            card.appendChild(ul)
+
+            const btnGrp = document.createElement('div');
+            btnGrp.setAttribute('class', 'btn-group btn-group-sm mx-auto d-block');
+            btnGrp.setAttribute('role', 'group')
+            btnGrp.setAttribute('aria-label', 'criteria buttons')
 
             const editBtn = document.createElement('button');
-            editBtn.setAttribute('class', 'crud crit edit');
+            editBtn.setAttribute('type', 'button')
+            editBtn.setAttribute('class', 'btn btn-outline-secondary w-100 edit');
             editBtn.setAttribute('id', `edit-${place_id}`);
             editBtn.innerHTML = 'Edit';
-            ul.appendChild(editBtn);
             editBtn.addEventListener('click', (evt) => {
                 evt.preventDefault();
                 editForm = createEditCritFrm(evt.target);
-                document.querySelector('div#crit-card.card').appendChild(editForm);
+                document.getElementById('place-type-row').appendChild(editForm);
                 hideCriteriaDetails();
             });
 
             const removeBtn = document.createElement('button');
-            removeBtn.setAttribute('class', 'crud crit remove');
+            removeBtn.setAttribute('class', 'btn btn-outline-danger w-100 remove');
             removeBtn.setAttribute('id', `remove-${place_id}`);
             removeBtn.innerHTML = 'Remove';
             removeBtn.addEventListener('click', (evt) => {
                 evt.preventDefault();
                 removeCriteria(evt.target); 
             });
-            ul.appendChild(removeBtn);
-
-            ul.appendChild(document.createElement('br'));
-            ul.appendChild(document.createElement('br'));
-
-        document.getElementById('crit-card').appendChild(ul);
+        
+        btnGrp.appendChild(editBtn);
+        btnGrp.appendChild(removeBtn);
+        card.appendChild(btnGrp);
+        document.getElementById('criteria-card-deck').appendChild(card)
         }
     });
+    
 };
 
 
@@ -121,29 +142,31 @@ const createCategoryBtns = () => {
             label.innerHTML = 'Place Categories';
 
             //Create fieldset to contain the category buttons
-            const fdset = document.createElement('fieldset');
-            fdset.setAttribute('id', 'cat-fieldset');
-            fdset.setAttribute('name', 'categories');
+            const btnGrp = document.createElement('div');
+            btnGrp.classList.add('btn-group-md')
+            btnGrp.setAttribute('id', 'cat-btn-grp');
+            btnGrp.setAttribute('name', 'categories');
 
             //Loop through categories and create buttons with event listeners
             //for each
-            for (const category of data){
+            for (const category of data.sort()){
                 const btn = document.createElement('button');
-                btn.setAttribute('class', 'category');
+                btn.setAttribute('type', 'button')
+                btn.setAttribute('class', 'btn btn-info category');
                 btn.setAttribute('id', `${category}`);
                 btn.innerHTML = category;
 
                 //Add Event Listener for each category - when clicked create
                 //criteria form with a dropdown with subcategories
                 btn.addEventListener('click', (evt) => {
-                    fdset.setAttribute('disabled', true);
+                    btnGrp.setAttribute('disabled', true);
                     const clickedBtn = evt.target.innerText;
                     createCritFrm(clickedBtn);
                 });
-                fdset.append(btn);
+                btnGrp.append(btn);
 
-            document.querySelector('#crit-card').prepend(fdset);
-            document.querySelector('#crit-card').prepend(label);
+            document.getElementById('place-cat-row').prepend(btnGrp);
+            document.getElementById('place-cat-row').prepend(label);
             
             };
         });
@@ -153,7 +176,7 @@ const createCategoryBtns = () => {
 //Create a form for user to set place criteria and importance
 const createCritFrm = (selectedCategory) => {
 
-    category = document.querySelector('#cat-fieldset');
+    const row = document.querySelector('#place-type-row');
     
     //Create form element
     const form = document.createElement('form');
@@ -181,7 +204,6 @@ const createCritFrm = (selectedCategory) => {
         let datalist = document.createElement('datalist');
         datalist.setAttribute('id', 'place-types');
 
-
         //Loop through placeTypes array and make each of those an option
         for (placeType of placeTypes) {
             option = document.createElement('option');
@@ -202,7 +224,7 @@ const createCritFrm = (selectedCategory) => {
         form.appendChild(createSaveBtn());
         form.appendChild(createCancelBtn(cancelAddCrit));
 
-        category.after(form);
+        row.appendChild(form);
 
         return form;
     });
@@ -390,11 +412,11 @@ const removeCriteria = (clickedBtn) => {
     display_criteria();
 
     //Get Add Criteria button
-    const addCritBtn = document.querySelector('button#add-crit.crud');
+    const addCritBtn = document.querySelector('button#add-crit');
     
     //Attach event listener with callback function to create category buttons
     addCritBtn.addEventListener('click', (evt)=> {
-        document.querySelector('button#add-crit.crud').style.display = 'none';
+        document.querySelector('button#add-crit').style.display = 'none';
         createCategoryBtns();
     });
 

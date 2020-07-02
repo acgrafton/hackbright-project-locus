@@ -31,10 +31,6 @@ const removeLocation = (clickedBtn) => {
 
 const displayLocations = () => {
 
-    //Create unordered list element
-    const ul = document.createElement('ul');
-    ul.setAttribute('class', 'loc-det');
-
     //Make ajax call to get scored location info
     fetch('/api/scored_locations')
     .then(response => response.json())
@@ -48,26 +44,39 @@ const displayLocations = () => {
 
             console.log(score_id, score, address)
 
-            const li = document.createElement('li');
-            li.innerHTML = `Address: ${address}`;
-            ul.appendChild(li);
+            const card = createCard()
+            card.classList.add('rounded')
             
-            const li2 = document.createElement('li');
-            li2.innerHTML = `Score: ${score}`;
-            ul.appendChild(li2);
+            const header = card.firstChild
+            header.classList.add('loc-header')
+            header.innerHTML = address;
+            
+            const body = document.createElement('div');
+            body.setAttribute('class','card-body');
+
+            const text = document.createElement('p')
+            text.setAttribute('class', 'card-text')
+            text.innerHTML = `Score: ${score}`;
+            body.appendChild(text)
+            card.appendChild(body)
+
+            const btnGrp = document.createElement('div');
+            btnGrp.setAttribute('class', 'btn-group btn-group-sm mx-auto d-block');
+            btnGrp.setAttribute('role', 'group')
+            btnGrp.setAttribute('aria-label', 'location buttons')
 
             const btn = document.createElement('button');
-            btn.setAttribute('class', 'crud loc remove');
+            btn.setAttribute('class', 'btn btn-outline-danger w-100 remove');
             btn.setAttribute('id', `remove-${score_id}`);
             btn.innerHTML = 'Remove';
             btn.addEventListener('click', (evt) => {
                 evt.preventDefault();
                 removeLocation(evt.target);
                 });
-            ul.appendChild(btn);
+            btnGrp.appendChild(btn);
+            body.appendChild(btnGrp);
 
-
-            document.getElementById('loc-card').appendChild(ul);
+            document.getElementById('loc-card-deck').appendChild(card);
         }
     });
 };
@@ -85,8 +94,10 @@ const addLocation = () => {
 
     //Attach event listener to "Add" location button
     //Callback function create form to add location
-    const addLocBtn = document.querySelector('button#add-loc.crud');
+    const addLocBtn = document.querySelector('button#add-loc');
     addLocBtn.onclick = addLocation;
+
+    
 
     
 })();

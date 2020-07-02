@@ -116,9 +116,22 @@ const createQForm = () => {
 
 (function runQuestionaire() {
     
-    let q = document.getElementById('questionaire');
+    let q = document.getElementById('q-row');
 
     q.appendChild(createQForm());
+
+    const skipBtn = document.createElement('button');
+    skipBtn.setAttribute('type', 'button');
+    skipBtn.setAttribute('class', 'btn btn-outline-info btn-sm');
+    skipBtn.innerHTML = 'skip';
+    skipBtn.onclick = backToProfile;
+
+    const navform = document.getElementById('nav-form');
+    navform.appendChild(skipBtn)
+
+    const logOutBtn = createLogOutBtn()
+    navform.appendChild(logOutBtn)
+    logOutBtn.onclick = logOut;
 
 })();
 

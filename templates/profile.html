@@ -1,48 +1,73 @@
 {% extends 'base.html' %}
-{% block title %}Your Profile{% endblock %}
+{% block title %}My Locus{% endblock %}
+{% block head %} 
+<link rel="stylesheet" href="/static/css/mylocus.css"> 
+{% endblock %}
 
 {% block body %}
 <header>
     
 </header>
-
-  <section id="profile">
-    <h3><span id="username">{{user.username}}</span>
-      
-    </h3>
-    <div class='card' id='user-card'>
-      <div class='card-body user-det'>
-        <p class='card-text'>first name: <span id="fname">{{user.first_name}}</span></p>
-        <p class='card-text'>last name: <span id="lname">{{user.last_name}}</span> </p>
-{#         <li>commute location: <span id="cloc">{{user.commute_locations[0].address}}</span></li> #}
-        <p class='card-text'>email: <span id="email">{{user.email}}</span></p>
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+  <li class="nav-item" role="presentation">
+    <a class="nav-link active" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="true">profile</a>
+  </li>
+  <li class="nav-item" role="presentation">
+    <a class="nav-link" id="criteria-tab" data-toggle="tab" href="#criteria" role="tab" aria-controls="criteria" aria-selected="false">criteria</a>
+  </li>
+  <li class="nav-item" role="presentation">
+    <a class="nav-link" id="savedLocation-tab" data-toggle="tab" href="#savedLocations" role="tab" aria-controls="savedLocations" aria-selected="false">scored locations</a>
+  </li>
+</ul>
+<div class="tab-content" id="myTabContent">
+  <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+    <div class='container-fluid' id='profile-container'>
+      <div class='col-8' id="profile-col">
+        <h3><span id="username">{{user.username}}</span></h3>
+        <div class='card' id='user-card'>
+          <div class='card-body user-det'>
+            <p class='card-text'>first name: <span id="fname">{{user.first_name}}</span></p>
+            <p class='card-text'>last name: <span id="lname">{{user.last_name}}</span> </p>
+  {#         <li>commute location: <span id="cloc">{{user.commute_locations[0].address}}</span></li> #}
+            <p class='card-text'>email: <span id="email">{{user.email}}</span></p>
+          </div>
+          <div class='btn-group' role='group' id='edit-user'>
+            <button type='button' class='btn btn-outline-secondary crud btn-md edit'  id='edit-user-btn'>edit</button>
+            <button type='button' class='btn btn-outline-danger crud btn-md remove' id='remove-user-btn'>remove</button>
+            <!-- <button type='button' class='btn btn-info crud' id='add-commute-loc-btn'>Add Commute Location</button> -->
+          </div>
+        </div>
       </div>
-      <div class='btn-group' role='group' id='edit-user'>
-        <button type='button' class='btn btn-secondary crud'  id='edit-user-btn'>Edit User</button>
-        <button type='button' class='btn btn-secondary crud' id='remove-user-btn'>Remove User</button>
-        <button type='button' class='btn btn-secondary crud' id='add-commute-loc-btn'>Add Commute Location</button>
-        <button type='button' class='btn btn-secondary logout' value='Log Out' id='logout'>Log Out</button>
+    </div>
+  </div>
+
+  <div class="tab-pane fade" id="criteria" role="tabpanel" aria-labelledby="criteria-tab">
+    <div class='container-fluid' id='criteria-container'>
+      <div class='col-10'>
+        <div class='row' id='add-crit-btn-row'>
+          <button type='button' class="btn btn-outline-success btn-sm btn-block w-50" id='add-crit'>add</button>
+        </div>
+        <div class='row' id='place-cat-row'></div>
+        <div class='row' id='place-type-row'></div>
+        <div class='row' id='view-crit-row'>
+          <div class='card-deck' id="criteria-card-deck"></div>
+        </div>
       </div>
     </div>
-  </section>
-  <hr>
-  <section id="criteria">
-    <h3>Criteria 
-      <button class='crud' id='add-crit'>Add</button>
-    </h3>
-    <div class='card' id='crit-card'>
+  </div>
+  <div class="tab-pane fade" id="savedLocations" role="tabpanel" aria-labelledby="savedLocations">
+    <div class='container-fluid' id="location-container">
+      <div class='col-10' id='add-loc-col'>
+        <div class='row' id='add-loc-row'>
+          <button type='button' class="btn btn-outline-success btn-sm btn-block w-50" id='add-loc'>add</button>
+        </div>
+        <div class='row'>
+          <div class='card-deck' id='loc-card-deck'>
+        </div>
+      </div>
     </div>
-  </section>
-  <hr>
-  <section id="locations">
-    <h3>Scored Locations    
-      <button class='crud loc add' id='add-loc'>Add</button>
-    </h3>
-    <div class='card' id='loc-card'>
-
-
     </div>
-  </section>
+  </div>
 
   <script src="/static/js/user.js"></script>
   <script src="/static/js/criteria.js"></script>

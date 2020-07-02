@@ -54,7 +54,7 @@ const addSignUpListener = (btn) => {
         .then(response => response.json())
         .then(data => {
             if (data['success'] === true) {
-                alert('You have successfully signed up.')
+                // alert('You have successfully signed up.')
                 document.location.assign('/questionaire')
             } else {
                 alert('Unable to create account. Please try again')
@@ -114,7 +114,7 @@ const addLogInListener = (btn) => {
         .then(response => response.json())
         .then(data => {
             if (data['success'] === true) {
-                alert(`Welcome back ${data['first_name']}!`)
+                // alert(`Welcome back ${data['first_name']}!`)
                 document.location.assign(`/profile/${data['username']}`)
             } else {
                 alert(data['err'])
@@ -125,7 +125,7 @@ const addLogInListener = (btn) => {
 
 const createModalAccessBtn = () => {
     const btn = document.createElement('button')
-    btn.setAttribute('class', 'btn btn-primary')
+    btn.setAttribute('class', 'btn btn-nav')
     btn.setAttribute('type', 'button')
     btn.setAttribute('data-toggle', 'modal')
     btn.setAttribute('data-target', '#home-modal')

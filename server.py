@@ -318,8 +318,7 @@ def process_questionaire():
     print(chains)
 
     for chain in chains:
-        print(chain.keys())
-        if list(chain.values())[0]:
+        if chain is not None:
             user.add_place_criterion(list(chain.keys())[0], 5, list(chain.values())[0])
 
     #place types
@@ -327,9 +326,14 @@ def process_questionaire():
     childcare = request.form.get('childcare')
     education = request.form.get('education')
 
-    place_types = [leisure, childcare, education]
+    place_types = set([leisure, childcare, education])
+    print(place_types)
+
+    place_types.remove(None)
 
     crud.batch_add_pl_crit(user, place_types)
+
+    print(user.place_criteria)
 
     return redirect(f'/profile/{username}')
 

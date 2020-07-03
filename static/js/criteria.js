@@ -71,7 +71,7 @@ const display_criteria = () => {
                 li.setAttribute('class', 'list-group-item flex-fill')
                 const span = document.createElement('span');
                 span.setAttribute('id', `${place_id}-${attributes[1]['id']}`);
-                span.innerHTML = attribute[1]['name'];
+                span.innerHTML = attributes[1]['name'];
                 li.appendChild(span);
                 ul.appendChild(li);
                 card.appendChild(ul)

@@ -55,9 +55,10 @@ const addSignUpListener = (btn) => {
         .then(data => {
             if (data['success'] === true) {
                 // alert('You have successfully signed up.')
-                document.location.assign('/questionaire')
+                document.location.assign('/questionaire');
             } else {
-                alert('Unable to create account. Please try again')
+                // alert('You already have an account. Please log in');
+                document.location.reload(true);
             }
         });
     });

@@ -19,7 +19,7 @@ gmaps = googlemaps.Client(key=API_KEY)
 def show_homepage():
     """Show homepage if not logged in, otherwise redirect to profile page"""
 
-    if session['user']:
+    if session.get('user') is not None:
         username = session['user']
         return redirect(f'/profile/{username}')
     
@@ -41,7 +41,7 @@ def register_user():
     password = request.form.get('password')
 
     #Alert if email already exists
-    if crud.get_user(email):
+    if crud.get_user(username):
         return jsonify({'success': False})
     
     #Otherwise, create new user account, add to session, and redirect to profile
@@ -305,7 +305,9 @@ def process_questionaire():
     """Process questionaire by creating Place Criterion for user in database"""
 
     username = session['user']
+    print(username)
     user = crud.get_user(username)
+    print(user)
 
     #specific names
     grocery = {'grocery': request.form.get('grocery')} if request.form.get('grocery') else None

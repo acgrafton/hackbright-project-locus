@@ -16,10 +16,10 @@ YELP_TOKEN = os.environ['YELP_TOKEN']
 
 gmaps = googlemaps.Client(key=API_KEY)
 
-CATEGORIES = ['active', 'airports', 'arts', 'restaurants', 'grocery', 
-                 'homeandgarden', 'education', 'utilities', 'auto', 
+CATEGORIES = ['active', 'hotelstravel', 'arts', 'restaurants', 'grocery', 
+                 'homeandgarden', 'education', 'utilities', 
                  'localservices', 'financialservices', 'laundryservices',
-                 'petservices', 'beautysvc', 'parks', 'gym', 'publicservicesgovt',
+                 'petservices', 'beautysvc', 'gym', 'publicservicesgovt',
                  'religiousorgs', 'shopping', 'martialarts', 'food', 'health']
 
 CORE_CAT = ['banks', 'hospitals']

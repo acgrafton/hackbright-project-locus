@@ -255,7 +255,6 @@ const removeUser = () => {
     const navform = document.getElementById('nav-base');
     const logOutBtn = createLogOutBtn()
     navform.appendChild(logOutBtn)
-    logOutBtn.onclick = logOut;
 
     // const addCommuteBtn = document.querySelector('button#add-commute-loc-btn');
     // addCommuteBtn.addEventListener('click', () => {

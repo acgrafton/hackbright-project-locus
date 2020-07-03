@@ -196,6 +196,7 @@ const createCritFrm = (selectedCategory) => {
     fetch(`/api/place_types/${selectedCategory}`)
     .then(response => response.json())
     .then(data => {
+        console.log(data)
 
         //Array of place types in alpha order
         placeTypes = data[selectedCategory];

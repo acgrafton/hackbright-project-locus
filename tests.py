@@ -26,13 +26,15 @@ class FlaskTests(TestCase):
 
     def setUp(self):
 
-    self.client = app.test_client()
-    app.config(['TESTING']) = True
+      os.system('createdb testdb')
 
-    connect_to_db(app, "postgresql:///testdb")
+      self.client = app.test_client()
+      app.config(['TESTING']) = True
 
-    db.create_all()
-    example_data()
+      connect_to_db(app, "postgresql:///testdb")
+
+      db.create_all()
+      example_data()
 
     def tearDown(self):
 
@@ -66,18 +68,6 @@ class FlaskTests(TestCase):
       self.assertIn(b'Bubble Tea', result.data)
 
 
-    # def test_add_location(self):
-    #   """Test set_criteria route"""
-
-    #   data = {'address': '', 'point': ''}
-
-    #   result = self.client.post("/api/criteria",
-    #                             data=data,
-    #                             follows_redirects=True)
-
-    #   self.assertIn(b'', result.data)
-
-
     def test_logout(self):
       """Test login page with correct login."""
 
@@ -97,6 +87,8 @@ class FlaskTests(TestCase):
                                 follows_redirects=True)
 
       self.assertIn(b"Your account has been successfuly created.", result.data)
+
+    
 
 
 

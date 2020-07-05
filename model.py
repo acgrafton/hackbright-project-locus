@@ -10,11 +10,9 @@ import score_logic
 GOOGLE_TOKEN = os.environ['GOOGLE_TOKEN']
 YELP_TOKEN = os.environ['YELP_TOKEN']
 
-
 gmaps = googlemaps.Client(key=GOOGLE_TOKEN)
 
 db = SQLAlchemy()
-
 
 class User(db.Model):
     """A user."""
@@ -46,21 +44,6 @@ class User(db.Model):
 
         return {'username': self.username, 'email': self.email,
                 'first_name': self.first_name, 'last_name': self.last_name}
-
-
-    @staticmethod    
-    def create_loc(geocode):
-        """Given geocode dict (including point, lat, long, address)"""
-
-        location = Location(address=geocode['address'],
-                            latitude=geocode['point']['lat'],
-                            longitude=geocode['point']['lng'],
-                            )
-
-        db.session.add(location)
-        db.session.commit()
-
-        return location
 
 
     def add_place_criterion(self, place_type_id, importance, name=None):
@@ -383,6 +366,9 @@ def example_data():
 
     db.session.add_all([melissa, kevin, stephanie, bryan, gregory])
     db.session.commit()
+
+    melissa.add_place_criterion('grocery',5, 'Whole Foods')
+    melissa.add_place_criterion('airports', 3)
 
 
 def connect_to_db(flask_app, db_uri='postgresql:///locus', echo=False):

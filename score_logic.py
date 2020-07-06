@@ -7,11 +7,11 @@
 #affiliated with the user or 4 points if not.
 
 import os
-from model import (User, Location, PlaceType, PlaceCategory, Score, 
-                   LocPlCriterion, CommuteLocation, db, connect_to_db)
-
+from model import User, Location, PlaceType, PlaceCategory, Score, LocPlCriterion, CommuteLocation, db, connect_to_db
+from crud import create_loc
 import googlemaps
 import requests
+import pickle
 
 API_KEY = os.environ['GOOGLE_TOKEN']
 YELP_TOKEN = os.environ['YELP_TOKEN']
@@ -29,7 +29,7 @@ CATEGORIES = ['active', 'hotelstravel', 'arts', 'restaurants', 'grocery',
                  'petservices', 'beautysvc', 'gym', 'publicservicesgovt',
                  'religiousorgs', 'shopping', 'martialarts', 'food', 'health']
 
-CORE_CAT = ['banks', 'hospitals']
+CORE_CAT = ['banks', 'hospitals', 'grocery']
 
 
 def points_lookup(distance, table='general'):
@@ -90,8 +90,8 @@ def googleplnb(place_criterion, location, plcrit_name=None):
 
   return gmaps.places_nearby(location={'lat': location.latitude, 
                                         'lng': location.longitude},
-                              radius=16093,
                               keyword=keyword,
+                              rank_by='distance'
                               )
 
 def googledm(location, destination):
@@ -159,7 +159,7 @@ def use_google(crit):
 
 
 def evaluate(user, location):
-  """Given a user location, return a list of lpc objects with results"""
+  """Given a user instance and location instance, return a dictionary with the score and a list of lpc objects with results"""
 
   #Store points based on points scored against each criteria
   points = 0
@@ -171,64 +171,63 @@ def evaluate(user, location):
   #Increment points variable for each criteria and create a LPC object to
   #store results.
   for crit in user.place_criteria:
+    print('crit', crit)
 
-      locplcrit = get_lpc(location, crit)
+    locplcrit = get_lpc(location, crit)
 
-      pl_data = (googleplnb(crit, location, plcrit_name=crit.name) if use_google(crit) else yelp(crit, location))
+    pl_data = (googleplnb(crit, location, plcrit_name=crit.name) if use_google(crit) else yelp(crit, location))
 
-      api = 'google' if 'results' in pl_data.keys() else 'yelp'
+    api = 'google' if 'results' in pl_data.keys() else 'yelp'
 
-      results = pl_data['results'] if api == 'google' else pl_data['businesses']
+    results = pl_data['results'][:10] if api == 'google' else pl_data['businesses']
 
-      #If no results from targeted search with name, do a general search
-      if not results:
-          pl_data = (googleplnb(crit, location, plcrit_name=None)
-                      if api == 'google' else yelp(crit, location, plcrit_name=None))
+    #If no results from targeted search with name, do a general search
+    if not results:
+        pl_data = (googleplnb(crit, location, plcrit_name=None)
+                    if api == 'google' else yelp(crit, location, plcrit_name=None))
 
-          api = 'google' if 'results' in pl_data.keys() else 'yelp'
+        api = 'google' if 'results' in pl_data.keys() else 'yelp'
 
-          print('pl+data', pl_data)
-          print('api', api)
+        results = pl_data['results'][:10] if api == 'google' else pl_data['businesses']
 
-          results = pl_data['results'] if api == 'google' else pl_data['businesses']
+        #If still no results, create an lpc object and go to next criterion
+        if not results:
+            update_lpc_noresults(location, locplcrit, crit, 0).serialize()
+            continue
 
-          #If still no results, create an lpc object and go to next criterion
-          if not results:
-              print(crit, 'no results')
-              update_lpc_noresults(location, locplcrit, crit, 0).serialize()
-              continue
+    #Pull latlng of the closest match
+    closest_match = (results[0]['geometry']['location'] if api == 'google'
+                      else (results[0]['coordinates']['latitude'],
+                            results[0]['coordinates']['longitude']))
 
-      #Pull latlng of the closest match
-      closest_match = (results[0]['geometry']['location'] if api == 'google'
-                        else (results[0]['coordinates']['latitude'],
-                              results[0]['coordinates']['longitude']))
+    #Get the distance from the closest match
+    clm_dist = googledm(location, closest_match)['distance']['value']
+    print('clm_dist')
 
-      #Get the distance from the closest match
-      clm_dist = googledm(location, closest_match)['distance']['value']
+    #Using the distance as an argument, get the points
+    crit_pts = affl_points(clm_dist) if bool(crit.name) else gen_points(clm_dist)
+    print('crit_pts', crit_pts)
 
-      #Using the distance as an argument, get the points
-      crit_pts = affl_points(clm_dist) if bool(crit.name) else gen_points(clm_dist)
-      print(crit, 'crit_pts', crit_pts)
+    #Tally overall location points and factor in importance
+    points = ( points + (crit_pts + crit.importance) / 2) if crit_pts > 0 else points
+    print('points', points)
 
-      #Tally overall location points and factor in importance
-      points += ((crit_pts + crit.importance) / 2)
-      print(points)
+    #Pickle the search results for db storage
+    pickled_results = pickle.dumps(results)
 
-      #Pickle the search results for db storage
-      pickled_results = pickle.dumps(results)
-
-      #Update LPC with result and add to evaluated lpc set
-      if api == 'google':
-          evaluated_lpc.append(update_lpc_wresults(location, locplcrit, crit,
-                                                crit_pts, clm_dist,
-                                                gresults=pickled_results).serialize())
-      else:
-          evaluated_lpc.append(update_lpc_wresults(location, locplcrit, crit,
-                                                crit_pts, clm_dist,
-                                                yresults=pickled_results).serialize())
-  print('max points', user.max_points)
+    #Update LPC with result and add to evaluated lpc set
+    if api == 'google':
+        evaluated_lpc.append(update_lpc_wresults(location, locplcrit, crit,
+                                              crit_pts, clm_dist,
+                                              gresults=pickled_results).serialize())
+    else:
+        evaluated_lpc.append(update_lpc_wresults(location, locplcrit, crit,
+                                              crit_pts, clm_dist,
+                                              yresults=pickled_results).serialize())
   points = conv_index(points, user.max_points)
-  print('final points', points)
+  print('arg_points', points)
+  print('max', user.max_points)
+  print('final after conversion', points)
 
   return {'score': points, 'criteria': evaluated_lpc}
 
@@ -243,7 +242,7 @@ def score_location(user, geocode):
 
   #If no record for location exists, create a new one
   if location is None:
-      location = user.create_loc(geocode)
+      location = create_loc(geocode)
 
   #Get record from Score table
   score = scoreq.filter(Score.location_id == location.location_id,
@@ -267,6 +266,14 @@ def score_location(user, geocode):
 
   return evaluation
 
-  
+
+if __name__ == '__main__':
+    from server import app
+
+    # Call connect_to_db(app, echo=False) if your program output gets
+    # too annoying; this will tell SQLAlchemy not to print out every
+    # query it executes.
+
+    connect_to_db(app)
 
     

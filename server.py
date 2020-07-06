@@ -2,6 +2,7 @@ import os
 
 from flask import (Flask, render_template, request, flash, session, redirect, jsonify)
 from model import connect_to_db
+from score_logic import score_location
 import crud
 import googlemaps
 from jinja2 import StrictUndefined 
@@ -292,7 +293,6 @@ def remove_criteria():
         return jsonify({'success': False,
                         'error': str(err)})
 
-
 @app.route('/questionaire')
 def display_questionaire():
     """Display questionaire"""
@@ -337,11 +337,6 @@ def process_questionaire():
 
     return redirect(f'/profile/{username}')
 
-    
-
-    
-
-
 
 @app.route('/api/score_location', methods=['POST'])
 def get_searched_location_json():
@@ -354,7 +349,7 @@ def get_searched_location_json():
     user = crud.get_user(session['user'])
     
     #Get dictionary of score and criteria
-    return jsonify(crud.score_location(user, geocode))
+    return jsonify(score_location(user, geocode))
 
 
 @app.route('/search_location')

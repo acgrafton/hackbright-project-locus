@@ -13,40 +13,41 @@ model.db.create_all()
 pc = model.PlaceCategory.query
 session = model.db.session
 
-def seed_database():
-    with open('static/categories.json', 'r') as read_file:
-        data = json.load(read_file)
-        for category in data:
-            yparent = category['parents']
+with open('static/categories.json', 'r') as read_file:
+    data = json.load(read_file)
+    for category in data:
+        yparent = category['parents']
 
-            if yparent and not pc.filter_by(place_category_id=yparent[0]).first():
+        if yparent and not pc.filter_by(place_category_id=yparent[0]).first():
 
-                if yparent[0] in CATEGORIES:
-                    new_cat = model.PlaceCategory(place_category_id=yparent[0])
-                    session.add(new_cat)
-                    session.commit()
-                    place_type = model.PlaceType(place_type_id=category['alias'], 
-                                            title=category['title'],
-                                            place_category_id=yparent[0])
-            elif yparent:
+            if yparent[0] in CATEGORIES:
+                new_cat = model.PlaceCategory(place_category_id=yparent[0])
+                session.add(new_cat)
+                session.commit()
                 place_type = model.PlaceType(place_type_id=category['alias'], 
-                                        title=category['title'],
-                                        place_category_id=yparent[0])
+                                         title=category['title'],
+                                         place_category_id=yparent[0])
+        elif yparent:
+            place_type = model.PlaceType(place_type_id=category['alias'], 
+                                    title=category['title'],
+                                    place_category_id=yparent[0])
 
-            session.add(place_type)
-            session.commit()
+        session.add(place_type)
+        session.commit()
 
-    places = model.PlaceType.query.all()
+categories = model.PlaceCategory.query.all()
+places = model.PlaceType.query.all()
 
-    grocery = model.PlaceCategory(place_category_id='grocery')
-    session.add(grocery)
-    session.commit()
+grocery = model.PlaceCategory(place_category_id='grocery')
+session.add(grocery)
+session.commit()
 
-    grocery_stores = ['grocery','intlgrocery','ethicgrocery','farmersmarket', 'importedfood']
+grocery_stores = ['grocery','intlgrocery','ethicgrocery','farmersmarket', 'importedfood']
 
-    for place in places:
-        if place.place_type_id in grocery_stores:
-            place.place_category_id = 'grocery'
-            session.commit()
+for place in places:
+    if place.place_type_id in grocery_stores:
+        place.place_category_id = 'grocery'
+        session.commit()
 
 
+model.example_data()

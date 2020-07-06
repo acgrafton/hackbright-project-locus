@@ -5,7 +5,6 @@ from flask_sqlalchemy import SQLAlchemy
 import pickle
 import googlemaps
 import requests
-import score_logic
 
 GOOGLE_TOKEN = os.environ['GOOGLE_TOKEN']
 YELP_TOKEN = os.environ['YELP_TOKEN']
@@ -79,8 +78,13 @@ class User(db.Model):
         criterion = PlaceCriterion.query.filter(PlaceCriterion.place_type_id ==place_type_id,
                                    PlaceCriterion.user_id ==self.user_id).first()
 
+        lpc = LocPlCriterion.query.filter_by(LocPlCriterion.user == self, LocPlCriterion.place_criterion == criterion)
+
         db.session.delete(criterion)
+        db.session.delete(lpc)
         db.session.commit()
+
+        self.update_max_points()
 
 
     def update_max_points(self):

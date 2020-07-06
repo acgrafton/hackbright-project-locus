@@ -117,7 +117,7 @@ class TestApiCalls(TestCase):
 
   def test_googleplnb(self):
 
-    geocode_result = gmaps.geocode('60611')[0]
+    geocode_result = gmaps.geocode('512 McClurg Ct, Chicago IL')[0]
     geocode_formatted = {'address': geocode_result['formatted_address'],
                         'point': geocode_result['geometry']['location']}
 
@@ -125,6 +125,8 @@ class TestApiCalls(TestCase):
     mel = crud.get_user('mking')
     loc = crud.create_loc(geocode_formatted)
     crit = mel.place_criteria[0]
+
+    print(score_logic.googleplnb(crit, loc, 'Whole Foods')['results'][0])
 
     self.assertIn('Whole Foods Market', 
                   score_logic.googleplnb(crit, loc, 'Whole Foods')['results'][0]['name'])
@@ -209,9 +211,28 @@ class Scoring(TestCase):
     self.assertEqual(lpc.eval_points, 5)
     self.assertEqual(lpc.closest_dist, 9000)
 
-  
+  def test_use_google(self):
 
+    mel = crud.get_user('mking')
+    grocery = mel.place_criteria[0]
+    airport = mel.place_criteria[1]
 
+    self.assertTrue(score_logic.use_google(grocery))
+    self.assertFalse(score_logic.use_google(airport))
+
+  def test_evaluate(self):
+
+    geocode_result = gmaps.geocode('60611')[0]
+    geocode_formatted = {'address': geocode_result['formatted_address'],
+                        'point': geocode_result['geometry']['location']}
+
+    mel = crud.get_user('mking')
+    loc = crud.create_loc(geocode_formatted)
+
+    evaluation = score_logic.evaluate(mel, loc)
+
+    self.assertEqual(evaluation['score'], 62)
+    self.assertIn('criteria', evaluation)
 
   
 

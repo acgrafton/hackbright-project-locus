@@ -31,7 +31,7 @@ class FlaskTests(TestCase):
       self.client = app.test_client()
       app.config(['TESTING']) = True
 
-      connect_to_db(app, "postgresql:///testdb")
+      connect_to_db(app)
 
       db.create_all()
       example_data()

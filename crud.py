@@ -2,7 +2,6 @@
 
 import os
 import re
-import pickle
 import requests
 from model import (User, Location, PlaceType, PlaceCategory, Score, 
                    LocPlCriterion, CommuteLocation, db, connect_to_db)

@@ -47,5 +47,6 @@ body {
 
 .crit-header {
     background-color: #931DBF;
-    color: white
+    color: white;
+    text-align: center;
 }

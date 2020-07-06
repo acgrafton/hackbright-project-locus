@@ -50,6 +50,7 @@ function getScore() {
 
     clearMarkers();
     clearResults();
+    clearLocusScore();
 
     let place = autocomplete.getPlace();
 
@@ -69,6 +70,9 @@ function getScore() {
 
             const criteria = data.criteria; //list of criteria objects
             const score = data.score; //location's total score based on weighted avg
+
+            let locationField = document.getElementById('locationField')
+            locationField.appendChild(addLocusScoreCard(score))
             
             for (const criterion of criteria) {
 
@@ -190,7 +194,27 @@ function clearResults() {
     while (results.childNodes[0]) {
       results.removeChild(results.childNodes[0]);
     }
-}      
+}
+
+function addLocusScoreCard(score) {
+    let card  = document.createElement('div');
+    card.setAttribute('class', 'card');
+    card.setAttribute('id', 'locus-score-card');
+    const body = document.createElement('div');
+    body.setAttribute('class', 'card-body');
+    body.setAttribute('id', 'locus-score');
+    body.innerHTML = `locus score: ${score}`;
+    card.appendChild(body);
+    return card
+}
+
+function clearLocusScore() {
+    let locationField = document.getElementById('locationField')
+    let card = document.getElementById('locus-score-card')
+    if (card) {
+        locationField.removeChild(card)
+    }
+}
 
 
 (function runLocationSearch() {

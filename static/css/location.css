@@ -55,3 +55,18 @@ nav a:hover, nav button:hover {
 .location-search {
   margin: 1rem 2rem;
 }
+
+#locus-score-card {
+  padding: .375rem .75rem; 
+  font-size: 1rem; 
+  text-align: center; 
+  vertical-align: middle;  
+  display: inline-block; 
+  border-radius: .25rem; 
+  margin-left: 1rem;
+  background-color: #13BF13;
+  color: white
+}
+.card-body {
+  padding: 0
+}

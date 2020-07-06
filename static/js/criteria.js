@@ -3,7 +3,7 @@
 
 //Helper functions to show and hide elements on page---------------------------
 const cancelCritChgs = () => {
-    let card = document.querySelector('div#crit-card.card');
+    let row = document.getElementById('place-cat-row');
     let form = document.querySelector('form#edit-crit-form');
     let label = document.querySelector('#cat-label')
     card.removeChild(form);
@@ -11,12 +11,12 @@ const cancelCritChgs = () => {
 };
 
 const cancelAddCrit = () => {
-    let card = document.querySelector('div#crit-card.card');
-    let form = document.querySelector('form#criteria-form');
-    card.removeChild(form);
-    showCriteriaDetails();
-    hideCategories();
-    document.querySelector('button#add-crit.crud').style.display = '';
+    let row = document.getElementById('place-cat-row');
+    row.removeChild(row.firstChild)
+    let row2 = document.getElementById('place-type-row');
+    row2.removeChild(row2.firstChild)
+
+    document.querySelector('button#add-crit').style.display = '';
 };
 
 const hideCriteriaDetails = () => {
@@ -45,8 +45,7 @@ const display_criteria = () => {
 
         console.log(data)
 
-        //Iterate through list of score dictionaries and create list elements
-        //to display address and score
+        //Iterate through criteria and put element into cards
         for (const {id, importance, name, 
                     place_id, place_title} of data) {
 
@@ -79,7 +78,7 @@ const display_criteria = () => {
 
             const li = document.createElement('li');
             li.setAttribute('class', 'list-group-item flex-fill')
-            li.innerHTML = `${attributes[2]['formal']}:`;
+            li.innerHTML = `${attributes[2]['formal']}: `;
 
             const span = document.createElement('span');
             span.setAttribute('id', `${place_id}-${attributes[2]['id']}`);
@@ -114,10 +113,14 @@ const display_criteria = () => {
                 removeCriteria(evt.target); 
             });
         
-        btnGrp.appendChild(editBtn);
-        btnGrp.appendChild(removeBtn);
-        card.appendChild(btnGrp);
-        document.getElementById('criteria-card-deck').appendChild(card)
+            btnGrp.appendChild(editBtn);
+            btnGrp.appendChild(removeBtn);
+            card.appendChild(btnGrp);
+            if (attributes[1]['name']) {
+                document.getElementById('criteria-card-deck-1').appendChild(card)
+            } else {
+                document.getElementById('criteria-card-deck-2').appendChild(card)
+            }
         }
     });
     
@@ -134,12 +137,6 @@ const createCategoryBtns = () => {
         .then(response => response.json())
         .then((data) => {
             console.log(data)
-
-            //Create label
-            const label = document.createElement('label');
-            label.setAttribute('for', 'categories');
-            label.setAttribute('id', 'cat-label')
-            label.innerHTML = 'Place Categories';
 
             //Create fieldset to contain the category buttons
             const btnGrp = document.createElement('div');
@@ -166,7 +163,6 @@ const createCategoryBtns = () => {
                 btnGrp.append(btn);
 
             document.getElementById('place-cat-row').prepend(btnGrp);
-            document.getElementById('place-cat-row').prepend(label);
             
             };
         });
@@ -406,7 +402,6 @@ const removeCriteria = (clickedBtn) => {
             }
         });
 }
-
 
 (function runCriteria() {
 

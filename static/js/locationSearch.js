@@ -6,7 +6,6 @@ var markers = [];
 var MARKER_PATH = 'https://developers.google.com/maps/documentation/javascript/images/marker_green';
 var hostnameRegexp = new RegExp('^https?://.+?/');
 
-
 function initMap() {
     
     const map = new google.maps.Map(
@@ -54,6 +53,20 @@ function getScore() {
 
     let place = autocomplete.getPlace();
 
+    var searchedIcon = {
+        url: "/static/images/home-run.svg",
+        scaledSize: new google.maps.Size(30, 30), // scaled size
+        origin: new google.maps.Point(0,0), // origin
+        anchor: new google.maps.Point(0, 0) // anchor
+    }
+
+    const searchedMarker = new google.maps.Marker({
+        position: place.geometry.location,
+        title: `place name: ${place.name}`,
+        map: map,
+        icon: searchedIcon
+    });
+
     let fetchData = {
         method: 'POST',
         body: JSON.stringify({'address': place.formatted_address,
@@ -75,6 +88,13 @@ function getScore() {
             locationField.appendChild(addLocusScoreCard(score))
             
             for (const criterion of criteria) {
+
+                var icon = {
+                    url: "/static/images/travel.svg",
+                    scaledSize: new google.maps.Size(30, 30), // scaled size
+                    origin: new google.maps.Point(0,0), // origin
+                    anchor: new google.maps.Point(0, 0) // anchor
+                }
 
                 const resultsSection = document.querySelector('section#results');
 
@@ -102,7 +122,8 @@ function getScore() {
                                 lng: place.geometry.location.lng
                             },
                             title: `place name: ${place.name}`,
-                            map: map
+                            map: map,
+                            icon: icon
                         });
                         if (count < 5) {
                             createPlaceSpans(critDiv, place);
@@ -128,7 +149,8 @@ function getScore() {
                                 lng: place.coordinates.longitude
                             },
                             title: `place name: ${place.name}`,
-                            map: map
+                            map: map,
+                            icon: icon
                         });
 
                         marker.addListener('click', () => {

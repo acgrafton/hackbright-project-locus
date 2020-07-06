@@ -367,7 +367,7 @@ def get_scored_locations_json():
     username = session['user']
     user = crud.get_user(username)
 
-    scored_locations = user.get_scores()
+    scored_locations = crud.get_scores(user)
 
     return jsonify(scored_locations)
 

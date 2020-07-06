@@ -145,7 +145,10 @@ def create_loc(geocode):
 
     return location
 
+def get_scores(user):
+    """Return a list of score dictionaries"""
 
+    return [score.serialize() for score in user.scores]
 
 
 if __name__ == '__main__':

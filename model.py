@@ -132,11 +132,6 @@ class User(db.Model):
         self.password = password
         db.session.commit()
 
-    def get_scores(self):
-        """Return a list of score dictionaries"""
-
-        return [score.serialize() for score in self.scores]
-
     def get_place_criteria(self):
         """Return a list of criteria dictionaries"""
 
@@ -323,11 +318,17 @@ class Score(db.Model):
     def __repr__(self):
         return f'<Score score_id={self.score_id}, score={self.score}>'
 
+    def get_lpc(self):
+        """Return a dictionary of criteria type and criteria score"""
+
+        return {lpc.place_criterion.place_type_id: lpc.serialize() 
+                for lpc in self.location.location_place_criteria}
+
     def serialize(self):
         """Return dictionary of core attributes"""
 
         return {'score_id': self.score_id, 'score': self.score, 
-                'address': self.location.address}
+                'address': self.location.address, 'criteria': self.get_lpc()}
 
 
 def example_data():

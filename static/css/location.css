@@ -70,3 +70,11 @@ nav a:hover, nav button:hover {
 .card-body {
   padding: 0
 }
+
+#autocomplete {
+  margin: .75rem 1rem;
+}
+
+.pac-container, .pac-item {
+  width: inherit !important;
+}

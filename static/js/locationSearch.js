@@ -96,10 +96,10 @@ function getScore() {
                     anchor: new google.maps.Point(0, 0) // anchor
                 }
 
-                const resultsSection = document.querySelector('section#results');
+                // const resultsSection = document.querySelector('section#results');
 
-                const critDiv = createCritDiv(criterion);
-                resultsSection.appendChild(critDiv);
+                // const critDiv = createCritDiv(criterion);
+                // resultsSection.appendChild(critDiv);
 
                 let count = 0;
 

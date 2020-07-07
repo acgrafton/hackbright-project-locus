@@ -45,7 +45,7 @@ const displayLocations = () => {
             console.log(score_id, score, address, criteria)
 
             const col = document.createElement('div');
-            col.setAttribute('class', 'col mb-4')
+            col.setAttribute('class', 'col mx-2 my-4')
 
             const card = createCard()
             card.classList.add('rounded')
@@ -62,7 +62,7 @@ const displayLocations = () => {
             header.appendChild(scorep)
             
             const body = document.createElement('div');
-            body.setAttribute('class','card-body');
+            body.setAttribute('class','card-body p-1');
             card.appendChild(body)
 
             const ul = document.createElement('ul')

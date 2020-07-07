@@ -53,6 +53,9 @@ const display_criteria = () => {
                           {'formal': `Preferred`, 'id': 'name', 'name': name},
                           {'formal': 'Importance', 'id': 'importance', 'name': importance},
                           ]; 
+
+            const col = document.createElement('div');
+            col.setAttribute('class', 'col mb-4')
             
             const card = createCard()
             // card.classList.add('flex-row')
@@ -116,11 +119,9 @@ const display_criteria = () => {
             btnGrp.appendChild(editBtn);
             btnGrp.appendChild(removeBtn);
             card.appendChild(btnGrp);
-            if (attributes[1]['name']) {
-                document.getElementById('criteria-card-deck-1').appendChild(card)
-            } else {
-                document.getElementById('criteria-card-deck-2').appendChild(card)
-            }
+            col.appendChild(card);
+
+            document.getElementById('criteria-card-deck').appendChild(col)
         }
     });
     

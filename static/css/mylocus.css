@@ -42,11 +42,17 @@ body {
 
 .loc-header {
     background-color: #265CBF;
-    color: white
+    color: white;
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
 
 .crit-header {
     background-color: #931DBF;
     color: white;
     text-align: center;
+}
+
+.loc-crit {
+    padding: None;
 }

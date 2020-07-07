@@ -89,9 +89,9 @@ const createLogOutBtn = () => {
 
 const createCard = () => {
     const card = document.createElement('div')
-    card.setAttribute('class', 'card')
+    card.setAttribute('class', 'card text-center h-100')
     const header = document.createElement('div')
-    header.setAttribute('class', 'card-header h-50')
+    header.setAttribute('class', 'card-header h-40')
     card.appendChild(header)
     return card
 }

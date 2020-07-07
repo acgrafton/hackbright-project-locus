@@ -40,25 +40,40 @@ const displayLocations = () => {
 
         //Iterate through list of score dictionaries and create list elements
         //to display address and score
-        for (const {score_id, score, address} of data) {
+        for (const {score_id, score, address, criteria} of data) {
 
-            console.log(score_id, score, address)
+            console.log(score_id, score, address, criteria)
+
+            const col = document.createElement('div');
+            col.setAttribute('class', 'col mb-4')
 
             const card = createCard()
             card.classList.add('rounded')
             
             const header = card.firstChild
             header.classList.add('loc-header')
-            header.innerHTML = address;
+
+            let addressH5 = document.createElement('h6')
+            addressH5.innerHTML = address
+            header.appendChild(addressH5)
+
+            let scorep = document.createElement('p')
+            scorep.innerHTML = `score: ${score}`
+            header.appendChild(scorep)
             
             const body = document.createElement('div');
             body.setAttribute('class','card-body');
-
-            const text = document.createElement('p')
-            text.setAttribute('class', 'card-text')
-            text.innerHTML = `Score: ${score}`;
-            body.appendChild(text)
             card.appendChild(body)
+
+            const ul = document.createElement('ul')
+            ul.setAttribute('class', 'list-group list-group-flush')
+            for (const crit in criteria) {
+                let li = document.createElement('li')
+                li.setAttribute('class', 'list-group-item')
+                li.innerHTML = `${crit}: ${criteria[crit]['gresults'] ? criteria[crit]['gresults'][0]['name']: criteria[crit]['yresults'] ? criteria[crit]['yresults'][0]['name']: 'no matches'}`
+                ul.appendChild(li);
+            }
+            body.appendChild(ul)
 
             const btnGrp = document.createElement('div');
             btnGrp.setAttribute('class', 'btn-group btn-group-sm mx-auto d-block');
@@ -76,7 +91,9 @@ const displayLocations = () => {
             btnGrp.appendChild(btn);
             body.appendChild(btnGrp);
 
-            document.getElementById('loc-card-deck').appendChild(card);
+            col.appendChild(card)
+
+            document.getElementById('loc-card-deck').appendChild(col);
         }
     });
 };

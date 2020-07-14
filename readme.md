@@ -26,17 +26,27 @@ Angela has always had an interest in coding deriving from her work as a Revenue 
 #### Homepage - User Registration / Login / Get Started Questionaire
 User registration and login is managed server-side using Flask. After registration, user is redirected to a questionaire with common criteria to get started.
 
-![alt text](https://github.com/acgrafton/locus/static/img/homepage.png "Locus Homepage")
+![alt text](https://github.com/acgrafton/hackbright-project-locus/static/images/homepage.png "Locus Homepage")
+
+![alt text](https://github.com/acgrafton/hackbright-project-locus/static/images/get_started.png "Get Started")
 
 
 #### User Mainpage - Manage User Info and Criteria / View Scored Locations
 User can make changes to their user info. 
 
+![alt text](https://github.com/acgrafton/hackbright-project-locus/static/images/user.png "User")
+
 Criteria tab: User can see a larger category menu and then some additional place types. Categories and Place Types from Yelp API. 
+
+![alt text](https://github.com/acgrafton/hackbright-project-locus/static/images/criteria.png "Criteria")
 
 Scored Locations tab: User can view and/or remove previously scored locations. Location cards show the name of the closest match for each criteria. Users can also click on Add Locations to get redirected Location Scoring page.
 
-#### Score Location
+![alt text](https://github.com/acgrafton/hackbright-project-locus/static/images/scored_loc.png "Scored Locations")
+
+#### Score a Location
 User can enter in location using the Google Autocomplete and see it on the Google Map. User can click on Score Location to see location matches of the User's criteria pinned on the map as well as the location score displayed.
+
+![alt text](https://github.com/acgrafton/hackbright-project-locus/static/images/add_location.png "Score a Location")
 
 

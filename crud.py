@@ -126,8 +126,6 @@ def batch_add_pl_crit(user, place_types):
     """Given a user and a dictionary of with place_types as keys and
     specific business name as the value, create Place Crit objects and return
     a list"""
-    
-    print(place_types)
 
     return [user.add_place_criterion(place, 5) for place in place_types]
 
@@ -149,6 +147,14 @@ def get_scores(user):
     """Return a list of score dictionaries"""
 
     return [score.serialize() for score in user.scores]
+
+def clear_nonetype_lpcs():
+
+    none_lpcs = LocPlCriterion.query.filter_by(plcriterion_id=None).all()
+
+    for lpc in none_lpcs:
+        db.session.delete(lpc)
+        db.session.commit()
 
 
 if __name__ == '__main__':

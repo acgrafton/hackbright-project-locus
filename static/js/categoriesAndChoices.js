@@ -15,9 +15,9 @@ const BANKS = {'Q': 'bank', 'dbPlaceType': 'banks', 'options': ['Huntington Nati
 'KeyBank', 'Citizens Bank', 'M&T Bank', 'Citibank', 'Capital One Bank',
 'Woodforest National Bank', 'Huntington Bank', 'Scotia Bank', 'Compass Bank']};
 
-const AMER_RESTAURANTS = {'Q': 'american restaurant category', 'dbPlaceType': 'restaurants',
-'options': ['Barbeque', 'Breakfast and Brunch', 'Burgers',
-'Buffets', 'Fast Food', 'Fish & Chips']};
+const RESTAURANTS = {'Q': 'restaurant', 'dbPlaceType': 'restaurant', 'options': ['LongHorn Steakhouse', 
+'Texas Roadhouse', 'Cracker Barrel', 'Olive Garden', 'Red Lobster', 'Outback Steakhouse', 'TGI Fridays', 
+'Applebee’s', 'Denny’s', 'Red Robin', 'Ruby Tuesday', 'Chili’s']};
 
 const ETHNIC_RESTAURANTS = {'Q': 'ethnic restaurant category', 'dbPlaceType': 'restaurants',
 'options': ['Asian Fusion', 'Chinese', 'Ethiopian', 'French', 'Italian',
@@ -39,7 +39,7 @@ const CHILDCARE = {'Q': 'childcare','label': 'childcare', 'options': {'Daycare':
 
 const EDUCATION = {'Q': 'schools', 'label': 'education',
                  'options': {'Elementary Schools': 'elementaryschools', 
-                            'Middle Schools and High Schools': 'highschools'}}; 
+                            'Middle Schools and High Schools': 'highschools'}};
 
 const CATEGORY_SET1 = [GROCERY_STORES, BANKS, COFFEE];
 

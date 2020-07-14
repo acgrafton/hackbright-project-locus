@@ -24,7 +24,7 @@
     <div class='container-fluid' id='profile-container'>
       <div class='col-8' id="profile-col">
         <h3><span id="username">{{user.username}}</span></h3>
-        <div class='card' id='user-card'>
+        <div class='card w-50' id='user-card'>
           <div class='card-body user-det'>
             <p class='card-text'>first name: <span id="fname">{{user.first_name}}</span></p>
             <p class='card-text'>last name: <span id="lname">{{user.last_name}}</span> </p>
@@ -48,7 +48,7 @@
           <button type='button' class="btn btn-outline-success btn-sm btn-block w-50" id='add-crit'>add</button>
         </div>
         <div class='row' id='place-cat-row'></div>
-        <div class='row' id='place-type-row'></div>
+        <div class='row mb-3' id='place-type-row'></div>
         <div class='row row-cols-1 row-cols-md-5' id="criteria-card-deck">
         </div>
         <!-- <div class='row' id='view-crit-row'>
@@ -64,7 +64,7 @@
           <button type='button' class="btn btn-outline-success btn-sm btn-block w-50" id='add-loc'>add</button>
         </div>
       </div>
-      <div class='row row-cols-1 row-cols-md-3' id='loc-card-deck'>
+      <div class='row row-cols-1 row-cols-md-5' id='loc-card-deck'>
       </div>
     </div>
   </div>

@@ -78,10 +78,13 @@ class User(db.Model):
         criterion = PlaceCriterion.query.filter(PlaceCriterion.place_type_id ==place_type_id,
                                    PlaceCriterion.user_id ==self.user_id).first()
 
-        lpc = LocPlCriterion.query.filter_by(LocPlCriterion.user == self, LocPlCriterion.place_criterion == criterion)
+        for score in self.scores :
+            for lpc in score.location.location_place_criteria:
+                if lpc.place_criterion == criterion:
+                    db.session.delete(lpc)
+                    db.session.commit()
 
         db.session.delete(criterion)
-        db.session.delete(lpc)
         db.session.commit()
 
         self.update_max_points()
@@ -155,7 +158,6 @@ class CommuteLocation(db.Model):
         return "".join((f'<CommuteLocation cloc_id={self.cloc_id}',
                         f'name {self.name}',
                         f'address {self.address}'))
-
 
 
 class Location(db.Model):
@@ -236,8 +238,6 @@ class PlaceCriterion(db.Model):
                 'name': self.name}
 
 
-        
-
 class LocPlCriterion(db.Model):
     """aka LPC"""
 
@@ -273,6 +273,25 @@ class LocPlCriterion(db.Model):
                 'name': self.place_criterion.name}
 
 
+class DistancePoints(db.Model):
+    """Return number of points based on place_type"""
+
+    __tablename__ = 'distance_points'
+
+    lpc_scoring_id = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
+    lpc_scoring_cat = db.Column(db.String, unique=True)
+    distance = db.Column(db.Integer)
+    points = db.Column(db.Integer)
+
+class PreferredLocPoints(db.Model):
+
+    __tablename = 'preferred_loc_points'
+
+    preferred_loc_pts_id = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
+    place_type_id = db.Column(db.String, db.ForeignKey('place_types.place_type_id'))
+    points = db.Column(db.Integer, default=1)
+
+
 class PlaceType(db.Model):
     """Place type such as grocery_store, restaurant, or DMV"""
 
@@ -301,7 +320,6 @@ class PlaceCategory(db.Model):
     #place_types = a list of place_types
 
 
-
 class Score(db.Model):
     """Score a location based user criteria"""
 
@@ -320,15 +338,16 @@ class Score(db.Model):
 
     def get_lpc(self):
         """Return a dictionary of criteria type and criteria score"""
-
-        return {lpc.place_criterion.place_type_id: lpc.serialize() 
-                for lpc in self.location.location_place_criteria}
+        
+        return ({lpc.place_criterion.place_type_id: lpc.serialize() 
+            for lpc in self.location.location_place_criteria})
 
     def serialize(self):
         """Return dictionary of core attributes"""
 
         return {'score_id': self.score_id, 'score': self.score, 
                 'address': self.location.address, 'criteria': self.get_lpc()}
+
 
 
 def example_data():

@@ -21,6 +21,7 @@ const removeLocation = (clickedBtn) => {
         .then(data => {
             if (data['success']) {
                 document.location.reload(true);
+                $('#savedLocations').tab('show')
             } else {
                 alert(data['error'])
             }
@@ -54,10 +55,12 @@ const displayLocations = () => {
             header.classList.add('loc-header')
 
             let addressH5 = document.createElement('h6')
+            addressH5.setAttribute('class', 'mt-1')
             addressH5.innerHTML = address
             header.appendChild(addressH5)
 
             let scorep = document.createElement('p')
+            scorep.setAttribute('class', 'mb-1')
             scorep.innerHTML = `score: ${score}`
             header.appendChild(scorep)
             
@@ -69,7 +72,7 @@ const displayLocations = () => {
             ul.setAttribute('class', 'list-group list-group-flush')
             for (const crit in criteria) {
                 let li = document.createElement('li')
-                li.setAttribute('class', 'list-group-item')
+                li.setAttribute('class', 'list-group-item p-1')
                 li.innerHTML = `${crit}: ${criteria[crit]['gresults'] ? criteria[crit]['gresults'][0]['name']: criteria[crit]['yresults'] ? criteria[crit]['yresults'][0]['name']: 'no matches'}`
                 ul.appendChild(li);
             }

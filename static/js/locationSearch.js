@@ -125,9 +125,9 @@ function getScore() {
                             map: map,
                             icon: icon
                         });
-                        if (count < 5) {
-                            createPlaceSpans(critDiv, place);
-                        }
+                        // if (count < 5) {
+                        //     createPlaceSpans(critDiv, place);
+                        // }
                         count += 1;
                     }
                 } else {
@@ -160,9 +160,9 @@ function getScore() {
                         });
                         console.log(count);
 
-                        if (count < 5) {
-                            createPlaceSpans(critDiv, place);
-                        }
+                        // if (count < 5) {
+                        //     createPlaceSpans(critDiv, place);
+                        // }
                         count += 1;
                     }
                 }

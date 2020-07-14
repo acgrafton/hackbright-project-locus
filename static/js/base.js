@@ -91,7 +91,7 @@ const createCard = () => {
     const card = document.createElement('div')
     card.setAttribute('class', 'card text-center h-100')
     const header = document.createElement('div')
-    header.setAttribute('class', 'card-header h-25 px-1')
+    header.setAttribute('class', 'card-header h-20 p-3')
     card.appendChild(header)
     return card
 }

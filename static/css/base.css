@@ -50,3 +50,11 @@ body {
 a {
   color: #2D5946
 }
+
+.col-form-label {
+  margin-left: 2rem;
+}
+
+.col-sm-10 {
+  padding-left: 40px
+}

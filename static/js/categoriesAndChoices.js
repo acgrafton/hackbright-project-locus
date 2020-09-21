@@ -28,8 +28,6 @@ const COFFEE = {'Q': 'coffee and tea', 'dbPlaceType': 'coffee', 'options': ['Sta
 'Peet\'s Coffee and Tea', 'The Coffee Bean & Tea Leaf', 
 'Dunn Bros Coffee', 'Tully\'s Coffee', 'PJ\'s Coffee of New Orleans']};
 
-const HMO = {'Q': 'HMO', 'dbPlaceType': 'hospitals', 'options': ['Kaiser Permanente', 'Sharp', 'GroupHealth']};
-
 const ACTIVITIES = {'Q': 'leisure activities','label': 'leisure', 'options': {'Air Travel': 'airports',
 'Beach': 'beaches','Hiking': 'hiking', 'Movie': 'movietheaters', 'Museums': 'museums',  
 'Nightlife': 'nightlife', 'Parks': 'parks', 'Shopping': 'shopping'}};
@@ -44,3 +42,7 @@ const EDUCATION = {'Q': 'schools', 'label': 'education',
 const CATEGORY_SET1 = [GROCERY_STORES, BANKS, COFFEE];
 
 const CATEGORY_SET2 = [ACTIVITIES, CHILDCARE, EDUCATION];
+
+const CATEGORIES = {'food': 'Food', 'health': 'Health', 'education': 'Education', 'financialservices': 'Financial Services',
+                    'gym': 'Gym', 'publicservicesgovt': 'Government', 'petservices': 'Pet Services',
+                    'religiousorgs': 'Religious', 'restaurants': 'Restaurants', 'shopping': 'Shopping'}

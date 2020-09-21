@@ -2,7 +2,7 @@ import os
 import score_logic
 import crud
 from server import app
-from model import db, connect_to_db, example_data, Location, User, LocPlCriterion
+from model import db, connect_to_db, User
 import model
 
 from unittest import TestCase
@@ -234,7 +234,6 @@ class Scoring(TestCase):
     self.assertEqual(evaluation['score'], 62)
     self.assertIn('criteria', evaluation)
 
-  
 
 if __name__ == '__main__':
   unittest.main()

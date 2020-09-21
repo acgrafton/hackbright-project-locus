@@ -215,11 +215,9 @@ const saveCLocBtn = () => {
 
 //Delete user from database and load homepage
 const removeUser = () => {
-
     fetchData = {
         method:'POST'
     };
-
     fetch('/api/remove_user', fetchData)
     .then(response => response.json())
     .then(data => {
@@ -229,7 +227,6 @@ const removeUser = () => {
         } else {
             alert(`${data['error']}`);
             document.location.reload();
-
         };
     });
 };

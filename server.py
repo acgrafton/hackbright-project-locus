@@ -2,7 +2,6 @@ import os
 
 from flask import (Flask, render_template, request, flash, session, redirect, jsonify)
 from model import connect_to_db
-from score_logic import score_location
 import crud
 import googlemaps
 from jinja2 import StrictUndefined 
@@ -19,11 +18,9 @@ gmaps = googlemaps.Client(key=API_KEY)
 @app.route('/')
 def show_homepage():
     """Show homepage if not logged in, otherwise redirect to profile page"""
-
     if session.get('user') is not None:
-        username = session['user']
-        return redirect(f'/profile/{username}')
-    
+        user = session['user']
+        return redirect(f'/profile/{user}')
     else:
         return render_template("homepage.html")
 
@@ -31,25 +28,17 @@ def show_homepage():
 @app.route('/api/new_user', methods=['POST'])
 def register_user():
     """Register new user."""
-
-    #Retrieve formdata
     email = request.form.get('email')
-    print(email)
-    username = request.form.get('username')
-    print(username)
     first_name = request.form.get('firstName')
     last_name = request.form.get('lastName')
     password = request.form.get('password')
-
-    #Alert if email already exists
-    if crud.get_user(username):
-        return jsonify({'success': False})
-    
-    #Otherwise, create new user account, add to session, and redirect to profile
+    #If user does not yet exist in database, create new user.  
+    if crud.get_user(email):
+        # return jsonify({'success': False})
+        return redirect(f'/profile/${email}')
     else:
-        print('hello') 
-        print(crud.create_user(email, username, first_name, last_name, password))
-        session['user'] = username
+        crud.create_user(email, first_name, last_name, password)
+        session['user'] = email
         session['logged_in'] = 'yes'
         return jsonify({'success': True})
 
@@ -57,85 +46,59 @@ def register_user():
 @app.route('/api/login', methods=['POST'])
 def login_user():
     """Provided correct email and password, log-in user"""
-
-    #Retrieve formdata
-    username = request.form.get('username')
+    email = request.form.get('email')
     password = request.form.get('password')
-
-    #Check email in database
-    if crud.get_user(username) is None:
-        return jsonify(({'success': False, 'err': "Invalid username"}))
-
-    #Check password match
-    elif crud.verify_password(username, password) is False:
-        return jsonify(({'success': False, 'err': "Incorrect password"}))
-
-    #Save user to session
+    if crud.get_user(email) is None or crud.verify_password(email, password) is False:
+        return jsonify(({'success': False, 'err': "Incorrect email or password"}))
     else: 
-        session['user'] = username
-        first_name = crud.get_user(username).first_name
+        session['user'] = email
+        first_name = crud.get_user_info(email)
         session['logged_in'] = 'yes'
-
-        return jsonify(({'success': True, 'first_name': first_name, 'username': session['user']}))
+        return jsonify(({'success': True, 'first_name': first_name, 'email': session['user']}))
 
 
 @app.route('/api/logout', methods=['POST'])
 def log_out_user():
     """Clear user out of session data"""
-
     try:
         session.pop('user', None)
         session['logged_in'] = 'no'
-
         return jsonify({'success': True})
-
     except Exception as err:
         return jsonify({'success': False,
                         'error': str(err)})
 
+# @app.route('/api/edit_user', methods=['POST'])
+# def save_user_changes():
+#     """Save user changes"""
+#     #Get form data
+#     first_name = request.form.get('edit-first-name')
+#     last_name = request.form.get('edit-last-name')
+#     email = request.form.get('edit-email')
+#     #Get email from session and get User object
+#     email = session['user']
+#     user = crud.get_user(email)
+#     #Track changes
+#     info_changed = False
 
-@app.route('/api/edit_user', methods=['POST'])
-def save_user_changes():
-    """Save user changes"""
+#     if user.first_name != first_name:
+#         user.update_first_name(first_name)
+#         info_changed = True
+#     if user.last_name != last_name:
+#         user.update_last_name(last_name)
+#         info_changed = True
+#     if user.email != email:
+#         user.update_email(email)
+#         info_changed = True
 
-    #Get form data
-    first_name = request.form.get('edit-first-name')
-    last_name = request.form.get('edit-last-name')
-    email = request.form.get('edit-email')
-
-    #Get usename from session and get User object
-    username = session['user']
-    user = crud.get_user(username)
-    
-    #Track changes
-    info_changed = False
-
-    if user.first_name != first_name:
-        user.update_first_name(first_name)
-        info_changed = True
-    if user.last_name != last_name:
-        user.update_last_name(last_name)
-        info_changed = True
-    if user.email != email:
-        user.update_email(email)
-        info_changed = True
-
-    if info_changed:
-        flash('Changes saved')
-    else:
-        flash('No change')
-
-    return redirect(f'/profile/{username}')
-
+#     return redirect(f'/profile/{email}')
 
 @app.route('/api/remove_user', methods=['POST'])
 def remove_user():
     """Remove a user"""
-
     try:
         crud.delete_user(session['user'])
         session.pop('user', None)
-
         return jsonify({'success': True})
 
     except Exception as err:
@@ -160,37 +123,13 @@ def save_password_changes():
 
     return redirect(f'/profile/{username}')
 
-@app.route('/api/add_commute_loc')
-def save_commute_location():
-    """Save commute location"""
 
-    data = request.json
-
-    username = session['user']
-    user = crud.get_user(username)
-
-    try:
-        user.add_commute_loc(address = data['address'],
-                            name = data['name'],
-                            latitude=data['latitude'],
-                            longitude=data['longitude'])
-
-        return jsonify({'success': True})
-
-    except Exception as err:
-        return jsonify({'success': False,
-                        'error': str(err)})
-
-
-@app.route('/profile/<username>')
-def show_profile(username):
+@app.route('/profile/<email>')
+def show_profile(email):
     """Render user profile page if logged in. Otherwise, redirect to homepage"""
-
-    if session.get('user') == username and session['logged_in'] == 'yes':
-        user = crud.get_user(username)
-        criteria = user.place_criteria #list of PlaceCriteria objects
-        scores = user.scores #list of Location object
-
+    if session.get('user') == email and session['logged_in'] == 'yes':
+        user = crud.get_user(email)
+        criteria, scores = user.get_criteria, user.get_scores()
         return render_template('profile.html', 
                                 user=user,
                                 criteria=criteria,
@@ -199,163 +138,60 @@ def show_profile(username):
     return redirect('/')
 
 
-@app.route('/api/place_categories')
-def get_place_categories_json():
-    """Return a JSON response with all place categories"""
-
-    categories = crud.get_place_categories()
-
-    list_categories = []
-
-    for category in categories:
-        list_categories.append(category.place_category_id)
-
-    return jsonify(list_categories)
-
-
-@app.route('/api/place_types/<selected_category>')
-def get_place_types_json(selected_category):
-    """Return a JSON response with all place types provided a selected category"""
-
-    place_type = crud.get_place_type_ids_by_category(selected_category)
-
-    return jsonify({selected_category: place_type})
-
-
-
-@app.route('/api/set_criteria', methods=['POST'])
-def save_user_criteria():
-    """Save users criteria into database"""
-
-    username = session['user']
-    user = crud.get_user(username)
-    selected_place_type = request.form.get('place-type')
-    selected_importance = request.form.get('importance')
-
-    place_type_id = crud.get_place_type_id_by_title(selected_place_type)
-
-    user.add_place_criterion(place_type_id, selected_importance)
-
-    flash('Criteria saved!')
-
-    return redirect(f'/profile/{username}')
-
-
-@app.route('/api/edit_criteria', methods=['POST'])
-def save_criteria_edits():
-    """Save users criteria into database"""
-
-    username = session['user']
-    user = crud.get_user(username)
-    selected_place_type = request.form.get('place-type')
-    selected_importance = request.form.get('importance')
-
-    place_type_id = crud.get_place_type_id_by_title(selected_place_type)
-
-    user.add_place_criterion(place_type_id, selected_importance)
-
-    return redirect(f'/profile/{username}')
-
-
 @app.route('/api/criteria')
-def get_criteria_json():
+def get_user_criteria():
     """Get json of criteria"""
-
-    username = session['user']
-    user = crud.get_user(username)
-
-    criteria = user.get_place_criteria()
-
-    print(criteria)
-
-    return jsonify(criteria)
+    email = session['user']
+    return jsonify(crud.get_criteria(email))
 
 
 @app.route('/api/remove_criteria', methods=['POST'])
 def remove_criteria():
     """Remove a criteria from a user"""
-
-    #Retrieve data in parsed JSON form
-    data = request.json
-
-    #Retrieve user
-    username = session['user']
-    user = crud.get_user(username)
-
+    crit_id = request.json['critId']
     try:
-        #Delete criteria from database using placeId to get criteria
-        user.del_place_crit(data['placeId'])
-
+        crud.del_criterion(crit_id)
         return jsonify({'success': True})
-
     except Exception as err:
-        
         return jsonify({'success': False,
                         'error': str(err)})
 
 @app.route('/questionaire')
 def display_questionaire():
     """Display questionaire"""
-
     return render_template('questionaire.html')
 
 
-@app.route('/api/questionaire', methods=['POST'])
-def process_questionaire():
-    """Process questionaire by creating Place Criterion for user in database"""
-
-    username = session['user']
-    print(username)
-    user = crud.get_user(username)
-    print(user)
-
-    #specific names
-    grocery = {'grocery': request.form.get('grocery')} if request.form.get('grocery') else None
-    bank = {'banks': request.form.get('banks')} if request.form.get('banks') else None
-    coffee = {'coffee': request.form.get('coffee')} if request.form.get('coffee') else None
-
-    chains = [grocery, bank, coffee]
-    print(chains)
-
-    for chain in chains:
-        if chain is not None:
-            user.add_place_criterion(list(chain.keys())[0], 5, list(chain.values())[0])
-
-    #place types
-    leisure = request.form.get('leisure')
-    childcare = request.form.get('childcare')
-    education = request.form.get('education')
-
-    place_types = set([leisure, childcare, education])
-    print(place_types)
-
-    place_types.remove(None)
-
-    crud.batch_add_pl_crit(user, place_types)
-
-    print(user.place_criteria)
-
-    return redirect(f'/profile/{username}')
+@app.route('/api/add_criteria', methods=['POST'])
+def add_criteria():
+    """Add one criteria to database."""
+    try:
+        email = session['user']
+        place_type = request.form.get('place-type')
+        DOW = request.form.get('DOW')
+        TOD = request.form.get('TOD') #time of day
+        mode = request.form.get('mode')
+        crud.add_criterion(email, place_type, DOW, TOD, mode)
+        return jsonify({'success': True})
+    except Exception as err:
+        return jsonify({'success': False,
+                        'error': str(err)})
 
 
 @app.route('/api/score_location', methods=['POST'])
 def get_searched_location_json():
     """Return criteria in JSON and score location"""
-
     #Geocode info from searched location
     geocode = request.json
-    
     #Retrieve user
-    user = crud.get_user(session['user'])
-    
+    email = session['user']
     #Get dictionary of score and criteria
-    return jsonify(score_location(user, geocode))
+    return jsonify(crud.score_location(email, geocode))
 
 
 @app.route('/search_location')
 def display_location_search():
     """Display location search page"""
-
     return render_template('location.html',
                             key=API_KEY)
 
@@ -363,34 +199,29 @@ def display_location_search():
 @app.route('/api/scored_locations')
 def get_scored_locations_json():
     """Get json of scored locations"""
-
-    username = session['user']
-    user = crud.get_user(username)
-
-    crud.clear_nonetype_lpcs()
-
-    scored_locations = crud.get_scores(user)
-
+    email = session['user']
+    scored_locations = crud.get_scores(email)
     return jsonify(scored_locations)
 
 
 @app.route('/api/remove_location', methods=['POST'])
 def remove_location():
     """Remove a user's score for a location"""
-
     #Retrieve data in parsed JSON form
     data = request.json
-
     score_id = data['scoreId']
-
     try:
         crud.del_score(score_id)
-
         return jsonify({'success': True})
-
     except Exception as err:
         return jsonify({'success': False,
                         'error': str(err)})
+
+
+@app.route('/api/get_place_types', methods=['GET'])
+def get_place_types():
+    return jsonify(crud.get_place_types())
+
 
 if __name__ == '__main__':
     connect_to_db(app)

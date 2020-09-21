@@ -2,11 +2,11 @@
 
 import os
 import re
-import requests
-from model import (User, Location, PlaceType, PlaceCategory, Score, 
-                   LocPlCriterion, CommuteLocation, db, connect_to_db)
+from model import (User, Criterion, PlaceType, Location, LocCrit, Score,
+                   db, connect_to_db)
 import googlemaps
 # from datetime import datetime
+from score_logic import yelp, get_matches, calcScore
 
 
 API_KEY = os.environ['GOOGLE_TOKEN']
@@ -14,147 +14,107 @@ YELP_TOKEN = os.environ['YELP_TOKEN']
 
 gmaps = googlemaps.Client(key=API_KEY)
 
-CATEGORIES = ['active', 'hotelstravel', 'arts', 'restaurants', 'grocery', 
-                 'homeandgarden', 'education', 'utilities', 'auto', 
-                 'localservices', 'financialservices', 'laundryservices',
-                 'petservices', 'beautysvc', 'gym', 'publicservicesgovt',
-                 'religiousorgs', 'shopping', 'martialarts', 'food', 'health']
+CATEGORIES = {'restaurants': 'Restaurants', 'education': 'Education', 'financialservices': 'Financial Services',
+              'petservices': 'Pet Services', 'gym': 'Gym', 'publicservicesgovt': 'Government',
+              'religiousorgs': 'Religious', 'shopping': 'Shopping', 'food': 'Food', 'health': 'Health'}
 
-CORE_CAT = ['banks', 'hospitals']
 
-def create_user(email, username, first_name, last_name, password):
+def create_user(email, first_name, last_name, password):
     """Create and return new user."""
 
-    new_user = User(email=email, 
-                    username=username,
-                    first_name=first_name, 
-                    last_name=last_name, 
-                    password=password,
-                    )
+    new_user = User(email=email, fname=first_name, lname=last_name, pw=password)
     db.session.add(new_user)
     db.session.commit()
-
     return new_user
 
+def get_user(email):
+    """Return user (object) given username or email"""
+    return User.query.get(email)
 
-def get_user(username_or_email):
-    """Return user given username or email"""
+def get_user_info(email):
+    return get_user(email).info()
 
-    if re.fullmatch(r"/(\w+)\@(\w+)\.(\w+)/", username_or_email):
-        return User.query.filter(User.email == username_or_email).first()
-
-    return User.query.filter(User.username == username_or_email).first()
-
-
-def delete_user(username):
+def delete_user(email):
     """Delete a user"""
-
-    user = get_user(username)
+    user = get_user(email)
     db.session.delete(user)
     db.session.commit()
 
 def modify_email(user, new_email):
     """Given user object and new_email, modify user's email attribute"""
+    user.set_email(new_email)
 
-    user.email = new_email
-
-    return user
-
-
-# def modify_password(user, new_password):
-#     """Given user object and new_email, modify user's password"""
-
-#     user.password = new_email
-
-#     return user.user_id
-      
+def modify_password(user, new_password):
+    """Given user object and new_email, modify user's password"""
+    user.set_pw(new_password)
 
 def verify_password(username, password):
     """Return boolean whether password given user provided email and password"""
-
     user = get_user(username)
-
-    return user.password == password
-
-
-def get_location_by_id(address):
-    """Get location by id"""
-
-    return Location.query.filter_by(address=address).first()
-
-
-def get_place_type_ids_by_category(category):
-    """Return a list of available place types"""
-
-    pcatq = PlaceCategory.query
-
-    place_types = pcatq.filter_by(place_category_id=category).first().place_types
-
-    list_place_type = []
-
-    for place_type in place_types:
-        list_place_type.append(place_type.title)
-
-    return list_place_type
-
-def get_place_categories():
-    """Return a limited list of place_categories"""
-
-    pcatq = PlaceCategory.query
-
-    return pcatq.filter(PlaceCategory.place_category_id.in_(CATEGORIES)).all()
-
-
-def get_place_type_id_by_title(place_type_title):
-    """Return place type id given the title"""
-
-    ptq = PlaceType.query
-
-    return ptq.filter(PlaceType.title == place_type_title).first().place_type_id
-
+    return user.get_pw() == password
 
 def del_score(score_id):
     """Delete a score object from a user"""
-  
     score = Score.query.get(score_id)
-
     db.session.delete(score)
     db.session.commit()
 
-
-def batch_add_pl_crit(user, place_types):
-    """Given a user and a dictionary of with place_types as keys and
-    specific business name as the value, create Place Crit objects and return
-    a list"""
-
-    return [user.add_place_criterion(place, 5) for place in place_types]
-
+def strLatLong(lat, lng):
+    return ",".join([str(lat), str(lng)])
 
 def create_loc(geocode):
     """Given geocode dict (including point, lat, long, address)"""
-
-    location = Location(address=geocode['address'],
-                        latitude=geocode['point']['lat'],
-                        longitude=geocode['point']['lng'],
+    latitude=geocode['point']['lat']
+    longitude=geocode['point']['lng']
+    location = Location(latlong=strLatLong(latitude, longitude),
+                        address=geocode['address'],
+                        latitude=latitude,
+                        longitude=longitude,
                         )
-
     db.session.add(location)
     db.session.commit()
-
     return location
 
-def get_scores(user):
+def get_loc(geocode):
+    lat = geocode['point']['lat']
+    lng = geocode['point']['lng']
+    latlong = strLatLong(lat, lng)
+    return Location.query.filter_by(latlong=latlong).first()
+
+def score_location(email, geocode):
+    loc = get_loc(geocode)
+    if loc is None:
+        loc = create_loc(geocode)
+    score = get_score(email, loc)
+    if score is not None:
+        db.session.delete(score)
+    new_score = calcScore(email, loc)
+    return new_score.info()
+
+def get_scores(email):
     """Return a list of score dictionaries"""
+    return [score.info() for score in get_user(email).scores]
 
-    return [score.serialize() for score in user.scores]
+def get_score(email, loc):
+    return Score.query.filter_by(latlong=loc.latlong, email=email).first()
 
-def clear_nonetype_lpcs():
+def get_place_types():
+    return sorted([place_type.info() for place_type in PlaceType.query.all()], key=lambda placetype: placetype['parent'])
 
-    none_lpcs = LocPlCriterion.query.filter_by(plcriterion_id=None).all()
+def add_criterion(email, place_type, dow, tod, mode):
+    if Criterion.query.filter_by(place_type_alias=place_type).first() is None:
+        new_crit = get_user(email).add_crit(place_type, dow, tod, mode)
+        return new_crit.info()
 
-    for lpc in none_lpcs:
-        db.session.delete(lpc)
-        db.session.commit()
+def get_criterion(crit_id):
+    return Criterion.query.get(crit_id)
+
+def get_criteria(email):
+    return get_user(email).get_criteria()
+
+def del_criterion(crit_id):
+    db.session.delete(get_criterion(crit_id))
+    db.session.commit()
 
 
 if __name__ == '__main__':

@@ -1,53 +1,49 @@
 import os
-import model, server
-from crud import CATEGORIES
-from random import randint, choice
+from server import app
+from model import db, connect_to_db, PlaceType
 import json
+import requests
+
 
 os.system('dropdb locus')
 os.system('createdb locus')
+connect_to_db(app)
+db.create_all()
 
-model.connect_to_db(server.app)
-model.db.create_all()
+YELP_TOKEN = os.environ['YELP_TOKEN']
 
-pc = model.PlaceCategory.query
-session = model.db.session
-
-with open('static/categories.json', 'r') as read_file:
-    data = json.load(read_file)
-    for category in data:
-        yparent = category['parents']
-
-        if yparent and not pc.filter_by(place_category_id=yparent[0]).first():
-
-            if yparent[0] in CATEGORIES:
-                new_cat = model.PlaceCategory(place_category_id=yparent[0])
-                session.add(new_cat)
-                session.commit()
-                place_type = model.PlaceType(place_type_id=category['alias'], 
-                                         title=category['title'],
-                                         place_category_id=yparent[0])
-        elif yparent:
-            place_type = model.PlaceType(place_type_id=category['alias'], 
-                                    title=category['title'],
-                                    place_category_id=yparent[0])
-
-        session.add(place_type)
-        session.commit()
-
-categories = model.PlaceCategory.query.all()
-places = model.PlaceType.query.all()
-
-grocery = model.PlaceCategory(place_category_id='grocery')
-session.add(grocery)
-session.commit()
-
-grocery_stores = ['grocery','intlgrocery','ethicgrocery','farmersmarket', 'importedfood']
-
-for place in places:
-    if place.place_type_id in grocery_stores:
-        place.place_category_id = 'grocery'
-        session.commit()
+CATEGORIES = {'restaurants': 'Restaurants', 'education': 'Education', 'financialservices': 'Financial Services',
+              'petservices': 'Pet Services', 'gym': 'Gym', 'publicservicesgovt': 'Government',
+              'religiousorgs': 'Religious', 'shopping': 'Shopping', 'food': 'Food', 'health': 'Health'}
 
 
-model.example_data()
+def populatePlaceTypes():
+    url = "https://api.yelp.com/v3/categories?locale=en_US"
+    payload = {}
+    headers = {
+    'Authorization': 'Bearer ' + YELP_TOKEN
+    }
+    response = requests.request("GET", url, headers=headers, data = payload).json()
+    categories = response['categories']
+
+    for cat in categories:
+        if cat['parent_aliases'] and cat['parent_aliases'][0] in CATEGORIES:
+            alias = cat['alias']
+            title = cat['title']
+            parent = None if not cat['parent_aliases'] else cat['parent_aliases'][0]
+            new_place_type = PlaceType(alias=alias, desc=title, parent=parent)
+            db.session.add(new_place_type)
+            db.session.commit()
+
+        elif cat['alias'] in CATEGORIES:
+            alias = cat['alias']
+            title = cat['title']
+            parent = cat['alias'] if not cat['parent_aliases'] else cat['parent_aliases'][0]
+            new_place_type = PlaceType(alias=alias, desc=title, parent=parent)
+            db.session.add(new_place_type)
+            db.session.commit()
+
+
+if __name__ == "__main__":
+    populatePlaceTypes()
+    print(PlaceType.query.all())

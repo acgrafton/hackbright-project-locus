@@ -5,9 +5,23 @@
 {% endblock %}
 
 {% block body %}
-<header>
-    
-</header>
+<header></header>
+<div class="modal" tabindex="-1" role="dialog" id='profile-modal'>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id='profile-modal-title'></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        </button>
+      </div>
+      <div class="modal-body" id='profile-modal-body'></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id='modal-save'></button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" id='modal-close'>close</button>
+      </div>
+    </div>
+  </div>
+</div>
 <ul class="nav nav-tabs" id="myTab" role="tablist">
   <li class="nav-item" role="presentation">
     <a class="nav-link active" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="true">profile</a>
@@ -23,12 +37,11 @@
   <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
     <div class='container-fluid' id='profile-container'>
       <div class='col-8' id="profile-col">
-        <h3><span id="username">{{user.username}}</span></h3>
+        <h3><span id="profile">profile</span></h3>
         <div class='card w-50' id='user-card'>
           <div class='card-body user-det'>
-            <p class='card-text'>first name: <span id="fname">{{user.first_name}}</span></p>
-            <p class='card-text'>last name: <span id="lname">{{user.last_name}}</span> </p>
-  {#         <li>commute location: <span id="cloc">{{user.commute_locations[0].address}}</span></li> #}
+            <p class='card-text'>first name: <span id="fname">{{user.fname}}</span></p>
+            <p class='card-text'>last name: <span id="lname">{{user.lname}}</span> </p>
             <p class='card-text'>email: <span id="email">{{user.email}}</span></p>
           </div>
           <div class='btn-group' role='group' id='edit-user'>
@@ -44,9 +57,7 @@
   <div class="tab-pane fade" id="criteria" role="tabpanel" aria-labelledby="criteria-tab">
     <div class='container-fluid' id='criteria-container'>
       <div class='col-10'>
-        <div class='row' id='add-crit-btn-row'>
-          <button type='button' class="btn btn-outline-success btn-sm btn-block w-50" id='add-crit'>add</button>
-        </div>
+        <div class='row' id='add-crit-btn-row'></div>
         <div class='row' id='place-cat-row'></div>
         <div class='row mb-3' id='place-type-row'></div>
         <div class='row row-cols-1 row-cols-md-5' id="criteria-card-deck">

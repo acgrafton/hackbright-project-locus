@@ -1,13 +1,10 @@
 //crud script for adding or removing locations
 
-//Display scored locations on profile page
+//display scored locations on profile page
 
 const removeLocation = (clickedBtn) => {
-    
     const scoreId = Number(clickedBtn.id.slice(7));
-
     const data = {'scoreId': scoreId};
-
     let fetchData = {
         method: 'POST',
         body: JSON.stringify(data),
@@ -15,7 +12,6 @@ const removeLocation = (clickedBtn) => {
             'Content-Type': 'application/json'
         },
     };
-
     fetch('/api/remove_location', fetchData)
         .then(response => response.json())
         .then(data => {
@@ -25,21 +21,20 @@ const removeLocation = (clickedBtn) => {
             } else {
                 alert(data['error'])
             }
-            
         });
 };
 
 
 const displayLocations = () => {
 
-    //Make ajax call to get scored location info
+    //make ajax call to get scored location info
     fetch('/api/scored_locations')
     .then(response => response.json())
     .then(data => {
 
         console.log(data)
 
-        //Iterate through list of score dictionaries and create list elements
+        //iterate through list of score dictionaries and create list elements
         //to display address and score
         for (const {score_id, score, address, criteria} of data) {
 
@@ -70,10 +65,12 @@ const displayLocations = () => {
 
             const ul = document.createElement('ul')
             ul.setAttribute('class', 'list-group list-group-flush')
-            for (const crit in criteria) {
+            for (const [crit, attr] of Object.entries(criteria)) {
+                console.log('crit', crit)
                 let li = document.createElement('li')
                 li.setAttribute('class', 'list-group-item p-1')
-                li.innerHTML = `${crit}: ${criteria[crit]['gresults'] ? criteria[crit]['gresults'][0]['name']: criteria[crit]['yresults'] ? criteria[crit]['yresults'][0]['name']: 'no matches'}`
+                li.innerHTML = `${attr['crit']}: ${attr['cl_match']}
+                                (${attr['match_time_str']} away)`
                 ul.appendChild(li);
             }
             body.appendChild(ul)
@@ -116,8 +113,5 @@ const addLocation = () => {
     //Callback function create form to add location
     const addLocBtn = document.querySelector('button#add-loc');
     addLocBtn.onclick = addLocation;
-
-    
-
     
 })();
